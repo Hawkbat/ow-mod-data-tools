@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1743211014, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
+  m_Name: Talked to Ernesto
+  m_EditorClassIdentifier: 
+  OverrideFullName: 
+  OverrideFullID: 
+  ID: 
+  Scope: 3
+  Mod: {fileID: 11400000, guid: afb62a04bf8d9614d85f86d38cde42e3, type: 2}
+  Dialogue: {fileID: 0}
+  Planet: {fileID: 0}
+  SolarSystem: {fileID: 11400000, guid: eb965e18d8f43b041a9e5b29edd0dc3f, type: 2}
+  Persistent: 1

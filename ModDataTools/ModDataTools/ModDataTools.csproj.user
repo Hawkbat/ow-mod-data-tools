@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <OutputPath>$(AppData)\OuterWildsModManager\OWML\Mods\Hawkbar.ModDataTools</OutputPath>
+    <UnityDllsDir>..\..\ModDataToolsUnityEditor\Assets\ModDataTools\Plugins</UnityDllsDir>
+  </PropertyGroup>
+</Project>

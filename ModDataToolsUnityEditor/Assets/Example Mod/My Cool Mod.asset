@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1414355776, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
+  m_Name: My Cool Mod
+  m_EditorClassIdentifier: 
+  OverrideFullName: 
+  OverrideFullID: 
+  ID: MyCoolMod
+  ExportMod: 1
+  ModExportPath: '%APPDATA%/OuterWildsModManager/OWML/Mods/'
+  OverrideJsonFile: {fileID: 0}
+  Author: Hawkbar
+  FileName: MyCoolMod.dll
+  Version: 0.1.0
+  OWMLVersion: 2.5.1
+  Patcher: 
+  Dependencies:
+  - Hawkbar.ModDataTools
+  - xen.NewHorizons
+  PriorityLoad: 0
+  MinGameVersion: 
+  MaxGameVersion: 
+  RequireLatestVersion: 0
+  IncompatibleVendors: 0
+  PathsToPreserve: []
+  Conflicts: []
+  Warning: 
+  AddonManifest:
+    ExportJsonFile: 1
+    OverrideJsonFile: {fileID: 0}
+    Icon: {fileID: 2800000, guid: d0a1989bfdb4ab747a28220eb5379ffa, type: 3}
+    Credits:
+    - Name: Hawkbar
+      Role: Cool Stuff
+    PopUpMessage: 

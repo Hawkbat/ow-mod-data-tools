@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModDataTools", "ModDataTools\ModDataTools.csproj", "{B6AE58EC-CF41-4490-9BA0-D8EF200F5128}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C5F3D5C3-3E25-45A2-A030-5DC2E89DC188}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModDataTools.Runtime", "ModDataTools.Runtime\ModDataTools.Runtime.csproj", "{678CD7F1-26E8-48C5-95A5-47662241E7E6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B6AE58EC-CF41-4490-9BA0-D8EF200F5128}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6AE58EC-CF41-4490-9BA0-D8EF200F5128}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6AE58EC-CF41-4490-9BA0-D8EF200F5128}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6AE58EC-CF41-4490-9BA0-D8EF200F5128}.Release|Any CPU.Build.0 = Release|Any CPU
+		{678CD7F1-26E8-48C5-95A5-47662241E7E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{678CD7F1-26E8-48C5-95A5-47662241E7E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{678CD7F1-26E8-48C5-95A5-47662241E7E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{678CD7F1-26E8-48C5-95A5-47662241E7E6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0EDD6A6C-C624-4E54-9747-78CE12C59255}
+	EndGlobalSection
+EndGlobal

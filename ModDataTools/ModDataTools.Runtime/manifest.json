@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/amazingalek/owml/master/schemas/manifest_schema.json",
+  "filename": "ModDataTools.Runtime.dll",
+  "author": "Hawkbar",
+  "name": "Mod Data Tools",
+  "uniqueName": "Hawkbar.ModDataTools",
+  "version": "0.1.0",
+  "owmlVersion": "2.5.1",
+  "dependencies": [ "xen.NewHorizons" ],
+  "priorityLoad": true
+}

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1116636309, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
+  m_Name: My Other Planet
+  m_EditorClassIdentifier: 
+  OverrideName: 
+  OverrideID: 
+  IDSuffix: 
+  SolarSystem: {fileID: 11400000, guid: 1e7c9313c5c74da49b71412e3eb68109, type: 2}
+  ChildIDPrefix: MOP
+  ExportConfigFile: 1
+  ConfigFile: {fileID: 0}
+  ExportShipLogFile: 1
+  ShipLogFile: {fileID: 0}
