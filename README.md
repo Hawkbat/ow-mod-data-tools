@@ -1,5 +1,7 @@
 # Mod Data Tools for Outer Wilds
 
+![banner](banner.png)
+
 This project aims to create an opinionated Unity-centric framework for defining and editing the various aspects of a large-scale Outer Wilds mod that uses [New Horizons](https://github.com/Outer-Wilds-New-Horizons/new-horizons): solar systems, planets, ship logs, dialogue trees, etc.
 
 It is not without its drawbacks, as it currently follows an all-or-nothing approach to mod structure, where you primarily work in a Unity project and export/generate your mod from there, instead of working directly with New Horizons' mod structure and config files. However, there are some significant benefits, such as a visual editing experience, edit-time validation of data, and the ability to reference data at runtime without relying on brittle transform paths or hard-coded IDs.
