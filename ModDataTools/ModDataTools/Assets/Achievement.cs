@@ -20,11 +20,11 @@ namespace ModDataTools.Assets
         [Tooltip("Should the name and description of the achievement be hidden until it is unlocked. Good for hiding spoilers!")]
         public bool Secret;
         [Tooltip("A list of facts that must be discovered before this achievement is unlocked.")]
-        public List<FactBase> Facts;
+        public List<FactBase> Facts = new();
         //[Tooltip("A list of signals that must be discovered before this achievement is unlocked.")]
-        //public List<Signal> Signals;
+        //public List<Signal> Signals = new();
         [Tooltip("A list of conditions that must be true before this achievement is unlocked. Conditions can be set via dialogue.")]
-        public List<Condition> Conditions;
+        public List<Condition> Conditions = new();
 
         public override IEnumerable<DataAsset> GetParentAssets()
         {
@@ -42,11 +42,11 @@ namespace ModDataTools.Assets
             writer.WriteStartObject();
             writer.WriteProperty("ID", GetFullID());
             writer.WriteProperty("secret", Secret);
-            if (Facts != null && Facts.Any())
+            if (Facts.Any())
                 writer.WriteProperty("factIDs", Facts.Select(f => f.GetFullID()));
-            //if (Signals != null && Signals.Any())
+            //if (Signals.Any())
             //    writer.WriteProperty("signalIDs", Signals.Select(s => s.GetID()));
-            if (Conditions != null && Conditions.Any())
+            if (Conditions.Any())
                 writer.WriteProperty("conditionIDs", Conditions.Select(c => c.GetFullID()));
             writer.WriteEndObject();
         }
@@ -57,7 +57,7 @@ namespace ModDataTools.Assets
             base.Validate(validator);
             if (!Icon)
                 validator.Warn(this, $"Missing {nameof(Icon)}");
-            if ((Facts == null || !Facts.Any()) && /* (Signals == null || !Signals.Any()) && */ (Conditions == null || !Conditions.Any()))
+            if (!Facts.Any() && /* !Signals.Any() && */ !Conditions.Any())
                 validator.Warn(this, $"No unlock criteria defined");
         }
     }

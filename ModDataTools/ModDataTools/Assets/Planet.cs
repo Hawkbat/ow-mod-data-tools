@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,11 +69,11 @@ namespace ModDataTools.Assets
             writer.WriteStartObject();
             writer.WriteProperty("$schema", "https://raw.githubusercontent.com/Outer-Wilds-New-Horizons/new-horizons/main/NewHorizons/Schemas/body_schema.json");
             writer.WriteProperty("name", GetFullID());
-            writer.WriteProperty("starSystem", SolarSystem.GetFullID());
+            writer.WriteProperty("starSystem", SolarSystem.GetFullName());
             writer.WritePropertyName("ShipLog");
             writer.WriteStartObject();
-            writer.WriteProperty("spriteFolder", "shiplogs/" + SolarSystem.GetFullID() + "/" + GetFullID() + "/sprites/");
-            writer.WriteProperty("xmlFile", "shiplogs/" + SolarSystem.GetFullID() + "/" + GetFullID() + ".xml");
+            writer.WriteProperty("spriteFolder", "shiplogs/" + SolarSystem.GetFullName() + "/" + GetFullName() + "/sprites/");
+            writer.WriteProperty("xmlFile", "shiplogs/" + SolarSystem.GetFullName() + "/" + GetFullName() + ".xml");
             writer.WriteEndObject();
             writer.WriteEndObject();
         }

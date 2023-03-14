@@ -24,7 +24,7 @@ namespace ModDataTools.Editors
                     EditorGUI.indentLevel++;
                     EditorGUILayout.LabelField("Dialogue Nodes");
                     EditorGUI.indentLevel++;
-                    if (dialogue.Nodes != null && dialogue.Nodes.Any())
+                    if (dialogue.Nodes.Any())
                     {
                         foreach (var node in dialogue.Nodes)
                         {

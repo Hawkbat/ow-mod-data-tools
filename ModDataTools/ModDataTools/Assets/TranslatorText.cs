@@ -23,11 +23,11 @@ namespace ModDataTools.Assets
         public TextAsset OverrideXmlFile;
         [Header("Data")]
         [Tooltip("Facts to reveal after translating text")]
-        public List<RevealFact> RevealFacts;
+        public List<RevealFact> RevealFacts = new();
         [Header("Children")]
         [Tooltip("The text blocks of this text object")]
         [HideInInspector]
-        public List<TranslatorTextBlock> TextBlocks;
+        public List<TranslatorTextBlock> TextBlocks = new();
 
         public override IEnumerable<DataAsset> GetParentAssets()
         {
@@ -39,7 +39,8 @@ namespace ModDataTools.Assets
         public override void Validate(IAssetValidator validator)
         {
             base.Validate(validator);
-            if (TextBlocks != null && TextBlocks.Any())
+            if (OverrideXmlFile) return;
+            if (TextBlocks.Any())
             {
                 foreach (TranslatorTextBlock block in TextBlocks)
                 {
@@ -48,11 +49,11 @@ namespace ModDataTools.Assets
                     block.Validate(validator);
                 }
             }
-            if (RevealFacts != null && RevealFacts.Any())
+            if (RevealFacts.Any())
             {
                 foreach (RevealFact reveal in RevealFacts)
                 {
-                    if (reveal.TextBlocks == null || reveal.TextBlocks.Count == 0)
+                    if (!reveal.TextBlocks.Any())
                         validator.Error(this, $"Translator text fact reveal has no linked text blocks");
                     else if (reveal.TextBlocks.Any(b => !b || !TextBlocks.Contains(b)))
                         validator.Error(this, $"Translator text fact reveal has invalid text block");

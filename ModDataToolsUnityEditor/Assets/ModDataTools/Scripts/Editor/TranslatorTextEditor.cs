@@ -24,7 +24,7 @@ namespace ModDataTools.Editors
                     EditorGUI.indentLevel++;
                     EditorGUILayout.LabelField("Text Blocks");
                     EditorGUI.indentLevel++;
-                    if (text.TextBlocks != null && text.TextBlocks.Any())
+                    if (text.TextBlocks.Any())
                     {
                         foreach (var block in text.TextBlocks)
                         {

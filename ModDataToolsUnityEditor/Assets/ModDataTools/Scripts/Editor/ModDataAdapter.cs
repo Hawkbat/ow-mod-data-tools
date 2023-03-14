@@ -64,5 +64,15 @@ namespace ModDataTools.Editors
             if (errors.ContainsKey(asset) && errors[asset].Any()) return false;
             return true;
         }
+
+        public string GetAssetBundle(UnityEngine.Object obj)
+        {
+            return AssetDatabase.GetImplicitAssetBundleName(GetAssetPath(obj));
+        }
+
+        public string GetAssetPath(UnityEngine.Object obj)
+        {
+            return AssetDatabase.GetAssetPath(obj);
+        }
     }
 }

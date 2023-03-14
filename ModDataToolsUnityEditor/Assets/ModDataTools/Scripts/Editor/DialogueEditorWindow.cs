@@ -48,7 +48,7 @@ namespace ModDataTools.Editors
             {
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 EditorGUILayout.ObjectField(node, typeof(Assets.DialogueNode), false);
-                if (node.Pages != null && node.Pages.Any())
+                if (node.Pages.Any())
                 {
                     var pageIndex = 0;
                     foreach (var page in node.Pages.ToList())
@@ -91,7 +91,7 @@ namespace ModDataTools.Editors
                     node.Pages.Add("");
                 }
                 EditorGUILayout.EndHorizontal();
-                if (node.Options == null || !node.Options.Any())
+                if (!node.Options.Any())
                 {
                     var nodeOptions = dialogue.Nodes.Select(n => n.GetFullName()).ToList();
                     nodeOptions.Insert(0, "(Exit Dialogue)");
@@ -105,51 +105,48 @@ namespace ModDataTools.Editors
                 }
                 if (!node.Target)
                 {
-                    if (node.Options != null && node.Options.Any())
+                    var optionIndex = 0;
+                    foreach (var option in node.Options.ToList())
                     {
-                        var optionIndex = 0;
-                        foreach (var option in node.Options.ToList())
+                        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                        EditorGUILayout.BeginHorizontal();
+                        string text = EditorGUILayout.DelayedTextField("Option", option.Text);
+                        if (text != option.Text)
                         {
-                            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-                            EditorGUILayout.BeginHorizontal();
-                            string text = EditorGUILayout.DelayedTextField("Option", option.Text);
-                            if (text != option.Text)
-                            {
-                                Undo.RecordObject(node, "Change option text");
-                                option.Text = text;
-                            }
-                            if (optionIndex > 0 && GUILayout.Button("↑", GUILayout.Width(25f)))
-                            {
-                                Undo.RecordObject(node, "Change option order");
-                                node.Options.RemoveAt(optionIndex);
-                                node.Options.Insert(optionIndex - 1, option);
-                                optionIndex--;
-                            }
-                            if (optionIndex < node.Options.Count - 1 && GUILayout.Button("↓", GUILayout.Width(25f)))
-                            {
-                                Undo.RecordObject(node, "Change option order");
-                                node.Options.RemoveAt(optionIndex);
-                                node.Options.Insert(optionIndex + 1, option);
-                                optionIndex--;
-                            }
-                            if (GUILayout.Button("X", GUILayout.Width(25f)))
-                            {
-                                Undo.RecordObject(node, "Remove option");
-                                node.Options.RemoveAt(optionIndex);
-                            }
-                            EditorGUILayout.EndHorizontal();
-                            var nodeOptions = dialogue.Nodes.Select(n => n.GetFullName()).ToList();
-                            nodeOptions.Insert(0, "(Exit Dialogue)");
-                            var currentIndex = option.Target ? dialogue.Nodes.IndexOf(option.Target) : -1;
-                            var targetIndex = EditorGUILayout.Popup("Target", currentIndex + 1, nodeOptions.ToArray()) - 1;
-                            if (targetIndex != currentIndex)
-                            {
-                                Undo.RecordObject(node, "Change option target");
-                                option.Target = targetIndex == -1 ? null : dialogue.Nodes[targetIndex];
-                            }
-                            EditorGUILayout.EndVertical();
-                            optionIndex++;
+                            Undo.RecordObject(node, "Change option text");
+                            option.Text = text;
                         }
+                        if (optionIndex > 0 && GUILayout.Button("↑", GUILayout.Width(25f)))
+                        {
+                            Undo.RecordObject(node, "Change option order");
+                            node.Options.RemoveAt(optionIndex);
+                            node.Options.Insert(optionIndex - 1, option);
+                            optionIndex--;
+                        }
+                        if (optionIndex < node.Options.Count - 1 && GUILayout.Button("↓", GUILayout.Width(25f)))
+                        {
+                            Undo.RecordObject(node, "Change option order");
+                            node.Options.RemoveAt(optionIndex);
+                            node.Options.Insert(optionIndex + 1, option);
+                            optionIndex--;
+                        }
+                        if (GUILayout.Button("X", GUILayout.Width(25f)))
+                        {
+                            Undo.RecordObject(node, "Remove option");
+                            node.Options.RemoveAt(optionIndex);
+                        }
+                        EditorGUILayout.EndHorizontal();
+                        var nodeOptions = dialogue.Nodes.Select(n => n.GetFullName()).ToList();
+                        nodeOptions.Insert(0, "(Exit Dialogue)");
+                        var currentIndex = option.Target ? dialogue.Nodes.IndexOf(option.Target) : -1;
+                        var targetIndex = EditorGUILayout.Popup("Target", currentIndex + 1, nodeOptions.ToArray()) - 1;
+                        if (targetIndex != currentIndex)
+                        {
+                            Undo.RecordObject(node, "Change option target");
+                            option.Target = targetIndex == -1 ? null : dialogue.Nodes[targetIndex];
+                        }
+                        EditorGUILayout.EndVertical();
+                        optionIndex++;
                     }
                     EditorGUILayout.BeginHorizontal();
                     if (GUILayout.Button("+ Add Option", GUILayout.ExpandWidth(false)))

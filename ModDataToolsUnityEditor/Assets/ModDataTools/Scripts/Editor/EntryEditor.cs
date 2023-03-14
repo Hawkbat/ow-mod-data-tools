@@ -27,7 +27,7 @@ namespace ModDataTools.Editors
                     EditorGUI.indentLevel++;
                     EditorGUILayout.LabelField("Explore Facts");
                     EditorGUI.indentLevel++;
-                    if (exploreFacts != null && exploreFacts.Any())
+                    if (exploreFacts.Any())
                     {
                         foreach (var fact in exploreFacts)
                         {
@@ -50,7 +50,7 @@ namespace ModDataTools.Editors
                     EditorGUI.indentLevel--;
                     EditorGUILayout.LabelField("Rumor Facts");
                     EditorGUI.indentLevel++;
-                    if (rumorFacts != null && rumorFacts.Any())
+                    if (rumorFacts.Any())
                     {
                         foreach (var fact in rumorFacts)
                         {

@@ -32,10 +32,10 @@ namespace ModDataTools.Assets
         [Header("Children")]
         [Tooltip("The rumor facts associated with this entry")]
         [HideInInspector]
-        public List<RumorFact> RumorFacts;
+        public List<RumorFact> RumorFacts = new();
         [Tooltip("The explore facts associated with this entry")]
         [HideInInspector]
-        public List<ExploreFact> ExploreFacts;
+        public List<ExploreFact> ExploreFacts = new();
 
         public Vector2 EditorPosition
         {

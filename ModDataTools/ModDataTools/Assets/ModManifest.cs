@@ -31,7 +31,7 @@ namespace ModDataTools.Assets
         [Tooltip("The path to the patcher to use")]
         public string Patcher;
         [Tooltip("The dependencies of the mod")]
-        public string[] Dependencies;
+        public List<string> Dependencies = new();
         [Tooltip("Whether or not to load the mod before other mods")]
         public bool PriorityLoad;
         [Tooltip("The minimum version of the game that this mod is compatible with")]
@@ -43,9 +43,9 @@ namespace ModDataTools.Assets
         [Tooltip("The vendors this mod does not work on")]
         public Vendors IncompatibleVendors;
         [Tooltip("The paths to preserve when updating the mod. Automatically includes config.json, manifest.json, and save.json")]
-        public string[] PathsToPreserve;
+        public List<string> PathsToPreserve = new();
         [Tooltip("The mods that this mod conflicts with")]
-        public string[] Conflicts;
+        public List<string> Conflicts = new();
         [Tooltip("The warning to display when starting the mod for the first time")]
         public string Warning;
         [Tooltip("The New Horizons addon manifest for this mod")]
@@ -126,7 +126,7 @@ namespace ModDataTools.Assets
             [Tooltip("The icon to display for this addon.")]
             public Texture2D Icon;
             [Tooltip("Credits info for this mod. A list of contributors and their roles.")]
-            public List<CreditsRow> Credits;
+            public List<CreditsRow> Credits = new();
             [Tooltip("A pop-up message for the first time a user runs the add-on.")]
             public string PopUpMessage;
 
@@ -135,9 +135,9 @@ namespace ModDataTools.Assets
                 writer.WriteStartObject();
                 writer.WriteProperty("$schema", "https://raw.githubusercontent.com/Outer-Wilds-New-Horizons/new-horizons/main/NewHorizons/Schemas/addon_manifest_schema.json");
                 var achievements = AssetRepository.GetAllAssets<Achievement>();
-                if (achievements != null && achievements.Any())
+                if (achievements.Any())
                     writer.WriteProperty("achievements", achievements);
-                if (Credits != null && Credits.Any())
+                if (Credits.Any())
                     writer.WriteProperty("credits", Credits.Select(c => $"{c.Name}#{c.Role}"));
                 if (!string.IsNullOrEmpty(PopUpMessage))
                     writer.WriteProperty("popupMessage", PopUpMessage);

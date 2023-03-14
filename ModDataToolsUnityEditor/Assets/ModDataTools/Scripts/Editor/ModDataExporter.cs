@@ -12,8 +12,6 @@ using System.Xml;
 using System.Text;
 using ModDataTools.Assets;
 using ModDataTools.Utilities;
-using Codice.Utils;
-using UnityEditor.VersionControl;
 
 namespace ModDataTools.Editors
 {
@@ -101,7 +99,7 @@ namespace ModDataTools.Editors
                 {
                     if (!adapter.Validate(dialogue)) continue;
                     if (!dialogue.ExportXmlFile) continue;
-                    WriteXmlAssetToMod(dialogue, dialogue.OverrideXmlFile, JoinPaths("dialogue/", dialogue.Planet.GetFullName(), dialogue.Planet.GetFullName(), dialogue.GetFullName() + ".xml"));
+                    WriteXmlAssetToMod(dialogue, dialogue.OverrideXmlFile, JoinPaths("dialogue/", dialogue.Planet.SolarSystem.GetFullName(), dialogue.Planet.GetFullName(), dialogue.GetFullName() + ".xml"));
                 }
 
                 var translatorTexts = adapter.LoadAssets<TranslatorText>().Where(a => a.GetMod() == modManifest);
@@ -109,7 +107,7 @@ namespace ModDataTools.Editors
                 {
                     if (!adapter.Validate(translatorText)) continue;
                     if (!translatorText.ExportXmlFile) continue;
-                    WriteXmlAssetToMod(translatorText, translatorText.OverrideXmlFile, JoinPaths("text/", translatorText.Planet.GetFullName(), translatorText.GetFullName() + ".xml"));
+                    WriteXmlAssetToMod(translatorText, translatorText.OverrideXmlFile, JoinPaths("text/", translatorText.Planet.SolarSystem.GetFullName(), translatorText.Planet.GetFullName(), translatorText.GetFullName() + ".xml"));
                 }
                 Log(LogLevel.Info, "Mod data exported.");
 
@@ -220,12 +218,6 @@ namespace ModDataTools.Editors
                 if (p.Contains("\\")) p = p.Replace('\\', Path.DirectorySeparatorChar);
                 return p;
             }));
-        }
-
-        private static T[] NullIfEmpty<T>(this T[] arr)
-        {
-            if (arr != null && arr.Length == 0) return null;
-            return arr;
         }
 
         static void Log(LogLevel level, string msg)

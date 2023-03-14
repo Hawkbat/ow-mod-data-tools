@@ -27,6 +27,8 @@ namespace ModDataTools.Assets
             if (TranslatorText) yield return TranslatorText;
         }
 
+        public override string GetIDPrefix() => string.Empty;
+
         public void ToXml(XmlWriter writer)
         {
             writer.WriteStartElement("TextBlock");

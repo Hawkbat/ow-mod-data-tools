@@ -21,5 +21,15 @@ namespace ModDataTools
 
         public IEnumerable<T> LoadAssets<T>() where T : DataAsset
             => FindObjectsOfType<T>();
+
+        public string GetAssetBundle(UnityEngine.Object obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetAssetPath(UnityEngine.Object obj)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -30,7 +30,7 @@ namespace ModDataTools.Assets
         [Header("Children")]
         [Tooltip("The flattened list of dialogue nodes")]
         [HideInInspector]
-        public List<DialogueNode> Nodes;
+        public List<DialogueNode> Nodes = new();
 
         public enum DialogueType
         {
@@ -50,16 +50,14 @@ namespace ModDataTools.Assets
         public override void Validate(IAssetValidator validator)
         {
             base.Validate(validator);
+            if (OverrideXmlFile) return;
             if (!DefaultNode)
                 validator.Error(this, $"Default node not set");
-            if (Nodes != null)
+            foreach (var node in Nodes)
             {
-                foreach (var node in Nodes)
-                {
-                    node.Validate(validator);
-                    if (node.Target && !Nodes.Any(n => n == node.Target))
-                        validator.Error(this, $"Node '{node.GetFullName()}' is targeting a non-existent node");
-                }
+                node.Validate(validator);
+                if (node.Target && !Nodes.Any(n => n == node.Target))
+                    validator.Error(this, $"Node '{node.GetFullName()}' is targeting a non-existent node");
             }
         }
 
@@ -75,11 +73,8 @@ namespace ModDataTools.Assets
                 writer.WriteElementString("NameField", CharacterName);
             else
                 writer.WriteElementString("NameField", GetFullName());
-            if (Nodes != null)
-            {
-                foreach (var node in Nodes)
-                    node.ToXml(writer);
-            }
+            foreach (var node in Nodes)
+                node.ToXml(writer);
             writer.WriteEndElement();
         }
         public string ToXmlString() => ExportUtility.ToXmlString(this);
