@@ -9,10 +9,10 @@ using UnityEngine;
 
 namespace ModDataTools.Assets
 {
-    public class RumorFact : FactBase
+    public class RumorFactAsset : FactAsset
     {
         [Tooltip("The source of this rumor, this draws a line in detective mode")]
-        public EntryBase Source;
+        public EntryAsset Source;
         [Tooltip("Displays on the card in detective mode if no ExploreFacts have been revealed on the parent entry")]
         public string RumorName;
         [Tooltip("Priority over other RumorFacts to appear as the entry card's title")]
@@ -22,8 +22,8 @@ namespace ModDataTools.Assets
         public override void ToXml(XmlWriter writer)
         {
             writer.WriteStartElement("RumorFact");
-            writer.WriteElementString("ID", GetFullID());
-            writer.WriteElementString("SourceID", Source.GetFullID());
+            writer.WriteElementString("ID", FullID);
+            writer.WriteElementString("SourceID", Source.FullID);
             if (!string.IsNullOrEmpty(RumorName))
             {
                 writer.WriteElementString("RumorName", RumorName);
@@ -37,7 +37,7 @@ namespace ModDataTools.Assets
             {
                 writer.WriteStartElement("AltText");
                 writer.WriteElementString("Text", AltText);
-                writer.WriteElementString("Condition", AltTextCondition.GetFullID());
+                writer.WriteElementString("Condition", AltTextCondition.FullID);
                 writer.WriteEndElement();
             }
             writer.WriteEndElement();

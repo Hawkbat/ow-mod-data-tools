@@ -8,23 +8,23 @@ using ModDataTools.Utilities;
 
 namespace ModDataTools.Assets
 {
-    [CreateAssetMenu]
-    public class Condition : DataAsset, IValidateableAsset
+    [CreateAssetMenu(menuName = ASSET_MENU_PREFIX + nameof(ConditionAsset))]
+    public class ConditionAsset : DataAsset, IValidateableAsset
     {
         [Tooltip("Determines the type of asset this condition will be prefixed under")]
         public ScopeType Scope;
         [Tooltip("The mod this condition belongs to")]
         [ConditionalField(nameof(Scope), ScopeType.Mod)]
-        public ModManifest Mod;
+        public ModManifestAsset Mod;
         [Tooltip("A dialogue to make this condition unique to")]
         [ConditionalField(nameof(Scope), ScopeType.Dialogue)]
-        public Dialogue Dialogue;
+        public DialogueAsset Dialogue;
         [Tooltip("A planet to make this condition unique to")]
         [ConditionalField(nameof(Scope), ScopeType.Planet)]
-        public Planet Planet;
+        public PlanetAsset Planet;
         [Tooltip("A solar system to make this condition unique to")]
         [ConditionalField(nameof(Scope), ScopeType.SolarSystem)]
-        public StarSystem SolarSystem;
+        public StarSystemAsset SolarSystem;
         [Header("Data")]
         [Tooltip("Whether the condition will only last for the current loop or (if persistent) indefinitely in the current save, unless cancelled or deleted")]
         public bool Persistent;

@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6578318703570185687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1272283372, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
+  m_Name: New Rumor
+  m_EditorClassIdentifier: 
+  OverrideFullName: 
+  OverrideFullID: 
+  ID: 
+  Entry: {fileID: 11400000}
+  IgnoreMoreToExplore: 0
+  Text: Spooky rumor
+  AltTextCondition: {fileID: 0}
+  AltText: 
+  InitiallyRevealed: 0
+  Source: {fileID: 11400000, guid: c824ce0e8488d7c4eb2287e937369955, type: 2}
+  RumorName: 
+  RumorNamePriority: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -460767994, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
+  m_Name: A Curiosity
+  m_EditorClassIdentifier: 
+  OverrideFullName: 
+  OverrideFullID: 
+  ID: 
+  Planet: {fileID: 11400000, guid: 5fc288192e46ba84d9fa8f070c3b4ad4, type: 2}
+  RumorModePosition: {x: -180, y: 170}
+  IgnoreMoreToExplore: 0
+  IgnoreMoreToExploreCondition: {fileID: 0}
+  Photo: {fileID: 2800000, guid: d0a1989bfdb4ab747a28220eb5379ffa, type: 3}
+  AltPhoto: {fileID: 0}
+  AltPhotoCondition: {fileID: 0}
+  IsCuriosity: 1
+  Curiosity: {fileID: 0}
+  Parent: {fileID: 0}
+  Color: {r: 1, g: 0.39999998, b: 0.39999998, a: 1}
+  OverrideNormalColor:
+    hasValue: 0
+    value: {r: 0, g: 0, b: 0, a: 0}
+  RumorFacts:
+  - {fileID: -6578318703570185687}
+  ExploreFacts:
+  - {fileID: 3283029458886857725}
+--- !u!114 &3283029458886857725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 433407062, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
+  m_Name: New Fact
+  m_EditorClassIdentifier: 
+  OverrideFullName: 
+  OverrideFullID: 
+  ID: 
+  Entry: {fileID: 11400000}
+  IgnoreMoreToExplore: 0
+  Text: 
+  AltTextCondition: {fileID: 0}
+  AltText: 
+  InitiallyRevealed: 0

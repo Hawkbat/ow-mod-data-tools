@@ -1,4 +1,5 @@
 ﻿using ModDataTools.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,18 +10,20 @@ using UnityEngine;
 
 namespace ModDataTools.Assets
 {
-    public class TranslatorTextBlock : DataAsset, IXmlAsset
+    public class TranslatorTextBlockAsset : DataAsset, IXmlSerializable
     {
         [Tooltip("The translator text this text block belongs to")]
         [ReadOnlyField]
-        public TranslatorText TranslatorText;
+        public TranslatorTextAsset TranslatorText;
         [Header("Data")]
         [Tooltip("The parent of this text block")]
-        public TranslatorTextBlock Parent;
+        public TranslatorTextBlockAsset Parent;
         [Tooltip("Whether this text block belongs to location 'A' or 'B' (for remote text walls)")]
-        public TranslatorText.Location Location;
+        public TranslatorTextAsset.Location Location;
         [Tooltip("The text to show for this option")]
         public string Text;
+        [Tooltip("Nomai wall text arc")]
+        public ArcInfo Arc;
 
         public override IEnumerable<DataAsset> GetParentAssets()
         {
@@ -32,23 +35,62 @@ namespace ModDataTools.Assets
         public void ToXml(XmlWriter writer)
         {
             writer.WriteStartElement("TextBlock");
-            writer.WriteElementString("ID", GetFullID());
+            writer.WriteElementString("ID", FullID);
             if (Parent)
-                writer.WriteElementString("Parent", Parent.GetFullID());
-            if (Location == TranslatorText.Location.A)
+                writer.WriteElementString("Parent", Parent.FullID);
+            if (Location == TranslatorTextAsset.Location.A)
                 writer.WriteEmptyElement("LocationA");
-            else if (Location == TranslatorText.Location.B)
+            else if (Location == TranslatorTextAsset.Location.B)
                 writer.WriteEmptyElement("LocationB");
             writer.WriteElementString("Text", Text);
             writer.WriteEndElement();
         }
-        public string ToXmlString() => ExportUtility.ToXmlString(this);
 
         public override void Validate(IAssetValidator validator)
         {
             base.Validate(validator);
             if (Parent && Parent.TranslatorText != TranslatorText)
                 validator.Error(this, $"Parent block does not belong to the same translator text");
+        }
+
+        [Serializable]
+        public class ArcInfo : IJsonSerializable
+        {
+            [Tooltip("Whether to skip modifying this spiral's placement, and instead keep the automatically determined placement.")]
+            public bool AutoPlacement = true;
+            [Tooltip("Whether to flip the spiral from left-curling to right-curling or vice versa.")]
+            [ConditionalField(nameof(AutoPlacement), false)]
+            public bool Mirror;
+            [Tooltip("The local position of this object on the wall.")]
+            [ConditionalField(nameof(AutoPlacement), false)]
+            public Vector2 Position;
+            [Tooltip("The z euler angle for this arc.")]
+            [ConditionalField(nameof(AutoPlacement), false)]
+            [Range(0f, 360f)]
+            public float ZRotation;
+            [Tooltip("The type of text to display")]
+            public ArcType Type;
+
+            public void ToJson(JsonTextWriter writer)
+            {
+                writer.WriteStartObject();
+                if (!AutoPlacement)
+                {
+                    writer.WriteProperty("mirror", Mirror);
+                    writer.WriteProperty("position", Position);
+                    writer.WriteProperty("zRotation", ZRotation);
+                }
+                if (Type != ArcType.Adult)
+                    writer.WriteProperty("type", Type);
+                writer.WriteEndObject();
+            }
+
+            public enum ArcType
+            {
+                Adult = 0,
+                Child = 1,
+                Stranger = 2,
+            }
         }
     }
 }

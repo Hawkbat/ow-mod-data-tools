@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEditor;
 using ModDataTools.Assets;
 using ModDataTools.Utilities;
+using ModDataTools.Assets.Props;
 
 namespace ModDataTools.Editors
 {
@@ -20,14 +21,6 @@ namespace ModDataTools.Editors
         public ModDataAdapter(bool outputToConsole)
         {
             OutputToConsole = outputToConsole;
-        }
-
-        public IEnumerable<T> LoadAssets<T>() where T : DataAsset
-        {
-            return AssetDatabase.FindAssets("t:" + typeof(T).Name)
-                .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
-                .Select(path => AssetDatabase.LoadAssetAtPath<T>(path))
-                .ToList();
         }
 
         public void Error(DataAsset asset, string message)
@@ -73,6 +66,14 @@ namespace ModDataTools.Editors
         public string GetAssetPath(UnityEngine.Object obj)
         {
             return AssetDatabase.GetAssetPath(obj);
+        }
+
+        public IEnumerable<T> LoadAllAssets<T>() where T : DataAsset
+        {
+            return AssetDatabase.FindAssets("t:" + typeof(T).Name)
+                .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
+                .Select(path => AssetDatabase.LoadAssetAtPath<T>(path))
+                .ToList();
         }
     }
 }

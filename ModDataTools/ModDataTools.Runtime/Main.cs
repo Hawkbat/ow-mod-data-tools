@@ -1,4 +1,5 @@
 ﻿using ModDataTools.Assets;
+using ModDataTools.Assets.Props;
 using ModDataTools.Utilities;
 using OWML.Common;
 using OWML.ModHelper;
@@ -19,8 +20,10 @@ namespace ModDataTools
             ModHelper.Console.WriteLine($"{nameof(ModDataTools)} loaded.", MessageType.Info);
         }
 
-        public IEnumerable<T> LoadAssets<T>() where T : DataAsset
-            => FindObjectsOfType<T>();
+        public IEnumerable<T> LoadAllAssets<T>() where T : DataAsset
+        {
+            throw new NotImplementedException();
+        }
 
         public string GetAssetBundle(UnityEngine.Object obj)
         {

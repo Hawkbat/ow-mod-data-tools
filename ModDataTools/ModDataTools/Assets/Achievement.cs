@@ -1,4 +1,7 @@
-﻿using ModDataTools.Utilities;
+﻿using ModDataTools.Assets.Props;
+using ModDataTools.Assets.Resources;
+using ModDataTools.Assets.Volumes;
+using ModDataTools.Utilities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,22 +12,22 @@ using UnityEngine;
 
 namespace ModDataTools.Assets
 {
-    [CreateAssetMenu]
-    public class Achievement : DataAsset, IValidateableAsset, IJsonAsset
+    [CreateAssetMenu(menuName = ASSET_MENU_PREFIX + nameof(AchievementAsset))]
+    public class AchievementAsset : DataAsset, IValidateableAsset, IJsonSerializable
     {
         [Tooltip("The mod this asset belongs to")]
-        public ModManifest Mod;
+        public ModManifestAsset Mod;
         [Header("Data")]
         [Tooltip("The icon to display for this achievement.")]
         public Texture2D Icon;
         [Tooltip("Should the name and description of the achievement be hidden until it is unlocked. Good for hiding spoilers!")]
         public bool Secret;
         [Tooltip("A list of facts that must be discovered before this achievement is unlocked.")]
-        public List<FactBase> Facts = new();
-        //[Tooltip("A list of signals that must be discovered before this achievement is unlocked.")]
-        //public List<Signal> Signals = new();
+        public List<FactAsset> Facts = new();
+        [Tooltip("A list of signals that must be discovered before this achievement is unlocked.")]
+        public List<SignalPropAsset> Signals = new();
         [Tooltip("A list of conditions that must be true before this achievement is unlocked. Conditions can be set via dialogue.")]
-        public List<Condition> Conditions = new();
+        public List<ConditionAsset> Conditions = new();
 
         public override IEnumerable<DataAsset> GetParentAssets()
         {
@@ -33,32 +36,38 @@ namespace ModDataTools.Assets
 
         public override string GetIDPrefix()
         {
-            if (Mod) return Mod.GetFullID() + "_";
+            if (Mod) return Mod.FullID + "_";
             return base.GetIDPrefix();
         }
 
         public void ToJson(JsonTextWriter writer)
         {
             writer.WriteStartObject();
-            writer.WriteProperty("ID", GetFullID());
+            writer.WriteProperty("ID", FullID);
             writer.WriteProperty("secret", Secret);
             if (Facts.Any())
-                writer.WriteProperty("factIDs", Facts.Select(f => f.GetFullID()));
-            //if (Signals.Any())
-            //    writer.WriteProperty("signalIDs", Signals.Select(s => s.GetID()));
+                writer.WriteProperty("factIDs", Facts.Select(f => f.FullID));
+            if (Signals.Any())
+                writer.WriteProperty("signalIDs", Signals.Select(s => s.FullID));
             if (Conditions.Any())
-                writer.WriteProperty("conditionIDs", Conditions.Select(c => c.GetFullID()));
+                writer.WriteProperty("conditionIDs", Conditions.Select(c => c.FullID));
             writer.WriteEndObject();
         }
-        public string ToJsonString() => ExportUtility.ToJsonString(this);
 
         public override void Validate(IAssetValidator validator)
         {
             base.Validate(validator);
             if (!Icon)
                 validator.Warn(this, $"Missing {nameof(Icon)}");
-            if (!Facts.Any() && /* !Signals.Any() && */ !Conditions.Any())
+            var revealVolumes = AssetRepository.GetAllProps<RevealVolumeData>().Where(r => r.Data.Achievement == this);
+            if (!Facts.Any() && !Signals.Any() && !Conditions.Any() && !revealVolumes.Any())
                 validator.Warn(this, $"No unlock criteria defined");
+        }
+
+        public override IEnumerable<AssetResource> GetResources()
+        {
+            if (Icon)
+                yield return new ImageResource(Icon, $"icons/{FullID}.png");
         }
     }
 }

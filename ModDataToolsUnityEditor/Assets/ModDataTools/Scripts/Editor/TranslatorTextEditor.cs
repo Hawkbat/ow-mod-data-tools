@@ -8,7 +8,7 @@ using System.Linq;
 namespace ModDataTools.Editors
 {
     [CanEditMultipleObjects]
-    [CustomEditor(typeof(TranslatorText), true)]
+    [CustomEditor(typeof(TranslatorTextAsset), true)]
     public class TranslatorTextEditor : DataAssetEditor
     {
 
@@ -17,7 +17,7 @@ namespace ModDataTools.Editors
             base.OnInspectorGUI();
             if (!serializedObject.isEditingMultipleObjects)
             {
-                if (target is TranslatorText text)
+                if (target is TranslatorTextAsset text)
                 {
                     EditorGUILayout.Space(EditorGUIUtility.singleLineHeight * 0.5f);
                     EditorGUILayout.LabelField("Children", EditorStyles.boldLabel);
@@ -28,12 +28,12 @@ namespace ModDataTools.Editors
                     {
                         foreach (var block in text.TextBlocks)
                         {
-                            EditorGUILayout.ObjectField(block, typeof(TranslatorTextBlock), false);
+                            EditorGUILayout.ObjectField(block, typeof(TranslatorTextBlockAsset), false);
                         }
                     }
                     if (GUILayout.Button("Add New Text Block"))
                     {
-                        var block = CreateInstance<TranslatorTextBlock>();
+                        var block = CreateInstance<TranslatorTextBlockAsset>();
 
                         block.TranslatorText = text;
                         block.name = "New Text Block";
@@ -49,7 +49,7 @@ namespace ModDataTools.Editors
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
             if (GUILayout.Button("Open Translator Text Editor"))
             {
-                TranslatorTextEditorWindow.Open(target as TranslatorText);
+                TranslatorTextEditorWindow.Open(target as TranslatorTextAsset);
             }
         }
     }

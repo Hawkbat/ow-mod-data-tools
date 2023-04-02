@@ -9,12 +9,12 @@ using UnityEngine;
 
 namespace ModDataTools.Assets
 {
-    public class ExploreFact : FactBase
+    public class ExploreFactAsset : FactAsset
     {
         public override void ToXml(XmlWriter writer)
         {
             writer.WriteStartElement("ExploreFact");
-            writer.WriteElementString("ID", GetFullID());
+            writer.WriteElementString("ID", FullID);
             if (IgnoreMoreToExplore)
                 writer.WriteEmptyElement("IgnoreMoreToExplore");
             writer.WriteElementString("Text", Text);
@@ -22,7 +22,7 @@ namespace ModDataTools.Assets
             {
                 writer.WriteStartElement("AltText");
                 writer.WriteElementString("Text", AltText);
-                writer.WriteElementString("Condition", AltTextCondition.GetFullID());
+                writer.WriteElementString("Condition", AltTextCondition.FullID);
                 writer.WriteEndElement();
             }
             writer.WriteEndElement();

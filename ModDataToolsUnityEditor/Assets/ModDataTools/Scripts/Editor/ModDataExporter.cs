@@ -12,6 +12,7 @@ using System.Xml;
 using System.Text;
 using ModDataTools.Assets;
 using ModDataTools.Utilities;
+using ModDataTools.Assets.Resources;
 
 namespace ModDataTools.Editors
 {
@@ -27,11 +28,11 @@ namespace ModDataTools.Editors
             
             Log(LogLevel.Info, "Exporting mod data...");
 
-            var manifests = LoadAllAssetsOfType<ModManifest>();
+            var manifests = LoadAllAssetsOfType<ModManifestAsset>();
 
             if (manifests.Count() != 1)
             {
-                Log(LogLevel.Fatal, $"You must have exactly one Mod Manifest in your project with {nameof(ModManifest)} checked to export your mod.");
+                Log(LogLevel.Fatal, $"You must have exactly one Mod Manifest in your project with {nameof(ModManifestAsset.ExportMod)} checked to export your mod.");
                 return;
             }
             foreach (var modManifest in manifests)
@@ -42,73 +43,34 @@ namespace ModDataTools.Editors
                 if (!adapter.Validate(modManifest)) continue;
 
                 modExportPath = settings.ModExportPath.Replace("%APPDATA%", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
-                modExportPath = JoinPaths(modExportPath, modManifest.GetFullID());
+                modExportPath = JoinPaths(modExportPath, modManifest.FullID);
 
-                WriteJsonAssetToMod(modManifest, modManifest.OverrideJsonFile, "manifest.json");
-                WriteJsonAssetToMod(modManifest.AddonManifest, modManifest.AddonManifest.OverrideJsonFile, "addon-manifest.json");
+                Dictionary<string, UnityEngine.Object> exportedResources = new Dictionary<string, UnityEngine.Object>();
 
-                if (modManifest.AddonManifest.Icon)
-                    WriteImageToMod(modManifest.AddonManifest.Icon, JoinPaths("icons/", modManifest.GetFullName() + ".png"));
-
-                var achievements = adapter.LoadAssets<Achievement>().Where(a => a.GetMod() == modManifest);
-                foreach (var achievement in achievements)
+                foreach (var asset in adapter.LoadAllAssets<DataAsset>().Where(a => a.GetMod() == modManifest))
                 {
-                    if (achievement.Icon)
-                        WriteImageToMod(achievement.Icon, JoinPaths("icons/", achievement.GetFullID() + ".png"));
-                }
-
-                var starSystems = adapter.LoadAssets<StarSystem>().Where(a => a.GetMod() == modManifest);
-                foreach (var starSystem in starSystems)
-                {
-                    if (!adapter.Validate(starSystem)) continue;
-                    if (starSystem.ExportConfigFile)
-                        WriteJsonAssetToMod(starSystem, starSystem.OverrideConfigFile, JoinPaths("systems/", starSystem.GetFullName() + ".json"));
-                    if (starSystem.NewHorizons.TravelAudio)
-                        WriteSoundToMod(starSystem.NewHorizons.TravelAudio, JoinPaths("systems/", starSystem.GetFullName(), "travel.wav"));
-                    if (starSystem.NewHorizons.Skybox.HasCustomSkybox && starSystem.NewHorizons.Skybox.IsCustomSkyboxValid())
+                    foreach (var resource in asset.GetResources())
                     {
-                        WriteImageToMod(starSystem.NewHorizons.Skybox.Left, JoinPaths("systems/", starSystem.GetFullName(), "skybox/", "left.png"));
-                        WriteImageToMod(starSystem.NewHorizons.Skybox.Right, JoinPaths("systems/", starSystem.GetFullName(), "skybox/", "right.png"));
-                        WriteImageToMod(starSystem.NewHorizons.Skybox.Top, JoinPaths("systems/", starSystem.GetFullName(), "skybox/", "top.png"));
-                        WriteImageToMod(starSystem.NewHorizons.Skybox.Bottom, JoinPaths("systems/", starSystem.GetFullName(), "skybox/", "bottom.png"));
-                        WriteImageToMod(starSystem.NewHorizons.Skybox.Front, JoinPaths("systems/", starSystem.GetFullName(), "skybox/", "front.png"));
-                        WriteImageToMod(starSystem.NewHorizons.Skybox.Back, JoinPaths("systems/", starSystem.GetFullName(), "skybox/", "back.png"));
+                        if (string.IsNullOrEmpty(resource.OutputPath) && string.IsNullOrEmpty(resource.AssetBundle))
+                        {
+                            Log(LogLevel.Error, $"Resource {resource.GetResource()} was expected to be in an asset bundle but is not assigned to one");
+                            continue;
+                        } else if (string.IsNullOrEmpty(resource.OutputPath))
+                        {
+                            continue;
+                        }
+                        if (resource is ImageResource img)
+                            WriteImageToMod(img.Image, img.OutputPath);
+                        else if (resource is AudioResource snd)
+                            WriteSoundToMod(snd.Audio, snd.OutputPath);
+                        else if (resource is TextResource txt)
+                            WriteTextToMod(txt.Text.text, txt.OutputPath);
+                        else
+                            Log(LogLevel.Error, $"Unspported resource type encountered (Resource {resource.GetResource()}) (Type {resource.GetType().Name})");
+
                     }
                 }
 
-                var planets = adapter.LoadAssets<Planet>().Where(a => a.GetMod() == modManifest);
-                foreach (var planet in planets)
-                {
-                    if (!adapter.Validate(planet)) continue;
-                    if (planet.ExportShipLogFile)
-                        WriteXmlAssetToMod(planet, planet.OverrideShipLogFile, JoinPaths("shiplogs/", planet.SolarSystem.GetFullName(), planet.GetFullName() + ".xml"));
-                    if (planet.ExportConfigFile)
-                        WriteJsonAssetToMod(planet, planet.OverrideConfigFile, JoinPaths("planets/", planet.SolarSystem.GetFullName(), planet.GetFullName() + ".json"));
-                    var entries = adapter.LoadAssets<EntryBase>().Where(e => e.Planet == planet);
-                    foreach (var entry in entries)
-                    {
-                        if (entry.Photo)
-                            WriteImageToMod(entry.Photo, JoinPaths("shiplogs/", planet.SolarSystem.GetFullName(), planet.GetFullName(), "sprites/", entry.GetFullID() + ".png"));
-                        if (entry.AltPhoto)
-                            WriteImageToMod(entry.Photo, JoinPaths("shiplogs/", planet.SolarSystem.GetFullName(), planet.GetFullName(), "sprites/", entry.GetFullID() + "_ALT.png"));
-                    }
-                }
-
-                var dialogues = adapter.LoadAssets<Dialogue>().Where(a => a.GetMod() == modManifest);
-                foreach (var dialogue in dialogues)
-                {
-                    if (!adapter.Validate(dialogue)) continue;
-                    if (!dialogue.ExportXmlFile) continue;
-                    WriteXmlAssetToMod(dialogue, dialogue.OverrideXmlFile, JoinPaths("dialogue/", dialogue.Planet.SolarSystem.GetFullName(), dialogue.Planet.GetFullName(), dialogue.GetFullName() + ".xml"));
-                }
-
-                var translatorTexts = adapter.LoadAssets<TranslatorText>().Where(a => a.GetMod() == modManifest);
-                foreach (var translatorText in translatorTexts)
-                {
-                    if (!adapter.Validate(translatorText)) continue;
-                    if (!translatorText.ExportXmlFile) continue;
-                    WriteXmlAssetToMod(translatorText, translatorText.OverrideXmlFile, JoinPaths("text/", translatorText.Planet.SolarSystem.GetFullName(), translatorText.Planet.GetFullName(), translatorText.GetFullName() + ".xml"));
-                }
                 Log(LogLevel.Info, "Mod data exported.");
 
                 BuildAllAssetBundles();
@@ -127,31 +89,12 @@ namespace ModDataTools.Editors
             Log(LogLevel.Info, "Asset bundles built.");
         }
 
-        private static string WriteJsonAssetToMod(IJsonAsset asset, TextAsset overrideFile, string modAssetPath)
-        {
-            return WriteJsonTextToMod(overrideFile ? overrideFile.text : asset.ToJsonString(), modAssetPath);
-        }
-
-        private static string WriteJsonTextToMod(string json, string modAssetPath)
+        private static string WriteTextToMod(string text, string modAssetPath)
         {
             var modAbsolutePath = Path.Combine(modExportPath, modAssetPath);
             Directory.CreateDirectory(Path.GetDirectoryName(modAbsolutePath));
-            File.WriteAllText(modAbsolutePath, json, Encoding.UTF8);
-            Log(LogLevel.Trace, $"Wrote JSON to {modAbsolutePath}");
-            return modAssetPath;
-        }
-
-        private static string WriteXmlAssetToMod(IXmlAsset asset, TextAsset overrideFile, string modAssetPath)
-        {
-            return WriteXmlTextToMod(overrideFile ? overrideFile.text : asset.ToXmlString(), modAssetPath);
-        }
-
-        private static string WriteXmlTextToMod(string xml, string modAssetPath)
-        {
-            var modAbsolutePath = Path.Combine(modExportPath, modAssetPath);
-            Directory.CreateDirectory(Path.GetDirectoryName(modAbsolutePath));
-            File.WriteAllText(modAbsolutePath, xml, Encoding.UTF8);
-            Log(LogLevel.Trace, $"Wrote XML to {modAbsolutePath}");
+            File.WriteAllText(modAbsolutePath, text, Encoding.UTF8);
+            Log(LogLevel.Trace, $"Wrote {Path.GetExtension(modAssetPath).ToUpper()} to {modAbsolutePath}");
             return modAssetPath;
         }
 
@@ -161,8 +104,11 @@ namespace ModDataTools.Editors
                 return CopyAssetToMod(tex, modAssetPath);
             var modAbsolutePath = Path.Combine(modExportPath, modAssetPath);
             Directory.CreateDirectory(Path.GetDirectoryName(modAbsolutePath));
-            File.WriteAllBytes(modAbsolutePath, tex.EncodeToPNG());
-            Log(LogLevel.Trace, $"Wrote PNG to {modAbsolutePath}");
+            if (Path.GetExtension(modAssetPath).ToLower() == ".png")
+                File.WriteAllBytes(modAbsolutePath, tex.EncodeToPNG());
+            else if (Path.GetExtension(modAssetPath).ToLower() == ".jpg")
+                File.WriteAllBytes(modAbsolutePath, tex.EncodeToJPG());
+            Log(LogLevel.Trace, $"Wrote {Path.GetExtension(modAssetPath).ToUpper()} to {modAbsolutePath}");
             return modAssetPath;
         }
 

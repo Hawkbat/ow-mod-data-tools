@@ -1,4 +1,5 @@
-﻿using ModDataTools.Utilities;
+﻿using ModDataTools.Assets.Resources;
+using ModDataTools.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,10 @@ namespace ModDataTools.Assets
 {
     public abstract class DataAsset : ScriptableObject, IValidateableAsset
     {
+        public const string ASSET_MENU_PREFIX = "Mod Data Assets/";
+        public const string PROP_MENU_PREFIX = "Mod Data Props/";
+        public const string VOLUME_MENU_PREFIX = "Mod Data Volumes/";
+
         public string Name { get => name; set => name = value; }
         [Header("Overrides")]
         [Tooltip("If set, uses this name instead of the filename")]
@@ -20,22 +25,29 @@ namespace ModDataTools.Assets
         [Tooltip("The ID of this asset, which will be concatenated with any applicable parent prefixes")]
         public string ID;
 
-        public virtual string GetFullName()
+        public string FullName
         {
-            if (!string.IsNullOrEmpty(OverrideFullName))
-                return OverrideFullName;
-            return Name;
-        }
-        public virtual string GetFullID()
-        {
-            if (!string.IsNullOrEmpty(OverrideFullID))
-                return OverrideFullID;
-            if (!string.IsNullOrEmpty(ID))
-                return GetIDPrefix() + ID;
-            return GetIDPrefix() + GetFullName().ToUpper().Replace(' ', '_');
+            get
+            {
+                if (!string.IsNullOrEmpty(OverrideFullName))
+                    return OverrideFullName;
+                return Name;
+            }
         }
 
-        public virtual ModManifest GetMod()
+        public string FullID
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(OverrideFullID))
+                    return OverrideFullID;
+                if (!string.IsNullOrEmpty(ID))
+                    return GetIDPrefix() + ID;
+                return GetIDPrefix() + FullName.ToUpper().Replace(' ', '_');
+            }
+        }
+
+        public virtual ModManifestAsset GetMod()
         {
             foreach (var parent in GetParentAssets())
             {
@@ -49,6 +61,9 @@ namespace ModDataTools.Assets
 
         public virtual IEnumerable<DataAsset> GetNestedAssets()
             => Enumerable.Empty<DataAsset>();
+
+        public virtual IEnumerable<AssetResource> GetResources()
+            => Enumerable.Empty<AssetResource>();
 
         public virtual string GetIDPrefix()
         {
@@ -64,9 +79,9 @@ namespace ModDataTools.Assets
 
         public virtual void Validate(IAssetValidator validator)
         {
-            if (string.IsNullOrEmpty(GetFullID()) || GetFullID().EndsWith("_") || GetFullID().EndsWith("."))
+            if (string.IsNullOrEmpty(FullID) || FullID.EndsWith("_") || FullID.EndsWith("."))
                 validator.Error(this, "Invalid ID");
-            if (string.IsNullOrEmpty(GetFullName()))
+            if (string.IsNullOrEmpty(FullName))
                 validator.Error(this, "Invalid Name");
             if (!GetMod())
                 validator.Error(this, "Not attached to any mod");

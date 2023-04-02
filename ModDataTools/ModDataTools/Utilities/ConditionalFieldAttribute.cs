@@ -7,10 +7,12 @@ using UnityEngine;
 
 namespace ModDataTools.Utilities
 {
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
     public class ConditionalFieldAttribute : PropertyAttribute
     {
         public string Field;
         public object[] Values;
+        public bool Invert;
 
         public ConditionalFieldAttribute(string field)
         {

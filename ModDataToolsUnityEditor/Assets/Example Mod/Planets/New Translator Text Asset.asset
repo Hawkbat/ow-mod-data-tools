@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7405816696621829387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -317527165, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
+  m_Name: A
+  m_EditorClassIdentifier: 
+  OverrideFullName: 
+  OverrideFullID: 
+  ID: 
+  TranslatorText: {fileID: 11400000}
+  Parent: {fileID: 0}
+  Location: 0
+  Text: 
+  Arc:
+    AutoPlacement: 1
+    Mirror: 0
+    Position: {x: 0, y: 0}
+    ZRotation: 0
+    Type: 0
+--- !u!114 &-7402644466513090496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -317527165, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
+  m_Name: C
+  m_EditorClassIdentifier: 
+  OverrideFullName: 
+  OverrideFullID: 
+  ID: 
+  TranslatorText: {fileID: 11400000}
+  Parent: {fileID: -7405816696621829387}
+  Location: 0
+  Text: 
+  Arc:
+    AutoPlacement: 1
+    Mirror: 0
+    Position: {x: 0, y: 0}
+    ZRotation: 0
+    Type: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 779216857, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
+  m_Name: New Translator Text Asset
+  m_EditorClassIdentifier: 
+  OverrideFullName: 
+  OverrideFullID: 
+  ID: 
+  Planet: {fileID: 0}
+  ExportXmlFile: 1
+  OverrideXmlFile: {fileID: 0}
+  RevealFacts: []
+  Seed: 0
+  TextBlocks:
+  - {fileID: -7402644466513090496}
+  - {fileID: 7000738761873904560}
+  - {fileID: -7405816696621829387}
+--- !u!114 &7000738761873904560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -317527165, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
+  m_Name: B
+  m_EditorClassIdentifier: 
+  OverrideFullName: 
+  OverrideFullID: 
+  ID: 
+  TranslatorText: {fileID: 11400000}
+  Parent: {fileID: -7405816696621829387}
+  Location: 0
+  Text: 
+  Arc:
+    AutoPlacement: 1
+    Mirror: 0
+    Position: {x: 0, y: 0}
+    ZRotation: 0
+    Type: 0

@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -2070916057, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
+  m_Name: SolarSystem
+  m_EditorClassIdentifier: 
+  OverrideFullName: 
+  OverrideFullID: SolarSystem
+  ID: 
+  Mod: {fileID: 11400000, guid: 25927d5d3f87cdf4182aa978103dbfd1, type: 2}
+  ChildIDPrefix: SS
+  ExportConfigFile: 0
+  OverrideConfigFile: {fileID: 0}
+  NewHorizons:
+    FarClipPlaneOverride:
+      hasValue: 0
+      value: 0
+    CanEnterViaWarpDrive: 1
+    FactRequiredForWarp: {fileID: 0}
+    DestroyStockPlanets: 0
+    EnableTimeLoop: 1
+    LoopDuration: 22
+    MapRestricted: 0
+    Skybox:
+      DestroyStarField: 0
+      UseCube: 0
+      Right: {fileID: 0}
+      Left: {fileID: 0}
+      Top: {fileID: 0}
+      Bottom: {fileID: 0}
+      Front: {fileID: 0}
+      Back: {fileID: 0}
+    StartHere: 0
+    RespawnHere: 0
+    TravelAudio: {fileID: 0}
+    TravelAudioType: 0
+    Vessel:
+      VesselPosition:
+        hasValue: 0
+        value: {x: 0, y: 0, z: 0}
+      VesselRotation:
+        hasValue: 0
+        value: {x: 0, y: 0, z: 0}
+      AlwaysPresent: 0
+      SpawnOnVessel: 0
+      HasPhysics: 0
+      HasZeroGravityVolume: 0
+      WarpExitPosition:
+        hasValue: 0
+        value: {x: 0, y: 0, z: 0}
+      WarpExitRotation:
+        hasValue: 0
+        value: {x: 0, y: 0, z: 0}
+      HasWarpCoordinates: 0
+      PromptFact: {fileID: 0}
+      WarpCoordinates:
+        x: 
+        y: 
+        z: 

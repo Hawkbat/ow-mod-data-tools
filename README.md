@@ -21,13 +21,15 @@ It is not without its drawbacks, as it currently follows an all-or-nothing appro
 - Localization support
 - New Horizons planet Props editing
 
-## Limitations
-- Most planet config settings are not implemented yet, so you will need to override the generated .json files with your own planet config .json files by setting the `OverrideConfigFile` field.
-
 ## Usage
 
+### For Players:
+If a mod that you want to play depends on this one, install this utility mod from the Outer Wilds Mod Manager. Boom! You're done!
+
+### For Mod Authors:
+
 This project is comprised of two components, developed in tandem:
-- A utility mod, available on the Outer Wilds Mod Manager, that provides various Unity asset classes representing common mod data.
+- A utility mod, available on the Outer Wilds Mod Manager, that provides various Unity asset classes representing common mod data (and the ability to interact with them at runtime, if they are included in an asset bundle).
 - A set of Unity editor scripts that can be imported into a mod's Unity project to allow for easy editing of the assets provided by the utility mod.
 
 To use these in your mod, import the latest .unitypackage file from this repository's releases into your mod's Unity project. If you haven't already set up a Unity project for your mod, you can clone the [outer-wilds-unity-template repo](https://github.com/ow-mods/outer-wilds-unity-template).
@@ -39,3 +41,6 @@ You must have a Mod Manifest asset created in your project and configured to rep
 When you're ready to package your data into a mod, you can export your data from the top menu under Export -> Mod Data. By default, the project will be exported to `%APPDATA%\OuterWildsModManager\OWML\Mods\{UniqueName}`. This can be changed in the settings as needed. The Export step will build all asset bundles, generate any New Horizons .json or .xml files, and copy any other static assets to the mod folder.
 
 If you use a separate project for mod code, you can set your Mod Manifest's Filename property to the name of your mod's DLL, and use the standard `ModName.csproj.user` approach to export your mod code DLL to the mod folder.
+
+## Limitations
+> If you use planets from the base game, or place new planets in the base solar system, you should use the `OverrideFullID` fields to set up planet and star system assets with the same names as the vanilla ones (e.g. a star system "SolarSystem" and a planet like "TimberHearth" or "QuantumMoon"). If you just need the asset to satisfy the asset hierarchy and don't need a config .json for it in your mod, you can uncheck `ExportConfigFile` in the asset's export settings.

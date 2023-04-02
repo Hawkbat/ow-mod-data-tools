@@ -3,27 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEditor;
-using ModDataTools;
 using ModDataTools.Assets;
+using ModDataTools.Utilities;
 
 namespace ModDataTools.Editors
 {
     public class ShipLogEditorWindow : EditorWindow
     {
-        public static float currentAssetDatabaseTime;
-
-        float savedAssetDatabaseTime;
-
-        List<EntryBase> entries;
-        List<RumorFact> rumorFacts;
-
         float zoom = 1f;
         Vector2 areaScrollPosition;
         Rect areaScrollRect;
-        Dictionary<EntryBase, Rect> entryRects = new Dictionary<EntryBase, Rect>();
-        HashSet<EntryBase> selected = new HashSet<EntryBase>();
-        EntryBase hovered = null;
-        EntryBase lastHovered = null;
+        Dictionary<EntryAsset, Rect> entryRects = new Dictionary<EntryAsset, Rect>();
+        HashSet<EntryAsset> selected = new HashSet<EntryAsset>();
+        EntryAsset hovered = null;
+        EntryAsset lastHovered = null;
         bool wasAreaClick = false;
         bool wasEntryClick = false;
         bool wasModifiedClick = false;
@@ -71,15 +64,15 @@ namespace ModDataTools.Editors
             entryBodyStyle.normal.background = black;
         }
 
-        int GetFontSize(EntryBase entry, EntryBase parentEntry)
+        int GetFontSize(EntryAsset entry, EntryAsset parentEntry)
         {
             var baseSize = 14;
             var multiplier =
                     parentEntry != null ?
-                        parentEntry is Curiosity ?
+                        parentEntry.IsCuriosity ?
                             0.8f
                             : 0.6f
-                    : entry is Curiosity ?
+                    : entry.IsCuriosity ?
                         2f
                         : 1f;
             return Mathf.RoundToInt(baseSize * multiplier * zoom);
@@ -93,16 +86,6 @@ namespace ModDataTools.Editors
                 .ToList();
         }
 
-        void ReloadAssets()
-        {
-            var curiosities = LoadAllAssetsOfType<Curiosity>();
-            var otherEntries = LoadAllAssetsOfType<Entry>();
-            entries = new List<EntryBase>().Concat(curiosities).Concat(otherEntries).ToList();
-            rumorFacts = LoadAllAssetsOfType<RumorFact>();
-
-            savedAssetDatabaseTime = currentAssetDatabaseTime;
-        }
-
         private void OnGUI()
         {
             titleContent = new GUIContent("Ship Log Editor");
@@ -112,8 +95,8 @@ namespace ModDataTools.Editors
             if (entryBackStyle == null || entryBackStyle.name != nameof(entryHeadStyle))
                 RegenerateStyles();
 
-            if (entries == null || savedAssetDatabaseTime != currentAssetDatabaseTime)
-                ReloadAssets();
+            var entries = AssetRepository.GetAllAssets<EntryAsset>();
+            var rumorFacts = AssetRepository.GetAllAssets<RumorFactAsset>();
 
             EditorGUILayout.BeginVertical();
             var newAreaScrollPosition = EditorGUILayout.BeginScrollView(areaScrollPosition, "TE BoxBackground");
@@ -145,15 +128,15 @@ namespace ModDataTools.Editors
 
             hovered = null;
 
-            var sortedEntries = new List<EntryBase>(entries);
+            var sortedEntries = new List<EntryAsset>(entries);
             sortedEntries.Sort((a, b) =>
             {
-                if (a is Curiosity != b is Curiosity)
-                    return a is Curiosity ? -1 : 1;
-                if (a is Entry != b is Entry)
-                    return a is Entry ? -1 : 1;
+                if (a.IsCuriosity != b.IsCuriosity)
+                    return a.IsCuriosity ? -1 : 1;
+                if (a is EntryAsset != b is EntryAsset)
+                    return a is EntryAsset ? -1 : 1;
 
-                if (a is Entry a2 && b is Entry b2 && a2.Parent != b2.Parent)
+                if (a is EntryAsset a2 && b is EntryAsset b2 && a2.Parent != b2.Parent)
                     return a2.Parent == null ? -1 : 1;
                 if (a.EditorPosition.y != b.EditorPosition.y)
                     return a.EditorPosition.y < b.EditorPosition.y ? -1 : 1;
@@ -181,14 +164,24 @@ namespace ModDataTools.Editors
                 }
             }
 
+            // 3.125 pixels per unit
+            // EntryCard: t:None AnchoredPosition (X, Y) AnchorMin (0.5, 0.5) OffsetMin(X, Y) AnchorMax (0.5, 0.5) OffsetMax(X, Y) Pivot (0.5, 0.5) SizeDelta (110, 145)
+            // > EntryCardRoot: t:None AnchoredPosition (0, 0) AnchorMin (0, 0) OffsetMin(0, 0) AnchorMax (1, 1) OffsetMax(0, 0) Pivot (0.5, 0.5) SizeDelta (0, 0)
+            // > > Background: t:Image (solid black) AnchoredPosition (0, 0) AnchorMin (0.5, 0) OffsetMin(-55, 0) AnchorMax (0.5, 0) OffsetMax(55, 110) Pivot (0.5, 0) SizeDelta (110, 110)
+            // > > NameBackground: t:Image (solid entry color) AnchoredPosition (0, 110) AnchorMin (0.5, 0) OffsetMin(-55, 110) AnchorMax (0.5, 1) OffsetMax(55, 0) Pivot (0.5, 0) SizeDelta (110, -110)
+            // > > > Name: t:Text (entry name, black) AnchoredPosition (0, 2) AnchorMin (0, 0) OffsetMin(2, 2) AnchorMax (1, 1) OffsetMax(-2, -2) Pivot (0.5, 0) SizeDelta (-4, -4)
+            // > > EntryCardBackground: t:Image (solid black) AnchoredPosition (0, 0) AnchorMin (0, 0) OffsetMin(0, 0) AnchorMax (1, 0) OffsetMax(0, 110) Pivot (0.5, 0) SizeDelta (0, 110)
+            // > > > PhotoImage: t:Image (entry photo) AnchoredPosition (0, 0) AnchorMin (0, 0) OffsetMin (0, 0) AnchorMax (1, 1) OffsetMax (0, 0) Pivot (0.5, 0.5) SizeDelta (0, 0)
+            // > > Border: t:Image (entry-colored image with solid 4px (of 512px) border and transparent interior) AnchoredPosition (0, 0) AnchorMin (0, 0) OffsetMin (0, 0) AnchorMax (1, 1) OffsetMax (0, 0) Pivot (0.5, 0.5) SizeDelta (0, 0)
+
             foreach (var entry in sortedEntries)
             {
                 bool isSelected = selected.Contains(entry);
-                var parentEntry = entry is Entry e ? e.Parent : null;
-                var scale = entry is Curiosity ? 2f : parentEntry != null ? parentEntry is Curiosity ? 0.8f : 0.6f : 1f;
+                var parentEntry = entry is EntryAsset e ? e.Parent : null;
+                var scale = entry.IsCuriosity ? 2f : parentEntry != null ? parentEntry.IsCuriosity ? 0.8f : 0.6f : 1f;
                 var size = new Vector2(110f, 110f) * scale * zoom;
-                var parentCuriosity = entry is Curiosity c ? c : entry is Entry e2 ? e2.Curiosity : null;
-                var label = new GUIContent("<size=" + GetFontSize(entry, parentEntry) + ">" + entry.GetFullName() + "</size>");
+                var parentCuriosity = entry.IsCuriosity ? entry : entry.Curiosity ? entry.Curiosity : null;
+                var label = new GUIContent("<size=" + GetFontSize(entry, parentEntry) + ">" + entry.FullName + "</size>");
                 size.y += entryHeadStyle.CalcHeight(label, size.x);
 
                 var entryOffset = offset;
@@ -237,7 +230,7 @@ namespace ModDataTools.Editors
                     if (wasEntryClick)
                     {
                         wasEntryClick = false;
-                        var sourceEntry = entries.Find(e => e == hovered);
+                        var sourceEntry = entries.FirstOrDefault(e => e == hovered);
                         var sourcePath = AssetDatabase.GetAssetPath(sourceEntry);
                         menu.AddItem(new GUIContent("Delete Entry"), false, () =>
                         {
@@ -249,7 +242,7 @@ namespace ModDataTools.Editors
                         {
                             var destPath = AssetDatabase.GenerateUniqueAssetPath(sourcePath);
                             AssetDatabase.CopyAsset(sourcePath, destPath);
-                            var newAsset = AssetDatabase.LoadAssetAtPath<EntryBase>(destPath);
+                            var newAsset = AssetDatabase.LoadAssetAtPath<EntryAsset>(destPath);
                             newAsset.EditorPosition = sourceEntry.EditorPosition + new Vector2(110f, 110f);
                             if (!string.IsNullOrEmpty(sourceEntry.ID))
                                 newAsset.ID = sourceEntry.ID + "_COPY";
@@ -270,7 +263,7 @@ namespace ModDataTools.Editors
                         });
                         menu.AddItem(new GUIContent("Add Rumor Fact"), false, () =>
                         {
-                            var fact = CreateInstance<RumorFact>();
+                            var fact = CreateInstance<RumorFactAsset>();
                             fact.Entry = sourceEntry;
                             fact.name = "New Rumor";
                             sourceEntry.RumorFacts.Add(fact);
@@ -280,7 +273,7 @@ namespace ModDataTools.Editors
                         });
                         menu.AddItem(new GUIContent("Add Explore Fact"), false, () =>
                         {
-                            var fact = CreateInstance<ExploreFact>();
+                            var fact = CreateInstance<ExploreFactAsset>();
                             fact.Entry = sourceEntry;
                             fact.name = "New Fact";
                             sourceEntry.ExploreFacts.Add(fact);
@@ -288,61 +281,6 @@ namespace ModDataTools.Editors
                             AssetDatabase.SaveAssets();
                             AssetDatabase.Refresh();
                         });
-                        if (sourceEntry is Entry entry)
-                        {
-                            menu.AddItem(new GUIContent("Convert to Curiosity"), false, () =>
-                            {
-                                if (!EditorUtility.DisplayDialog("Destructive Edit", "This will delete any facts or rumors associated with this entry. Are you sure you want to continue?", "Continue", "Cancel")) return;
-                                var newCuriosity = CreateInstance<Curiosity>();
-                                newCuriosity.OverrideFullName = entry.OverrideFullName;
-                                newCuriosity.OverrideFullID = entry.OverrideFullID;
-                                newCuriosity.ID = entry.ID;
-                                newCuriosity.Planet = entry.Planet;
-                                newCuriosity.RumorModePosition = entry.RumorModePosition;
-                                newCuriosity.IgnoreMoreToExplore = entry.IgnoreMoreToExplore;
-                                newCuriosity.IgnoreMoreToExploreCondition = entry.IgnoreMoreToExploreCondition;
-                                newCuriosity.Photo = entry.Photo;
-                                newCuriosity.AltPhoto = entry.AltPhoto;
-                                newCuriosity.AltPhotoCondition = entry.AltPhotoCondition;
-                                newCuriosity.Color = Color.white;
-                                if (selected.Contains(sourceEntry))
-                                {
-                                    selected.Remove(sourceEntry);
-                                    selected.Add(newCuriosity);
-                                }
-                                AssetDatabase.DeleteAsset(sourcePath);
-                                AssetDatabase.CreateAsset(newCuriosity, sourcePath);
-                                AssetDatabase.SaveAssets();
-                                AssetDatabase.Refresh();
-                            });
-                        }
-                        if (sourceEntry is Curiosity curiosity)
-                        {
-                            menu.AddItem(new GUIContent("Convert to Normal Entry"), false, () =>
-                            {
-                                if (!EditorUtility.DisplayDialog("Destructive Edit", "This will delete any facts or rumors associated with this curiosity. Are you sure you want to continue?", "Continue", "Cancel")) return;
-                                var newEntry = CreateInstance<Entry>();
-                                newEntry.OverrideFullName = curiosity.OverrideFullName;
-                                newEntry.OverrideFullID = curiosity.OverrideFullID;
-                                newEntry.ID = curiosity.ID;
-                                newEntry.Planet = curiosity.Planet;
-                                newEntry.RumorModePosition = curiosity.RumorModePosition;
-                                newEntry.IgnoreMoreToExplore = curiosity.IgnoreMoreToExplore;
-                                newEntry.IgnoreMoreToExploreCondition = curiosity.IgnoreMoreToExploreCondition;
-                                newEntry.Photo = curiosity.Photo;
-                                newEntry.AltPhoto = curiosity.AltPhoto;
-                                newEntry.AltPhotoCondition = curiosity.AltPhotoCondition;
-                                if (selected.Contains(sourceEntry))
-                                {
-                                    selected.Remove(sourceEntry);
-                                    selected.Add(newEntry);
-                                }
-                                AssetDatabase.DeleteAsset(sourcePath);
-                                AssetDatabase.CreateAsset(newEntry, sourcePath);
-                                AssetDatabase.SaveAssets();
-                                AssetDatabase.Refresh();
-                            });
-                        }
                     }
                     menu.ShowAsContext();
                 }

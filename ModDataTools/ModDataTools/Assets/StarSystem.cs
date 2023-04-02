@@ -4,16 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using ModDataTools.Assets.Props;
 using ModDataTools.Utilities;
 using Newtonsoft.Json;
+using ModDataTools.Assets.Resources;
 
 namespace ModDataTools.Assets
 {
-    [CreateAssetMenu]
-    public class StarSystem : DataAsset, IValidateableAsset, IJsonAsset
+    [CreateAssetMenu(menuName = ASSET_MENU_PREFIX + nameof(StarSystemAsset))]
+    public class StarSystemAsset : DataAsset, IValidateableAsset, IJsonSerializable
     {
         [Tooltip("The mod this asset belongs to")]
-        public ModManifest Mod;
+        public ModManifestAsset Mod;
         [Tooltip("A prefix appended to all entry and fact IDs belonging to planets in this star system")]
         public string ChildIDPrefix;
         [Header("Export")]
@@ -42,7 +44,7 @@ namespace ModDataTools.Assets
         public override void Validate(IAssetValidator validator)
         {
             base.Validate(validator);
-            if (NewHorizons.HasWarpCoordinates && !NewHorizons.Vessel.WarpCoordinates.IsValid())
+            if (NewHorizons.Vessel.HasWarpCoordinates && !NewHorizons.Vessel.WarpCoordinates.IsValid())
                 validator.Error(this, $"Invalid warp coordinates");
             if (NewHorizons.Skybox.HasCustomSkybox && !NewHorizons.Skybox.IsCustomSkyboxValid())
                 validator.Error(this, $"Missing some skybox images");
@@ -53,8 +55,7 @@ namespace ModDataTools.Assets
             var nh = NewHorizons;
             writer.WriteStartObject();
             writer.WriteProperty("$schema", "https://raw.githubusercontent.com/Outer-Wilds-New-Horizons/new-horizons/main/NewHorizons/Schemas/star_system_schema.json");
-            if (nh.FarClipPlaneOverrideEnabled)
-                writer.WriteProperty("farClipPlaneOverride", nh.FarClipPlaneOverride);
+            writer.WriteProperty("farClipPlaneOverride", nh.FarClipPlaneOverride);
             writer.WriteProperty("canEnterViaWarpDrive", nh.CanEnterViaWarpDrive);
             writer.WriteProperty("destroyStockPlanets", nh.DestroyStockPlanets);
             writer.WriteProperty("enableTimeLoop", nh.EnableTimeLoop);
@@ -69,39 +70,87 @@ namespace ModDataTools.Assets
             if (nh.Skybox.HasCustomSkybox)
             {
                 writer.WriteProperty("useCube", nh.Skybox.UseCube);
-                writer.WriteProperty("rightPath", "systems/" + GetFullID() + "/skybox/" + "right.png");
-                writer.WriteProperty("leftPath", "systems/" + GetFullID() + "/skybox/" + "left.png");
-                writer.WriteProperty("topPath", "systems/" + GetFullID() + "/skybox/" + "top.png");
-                writer.WriteProperty("bottomPath", "systems/" + GetFullID() + "/skybox/" + "bottom.png");
-                writer.WriteProperty("frontPath", "systems/" + GetFullID() + "/skybox/" + "front.png");
-                writer.WriteProperty("backPath", "systems/" + GetFullID() + "/skybox/" + "back.png");
+                writer.WriteProperty("rightPath", $"systems/{FullID}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Right)}");
+                writer.WriteProperty("leftPath", $"systems/{FullID}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Left)}");
+                writer.WriteProperty("topPath", $"systems/{FullID}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Top)}");
+                writer.WriteProperty("bottomPath", $"systems/{FullID}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Bottom)}");
+                writer.WriteProperty("frontPath", $"systems/{FullID}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Front)}");
+                writer.WriteProperty("backPath", $"systems/{FullID}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Back)}");
             }
             writer.WriteEndObject();
             writer.WriteProperty("startHere", nh.StartHere);
             writer.WriteProperty("respawnHere", nh.RespawnHere);
             if (nh.TravelAudio)
-                writer.WriteProperty("travelAudio", "systems/" + GetFullID() + "/travel.wav");
+                writer.WriteProperty("travelAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.TravelAudio)}");
             else if (nh.TravelAudioType != AudioType.None)
-                writer.WriteProperty("travelAudio", nh.TravelAudioType.ToString());
-            if (nh.HasWarpCoordinates)
+                writer.WriteProperty("travelAudio", nh.TravelAudioType, false);
+
+            var vesselProp = AssetRepository.GetAllProps<VesselPropData>().FirstOrDefault(c => c.Planet && c.Planet.StarSystem == this);
+            var warpExitProp = AssetRepository.GetAllProps<VesselWarpExitPropData>().FirstOrDefault(c => c.Planet && c.Planet.StarSystem == this);
+            if (nh.Vessel.HasWarpCoordinates || nh.Vessel.VesselPosition.HasValue || nh.Vessel.WarpExitPosition.HasValue || vesselProp != null && warpExitProp != null)
             {
                 writer.WritePropertyName("Vessel");
                 writer.WriteStartObject();
-                writer.WritePropertyName("coords");
-                writer.WriteStartObject();
-                writer.WriteProperty("x", nh.Vessel.WarpCoordinates.x);
-                writer.WriteProperty("y", nh.Vessel.WarpCoordinates.y);
-                writer.WriteProperty("z", nh.Vessel.WarpCoordinates.z);
-                writer.WriteEndObject();
-                writer.WriteProperty("vesselPosition", nh.Vessel.VesselPosition);
-                writer.WriteProperty("vesselRotation", nh.Vessel.VesselRotation);
-                writer.WriteProperty("warpExitPosition", nh.Vessel.WarpExitPosition);
-                writer.WriteProperty("warpExitRotation", nh.Vessel.WarpExitRotation);
-                if (nh.Vessel.PromptFact)
-                    writer.WriteProperty("promptFact", nh.Vessel.PromptFact.GetFullID());
+                if (nh.Vessel.HasWarpCoordinates)
+                {
+                    writer.WritePropertyName("coords");
+                    writer.WriteStartObject();
+                    writer.WriteProperty("x", nh.Vessel.WarpCoordinates.x);
+                    writer.WriteProperty("y", nh.Vessel.WarpCoordinates.y);
+                    writer.WriteProperty("z", nh.Vessel.WarpCoordinates.z);
+                    writer.WriteEndObject();
+                    if (nh.Vessel.PromptFact)
+                        writer.WriteProperty("promptFact", nh.Vessel.PromptFact.FullID);
+                }
+                if (nh.Vessel.VesselPosition.HasValue)
+                {
+                    writer.WritePropertyName("vesselSpawn");
+                    writer.WriteStartObject();
+                    writer.WriteProperty("position", nh.Vessel.VesselPosition);
+                    writer.WriteProperty("rotation", nh.Vessel.VesselRotation);
+                    writer.WriteEndObject();
+                    if (nh.Vessel.AlwaysPresent)
+                        writer.WriteProperty("alwaysPresent", nh.Vessel.AlwaysPresent);
+                    if (nh.Vessel.SpawnOnVessel)
+                        writer.WriteProperty("spawnOnVessel", nh.Vessel.SpawnOnVessel);
+                    if (!nh.Vessel.HasPhysics)
+                        writer.WriteProperty("hasPhysics", nh.Vessel.HasPhysics);
+                    if (!nh.Vessel.HasZeroGravityVolume)
+                        writer.WriteProperty("hasZeroGravityVolume", nh.Vessel.HasZeroGravityVolume);
+                }
+                else
+                {
+                    if (vesselProp != null)
+                    {
+                        writer.WriteProperty("vesselSpawn", vesselProp);
+                        var vesselPropData = vesselProp.Prop.GetData() as VesselPropData;
+                        if (nh.Vessel.AlwaysPresent)
+                            writer.WriteProperty("alwaysPresent", vesselPropData.AlwaysPresent);
+                        if (nh.Vessel.SpawnOnVessel)
+                            writer.WriteProperty("spawnOnVessel", vesselPropData.SpawnOnVessel);
+                        if (nh.Vessel.HasPhysics)
+                            writer.WriteProperty("hasPhysics", vesselPropData.HasPhysics);
+                        if (nh.Vessel.HasZeroGravityVolume)
+                            writer.WriteProperty("hasZeroGravityVolume", vesselPropData.HasZeroGravityVolume);
+                    }
+                }
+                if (nh.Vessel.WarpExitPosition.HasValue)
+                {
+                    writer.WritePropertyName("warpExit");
+                    writer.WriteStartObject();
+                    writer.WriteProperty("position", nh.Vessel.WarpExitPosition);
+                    writer.WriteProperty("rotation", nh.Vessel.WarpExitRotation);
+                    writer.WriteProperty("attachToVessel", true);
+                    writer.WriteEndObject();
+                }
+                else
+                {
+                    if (warpExitProp != null)
+                        writer.WriteProperty("warpExit", warpExitProp);
+                }
                 writer.WriteEndObject();
             }
-            var entries = AssetRepository.GetAllAssets<EntryBase>().Where(e => e.Planet && e.Planet.SolarSystem == this);
+            var entries = AssetRepository.GetAllAssets<EntryAsset>().Where(e => e.Planet && e.Planet.StarSystem == this);
             if (entries.Any())
             {
                 writer.WritePropertyName("entryPositions");
@@ -109,17 +158,17 @@ namespace ModDataTools.Assets
                 foreach (var entry in entries)
                 {
                     writer.WriteStartObject();
-                    writer.WriteProperty("id", entry.GetFullID());
+                    writer.WriteProperty("id", entry.FullID);
                     writer.WriteProperty("position", entry.RumorModePosition);
                     writer.WriteEndObject();
                 }
                 writer.WriteEndArray();
             }
-            var initialFacts = AssetRepository.GetAllAssets<FactBase>()
-                .Where(f => f.InitiallyRevealed && f.Entry && f.Entry.Planet && f.Entry.Planet.SolarSystem == this);
+            var initialFacts = AssetRepository.GetAllAssets<FactAsset>()
+                .Where(f => f.InitiallyRevealed && f.Entry && f.Entry.Planet && f.Entry.Planet.StarSystem == this);
             if (initialFacts.Any())
-                writer.WriteProperty("initialReveal", initialFacts.Select(f => f.GetFullID()));
-            var curiosities = AssetRepository.GetAllAssets<Curiosity>().Where(e => e.Planet && e.Planet.SolarSystem == this);
+                writer.WriteProperty("initialReveal", initialFacts.Select(f => f.FullID));
+            var curiosities = AssetRepository.GetAllAssets<EntryAsset>().Where(e => e.IsCuriosity && e.Planet && e.Planet.StarSystem == this);
             if (curiosities.Any())
             {
                 writer.WritePropertyName("curiosities");
@@ -127,30 +176,56 @@ namespace ModDataTools.Assets
                 foreach (var curiosity in curiosities)
                 {
                     writer.WriteStartObject();
-                    writer.WriteProperty("color", curiosity.NormalColor);
-                    writer.WriteProperty("highlightColor", curiosity.HighlightColor);
-                    writer.WriteProperty("id", curiosity.GetFullID());
+                    writer.WriteProperty("color", (Color32)curiosity.NormalColor);
+                    writer.WriteProperty("highlightColor", (Color32)curiosity.HighlightColor);
+                    writer.WriteProperty("id", curiosity.FullID);
                     writer.WriteEndObject();
                 }
                 writer.WriteEndArray();
             }
             writer.WriteEndObject();
         }
-        public string ToJsonString() => ExportUtility.ToJsonString(this);
+
+        public override IEnumerable<AssetResource> GetResources()
+        {
+            if (ExportConfigFile)
+            {
+                if (OverrideConfigFile)
+                    yield return new TextResource(OverrideConfigFile, $"systems/{FullID}.json");
+                else
+                    yield return new TextResource(ExportUtility.ToJsonString(this), $"systems/{FullID}.json");
+            }
+            if (NewHorizons.TravelAudio)
+                yield return new AudioResource(NewHorizons.TravelAudio, this);
+            if (NewHorizons.Skybox.HasCustomSkybox)
+            {
+                if (NewHorizons.Skybox.Right)
+                    yield return new ImageResource(NewHorizons.Skybox.Right, this);
+                if (NewHorizons.Skybox.Left)
+                    yield return new ImageResource(NewHorizons.Skybox.Left, this);
+                if (NewHorizons.Skybox.Top)
+                    yield return new ImageResource(NewHorizons.Skybox.Top, this);
+                if (NewHorizons.Skybox.Bottom)
+                    yield return new ImageResource(NewHorizons.Skybox.Bottom, this);
+                if (NewHorizons.Skybox.Front)
+                    yield return new ImageResource(NewHorizons.Skybox.Front, this);
+                if (NewHorizons.Skybox.Back)
+                    yield return new ImageResource(NewHorizons.Skybox.Back, this);
+            }
+        }
+
+        public string GetResourcePath(UnityEngine.Object resource) => $"systems/{FullName}/{AssetRepository.GetAssetFileName(resource)}";
 
         [Serializable]
         public class NewHorizonsConfig
         {
             [Tooltip("An override value for the far clip plane. Allows you to see farther.")]
-            public bool FarClipPlaneOverrideEnabled;
-            [Tooltip("An override value for the far clip plane. Allows you to see farther.")]
-            [ConditionalField(nameof(FarClipPlaneOverrideEnabled))]
-            public float FarClipPlaneOverride;
+            public NullishSingle FarClipPlaneOverride;
             [Tooltip("Whether this system can be warped to via the warp drive")]
             public bool CanEnterViaWarpDrive = true;
             [Tooltip("Set to the Fact that must be revealed before it can be warped to.")]
             [ConditionalField(nameof(CanEnterViaWarpDrive))]
-            public FactBase FactRequiredForWarp;
+            public FactAsset FactRequiredForWarp;
             [Tooltip("Do you want a clean slate for this star system? Or will it be a modified version of the original.")]
             public bool DestroyStockPlanets = true;
             [Tooltip("Should the time loop be enabled in this system?")]
@@ -169,13 +244,10 @@ namespace ModDataTools.Assets
             [Tooltip("The music to play while flying between planets")]
             public AudioClip TravelAudio;
             [Tooltip("The music to play while flying between planets, if not using a custom audio clip")]
-            [EnumValuePicker]
             [ConditionalField(nameof(TravelAudio), (AudioClip)null)]
+            [EnumValuePicker]
             public AudioType TravelAudioType;
-            [Tooltip("Whether you can warp to this system with the vessel")]
-            public bool HasWarpCoordinates;
             [Tooltip("Settings for the vessel")]
-            [ConditionalField(nameof(HasWarpCoordinates))]
             public VesselConfig Vessel;
         }
 
@@ -207,16 +279,33 @@ namespace ModDataTools.Assets
         public class VesselConfig
         {
             [Tooltip("The position in the solar system the vessel will warp to.")]
-            public Vector3 VesselPosition;
+            public NullishVector3 VesselPosition;
             [Tooltip("Euler angles by which the vessel will be oriented.")]
-            public Vector3 VesselRotation;
+            [ConditionalField(nameof(VesselPosition))]
+            public NullishVector3 VesselRotation;
+
+            [Tooltip("Whether the vessel should spawn in this system even if it wasn't used to warp to it. This will automatically power on the vessel.")]
+            public bool AlwaysPresent;
+            [Tooltip("Whether to always spawn the player on the vessel, even if it wasn't used to warp to the system.")]
+            public bool SpawnOnVessel;
+            [Tooltip("Whether the vessel should have physics enabled. Defaults to false if parentBody is set, and true otherwise.")]
+            public bool HasPhysics;
+            [Tooltip("Whether the vessel should have a zero-gravity volume around it. Defaults to false if parentBody is set, and true otherwise.")]
+            public bool HasZeroGravityVolume;
+
             [Tooltip("The relative position to the vessel that you will be teleported to when you exit the vessel through the black hole.")]
-            public Vector3 WarpExitPosition;
+            public NullishVector3 WarpExitPosition;
             [Tooltip("Euler angles by which the warp exit will be oriented.")]
-            public Vector3 WarpExitRotation;
+            [ConditionalField(nameof(WarpExitPosition))]
+            public NullishVector3 WarpExitRotation;
+
+            [Tooltip("Whether you can warp to this system with the vessel")]
+            public bool HasWarpCoordinates;
             [Tooltip("A ship log fact which will make a prompt appear showing the coordinates when you're in the Vessel.")]
-            public FactBase PromptFact;
+            [ConditionalField(nameof(HasWarpCoordinates))]
+            public FactAsset PromptFact;
             [Tooltip("The warp coordinates to use with the vessel")]
+            [ConditionalField(nameof(HasWarpCoordinates))]
             public Coordinates WarpCoordinates;
         }
 

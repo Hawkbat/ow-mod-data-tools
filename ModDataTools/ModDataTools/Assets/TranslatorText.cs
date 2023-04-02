@@ -4,18 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using ModDataTools.Assets.Resources;
 using ModDataTools.Utilities;
 using UnityEngine;
 
 namespace ModDataTools.Assets
 {
-    [CreateAssetMenu]
-    public class TranslatorText : DataAsset, IValidateableAsset, IXmlAsset
+    [CreateAssetMenu(menuName = ASSET_MENU_PREFIX + nameof(TranslatorTextAsset))]
+    public class TranslatorTextAsset : DataAsset, IValidateableAsset, IXmlSerializable
     {
         [Tooltip("The planet this text is associated with")]
-        public Planet Planet;
-        [Tooltip("How to present this text object for editing; e.g. Branching for wall text, Linear for recorders")]
-        public TextEditType EditType;
+        public PlanetAsset Planet;
         [Header("Export")]
         [Tooltip("Whether to export a text .xml file")]
         public bool ExportXmlFile = true;
@@ -24,10 +23,12 @@ namespace ModDataTools.Assets
         [Header("Data")]
         [Tooltip("Facts to reveal after translating text")]
         public List<RevealFact> RevealFacts = new();
+        [Tooltip("The random seed used to pick what the text arcs will look like.")]
+        public int Seed;
         [Header("Children")]
         [Tooltip("The text blocks of this text object")]
         [HideInInspector]
-        public List<TranslatorTextBlock> TextBlocks = new();
+        public List<TranslatorTextBlockAsset> TextBlocks = new();
 
         public override IEnumerable<DataAsset> GetParentAssets()
         {
@@ -42,7 +43,7 @@ namespace ModDataTools.Assets
             if (OverrideXmlFile) return;
             if (TextBlocks.Any())
             {
-                foreach (TranslatorTextBlock block in TextBlocks)
+                foreach (TranslatorTextBlockAsset block in TextBlocks)
                 {
                     if (block.Parent && !TextBlocks.Any(b => b == block.Parent))
                         validator.Error(this, $"Block is targeting a non-existent parent block");
@@ -67,7 +68,7 @@ namespace ModDataTools.Assets
         {
             writer.WriteStartElement("NomaiObject");
             writer.WriteSchemaAttributes("https://raw.githubusercontent.com/Outer-Wilds-New-Horizons/new-horizons/main/NewHorizons/Schemas/text_schema.xsd");
-            foreach (TranslatorTextBlock textBlock in TextBlocks)
+            foreach (TranslatorTextBlockAsset textBlock in TextBlocks)
             {
                 textBlock.ToXml(writer);
             }
@@ -79,28 +80,45 @@ namespace ModDataTools.Assets
                 else if (reveal.Location == Location.B)
                     writer.WriteEmptyElement("LocationB");
                 writer.WriteStartElement("RevealFact");
-                writer.WriteElementString("FactID", reveal.Fact.GetFullID());
+                writer.WriteElementString("FactID", reveal.Fact.FullID);
                 writer.WriteElementString("Condition", string.Join(",", reveal.TextBlocks));
                 writer.WriteEndElement();
                 writer.WriteEndElement();
             }
             writer.WriteEndElement();
         }
-        public string ToXmlString() => ExportUtility.ToXmlString(this);
+        public string GetXmlOutputPath() => $"text/{Planet.StarSystem.FullName}/{Planet.FullName}/{FullName}.xml";
 
-        public enum TextEditType
+        public override IEnumerable<AssetResource> GetResources()
         {
-            Unknown,
-            Single,
-            Linear,
-            Branching,
+            if (ExportXmlFile)
+            {
+                if (OverrideXmlFile)
+                    yield return new TextResource(OverrideXmlFile, GetXmlOutputPath());
+                else
+                    yield return new TextResource(ExportUtility.ToXmlString(this), GetXmlOutputPath());
+            }
+        }
+
+        public enum TextType
+        {
+            Wall = 0,
+            Scroll = 1,
+            Computer = 2,
+            Cairn = 3,
+            Recorder = 4,
+            PreCrashRecorder = 5,
+            PreCrashComputer = 6,
+            Trailmarker = 7,
+            CairnVariant = 8,
+            Whiteboard = 9,
         }
 
         public enum Location
         {
-            Any,
-            A,
-            B,
+            Unspecified = 0,
+            A = 1,
+            B = 2,
         }
 
         [Serializable]
@@ -109,9 +127,9 @@ namespace ModDataTools.Assets
             [Tooltip("The location ('A' or 'B' for remote text walls) that the player must be at to reveal this fact")]
             public Location Location;
             [Tooltip("The text blocks that must all be read to reveal the fact")]
-            public List<TranslatorTextBlock> TextBlocks;
+            public List<TranslatorTextBlockAsset> TextBlocks;
             [Tooltip("The fact to reveal")]
-            public FactBase Fact;
+            public FactAsset Fact;
         }
     }
 }

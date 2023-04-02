@@ -7,7 +7,7 @@ using ModDataTools.Assets;
 namespace ModDataTools.Editors
 {
     [CanEditMultipleObjects]
-    [CustomEditor(typeof(TranslatorTextBlock), true)]
+    [CustomEditor(typeof(TranslatorTextBlockAsset), true)]
     public class TranslatorTextBlockEditor : DataAssetEditor
     {
 
@@ -25,7 +25,7 @@ namespace ModDataTools.Editors
             base.OnInspectorGUI();
             if (!serializedObject.isEditingMultipleObjects)
             {
-                if (target is TranslatorTextBlock block)
+                if (target is TranslatorTextBlockAsset block)
                 {
                     if (GUILayout.Button("Delete"))
                     {
@@ -40,7 +40,7 @@ namespace ModDataTools.Editors
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
             if (GUILayout.Button("Open Translator Text Editor"))
             {
-                if (!serializedObject.isEditingMultipleObjects && target is TranslatorTextBlock block)
+                if (!serializedObject.isEditingMultipleObjects && target is TranslatorTextBlockAsset block)
                     TranslatorTextEditorWindow.Open(block.TranslatorText);
                 else
                     TranslatorTextEditorWindow.Open(null);

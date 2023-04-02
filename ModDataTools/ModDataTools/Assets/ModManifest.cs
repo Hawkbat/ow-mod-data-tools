@@ -1,4 +1,5 @@
-﻿using ModDataTools.Utilities;
+﻿using ModDataTools.Assets.Resources;
+using ModDataTools.Utilities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,8 +11,8 @@ using UnityEngine;
 
 namespace ModDataTools.Assets
 {
-    [CreateAssetMenu]
-    public class ModManifest : DataAsset, IValidateableAsset, IJsonAsset
+    [CreateAssetMenu(menuName = ASSET_MENU_PREFIX + nameof(ModManifestAsset))]
+    public class ModManifestAsset : DataAsset, IValidateableAsset, IJsonSerializable
     {
         [Header("Export")]
         [Tooltip("Whether to export this mod's data")]
@@ -49,9 +50,9 @@ namespace ModDataTools.Assets
         [Tooltip("The warning to display when starting the mod for the first time")]
         public string Warning;
         [Tooltip("The New Horizons addon manifest for this mod")]
-        public NewHorizonsAddonManifest AddonManifest;
+        public NewHorizonsAddonManifest NewHorizons;
 
-        public override ModManifest GetMod() => this;
+        public override ModManifestAsset GetMod() => this;
 
         public override string GetIDPrefix() => $"{Author}.";
 
@@ -81,8 +82,8 @@ namespace ModDataTools.Assets
             if (!string.IsNullOrEmpty(Patcher))
                 writer.WriteProperty("patch", Patcher);
             writer.WriteProperty("author", Author);
-            writer.WriteProperty("name", GetFullName());
-            writer.WriteProperty("uniqueName", GetFullID());
+            writer.WriteProperty("name", FullName);
+            writer.WriteProperty("uniqueName", FullID);
             writer.WriteProperty("version", Version);
             writer.WriteProperty("owmlVersion", OWMLVersion);
             if (Dependencies.Any())
@@ -103,7 +104,26 @@ namespace ModDataTools.Assets
                 writer.WriteProperty("warning", Warning);
             writer.WriteEndObject();
         }
-        public string ToJsonString() => ExportUtility.ToJsonString(this);
+
+        public override IEnumerable<AssetResource> GetResources()
+        {
+            if (ExportMod)
+            {
+                if (OverrideJsonFile)
+                    yield return new TextResource(OverrideJsonFile, "manifest.json");
+                else
+                    yield return new TextResource(ExportUtility.ToJsonString(this), "manifest.json");
+            }
+            if (NewHorizons.ExportJsonFile)
+            {
+                if (NewHorizons.OverrideJsonFile)
+                    yield return new TextResource(NewHorizons.OverrideJsonFile, "addon-manifest.json");
+                else
+                    yield return new TextResource(ExportUtility.ToJsonString(NewHorizons), "addon-manifest.json");
+            }
+            if (NewHorizons.Icon)
+                yield return new ImageResource(NewHorizons.Icon, $"icons/{FullID}.png");
+        }
 
         public enum Vendors
         {
@@ -114,7 +134,7 @@ namespace ModDataTools.Assets
         }
 
         [Serializable]
-        public class NewHorizonsAddonManifest : IJsonAsset
+        public class NewHorizonsAddonManifest : IJsonSerializable
         {
             [Header("Export")]
             [Tooltip("Whether to export this mod's New Horizons addon-manifest.json file")]
@@ -134,7 +154,7 @@ namespace ModDataTools.Assets
             {
                 writer.WriteStartObject();
                 writer.WriteProperty("$schema", "https://raw.githubusercontent.com/Outer-Wilds-New-Horizons/new-horizons/main/NewHorizons/Schemas/addon_manifest_schema.json");
-                var achievements = AssetRepository.GetAllAssets<Achievement>();
+                var achievements = AssetRepository.GetAllAssets<AchievementAsset>();
                 if (achievements.Any())
                     writer.WriteProperty("achievements", achievements);
                 if (Credits.Any())
@@ -144,7 +164,6 @@ namespace ModDataTools.Assets
 
                 writer.WriteEndObject();
             }
-            public string ToJsonString() => ExportUtility.ToJsonString(this);
 
             [Serializable]
             public class CreditsRow

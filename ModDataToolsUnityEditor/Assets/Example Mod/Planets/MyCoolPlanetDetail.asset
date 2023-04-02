@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 2112342953, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
+  m_Name: MyCoolPlanetDetail
+  m_EditorClassIdentifier: 
+  OverrideFullName: 
+  OverrideFullID: 
+  ID: 
+  Planet: {fileID: 11400000, guid: 5fc288192e46ba84d9fa8f070c3b4ad4, type: 2}
+  Data:
+    Prefab: {fileID: 2503318827341453096, guid: bf378ac2aa282c54c878c5ccd3e7216a,
+      type: 3}
+    Path: 
+    RemoveChildren: []
+    RemoveComponents: 0
+    KeepLoaded: 0
+    HasPhysics: 0
+    PhysicsMass: 0.001
+    PhysicsRadius: 1
+    IgnoreSun: 0
+    IsProxyDetail: 0
+  ParentPath: 
+  IsRelativeToParent: 0
+  Position: {x: 0, y: 0, z: 0}
+  Rotation: {x: 0, y: 0, z: 0}
+  AlignRadial: 0
+  Scale: 1
+  Stretch: {x: 1, y: 1, z: 1}
+  QuantumGroup: {fileID: 0}

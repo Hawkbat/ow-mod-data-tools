@@ -11,14 +11,14 @@ using Delaunay;
 namespace ModDataTools.Assets
 {
 
-    public class DialogueNode : DataAsset, IValidateableAsset, IXmlAsset
+    public class DialogueNodeAsset : DataAsset, IValidateableAsset, IXmlSerializable
     {
         [Tooltip("The dialogue this node belongs to")]
         [ReadOnlyField]
-        public Dialogue Dialogue;
+        public DialogueAsset Dialogue;
         [Header("Data")]
         [Tooltip("The condition that needs to be met in order for the dialogue to begin at this node.")]
-        public List<Condition> EntryConditions = new();
+        public List<ConditionAsset> EntryConditions = new();
         [Tooltip("When used with multiple Dialogues, the node will choose a random one to show")]
         public bool Randomize;
         [Tooltip("Pages of dialogue to show to the player")]
@@ -26,13 +26,13 @@ namespace ModDataTools.Assets
         [Tooltip("A list of options to show to the player once the character is done talking")]
         public List<Option> Options = new();
         [Tooltip("Facts to reveal when the player goes through this dialogue node")]
-        public List<FactBase> RevealFacts = new();
+        public List<FactAsset> RevealFacts = new();
         [Tooltip("Sets new conditions that will only last for the current loop or (if persistent) indefinitely in the current save, unless cancelled or deleted")]
-        public List<Condition> SetConditions = new();
+        public List<ConditionAsset> SetConditions = new();
         [Tooltip("Ship log facts that must be revealed in order to proceed to the target node")]
-        public List<FactBase> RequiredTargetFacts = new();
+        public List<FactAsset> RequiredTargetFacts = new();
         [Tooltip("The dialogue node to go to after this node. Mutually exclusive with using dialogue options")]
-        public DialogueNode Target;
+        public DialogueNodeAsset Target;
 
         public override IEnumerable<DataAsset> GetParentAssets()
         {
@@ -53,11 +53,11 @@ namespace ModDataTools.Assets
         public void ToXml(XmlWriter writer)
         {
             writer.WriteStartElement("DialogueNode");
-            writer.WriteElementString("Name", GetFullID());
+            writer.WriteElementString("Name", FullID);
             if (Dialogue && Dialogue.DefaultNode == this)
                 writer.WriteElementString("EntryCondition", "DEFAULT");
             foreach (var condition in EntryConditions)
-                writer.WriteElementString("EntryCondition", condition.GetFullID());
+                writer.WriteElementString("EntryCondition", condition.FullID);
             if (Randomize)
                 writer.WriteEmptyElement("Randomize");
             writer.WriteStartElement("Dialogue");
@@ -75,62 +75,60 @@ namespace ModDataTools.Assets
             {
                 writer.WriteStartElement("RevealFacts");
                 foreach (var fact in RevealFacts)
-                    writer.WriteElementString("FactID", fact.GetFullID());
+                    writer.WriteElementString("FactID", fact.FullID);
                 writer.WriteEndElement();
             }
             foreach (var condition in SetConditions.Where(c => !c.Persistent))
-                writer.WriteElementString("SetCondition", condition.GetFullID());
+                writer.WriteElementString("SetCondition", condition.FullID);
             foreach (var condition in SetConditions.Where(c => c.Persistent))
-                writer.WriteElementString("SetPersistentCondition", condition.GetFullID());
+                writer.WriteElementString("SetPersistentCondition", condition.FullID);
             foreach (var fact in RequiredTargetFacts)
-                writer.WriteElementString("DialogueTargetShipLogCondition", fact.GetFullID());
+                writer.WriteElementString("DialogueTargetShipLogCondition", fact.FullID);
             if (Target)
-                writer.WriteElementString("DialogueTarget", Target.GetFullID());
+                writer.WriteElementString("DialogueTarget", Target.FullID);
             writer.WriteEndElement();
         }
-        public string ToXmlString() => ExportUtility.ToXmlString(this);
 
         [Serializable]
-        public class Option : IXmlAsset
+        public class Option : IXmlSerializable
         {
             [Tooltip("The text to show for this option")]
             public string Text;
             [Tooltip("Require a condition or persistent condition to be met to show this option")]
-            public List<Condition> RequiredConditions = new();
+            public List<ConditionAsset> RequiredConditions = new();
             [Tooltip("Hide this option if a condition or persistent condition has been met")]
-            public List<Condition> CancelledConditions = new();
+            public List<ConditionAsset> CancelledConditions = new();
             [Tooltip("Require ship log facts to be known to show this option")]
-            public List<FactBase> RequiredFacts = new();
+            public List<FactAsset> RequiredFacts = new();
             [Tooltip("Set these conditions when this option is chosen")]
-            public List<Condition> ConditionsToSet = new();
+            public List<ConditionAsset> ConditionsToSet = new();
             [Tooltip("Cancel these conditions when this option is chosen")]
-            public List<Condition> ConditionsToCancel = new();
+            public List<ConditionAsset> ConditionsToCancel = new();
             [Tooltip("The dialogue node to go to when this option is selected")]
-            public DialogueNode Target;
+            public DialogueNodeAsset Target;
 
             public void ToXml(XmlWriter writer)
             {
                 writer.WriteStartElement("DialogueOption");
                 foreach (var condition in RequiredConditions.Where(c => c.Persistent))
-                    writer.WriteElementString("RequiredPersistentCondition", condition.GetFullID());
+                    writer.WriteElementString("RequiredPersistentCondition", condition.FullID);
                 foreach (var condition in CancelledConditions.Where(c => c.Persistent))
-                    writer.WriteElementString("CancelledPersistentCondition", condition.GetFullID());
+                    writer.WriteElementString("CancelledPersistentCondition", condition.FullID);
                 foreach (var condition in RequiredConditions.Where(c => !c.Persistent))
-                    writer.WriteElementString("RequiredCondition", condition.GetFullID());
+                    writer.WriteElementString("RequiredCondition", condition.FullID);
                 foreach (var condition in CancelledConditions.Where(c => !c.Persistent))
-                    writer.WriteElementString("CancelledCondition", condition.GetFullID());
+                    writer.WriteElementString("CancelledCondition", condition.FullID);
                 foreach (var fact in RequiredFacts)
-                    writer.WriteElementString("RequiredLogCondition", fact.GetFullID());
+                    writer.WriteElementString("RequiredLogCondition", fact.FullID);
                 writer.WriteElementString("Text", Text);
                 foreach (var condition in ConditionsToSet)
-                    writer.WriteElementString("ConditionToSet", condition.GetFullID());
+                    writer.WriteElementString("ConditionToSet", condition.FullID);
                 foreach (var condition in ConditionsToCancel)
-                    writer.WriteElementString("ConditionToCancel", condition.GetFullID());
+                    writer.WriteElementString("ConditionToCancel", condition.FullID);
                 if (Target)
-                    writer.WriteElementString("DialogueTarget", Target.GetFullID());
+                    writer.WriteElementString("DialogueTarget", Target.FullID);
                 writer.WriteEndElement();
             }
-            public string ToXmlString() => ExportUtility.ToXmlString(this);
         }
     }
 }

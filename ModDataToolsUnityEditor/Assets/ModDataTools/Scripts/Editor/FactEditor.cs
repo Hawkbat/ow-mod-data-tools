@@ -7,7 +7,7 @@ using ModDataTools.Assets;
 namespace ModDataTools.Editors
 {
     [CanEditMultipleObjects]
-    [CustomEditor(typeof(FactBase), true)]
+    [CustomEditor(typeof(FactAsset), true)]
     public class FactEditor : DataAssetEditor
     {
 
@@ -25,12 +25,12 @@ namespace ModDataTools.Editors
             base.OnInspectorGUI();
             if (!serializedObject.isEditingMultipleObjects)
             {
-                if (target is FactBase fact)
+                if (target is FactAsset fact)
                 {
                     if (GUILayout.Button("Delete"))
                     {
-                        if (target is RumorFact rumor) fact.Entry.RumorFacts.Remove(rumor);
-                        if (target is ExploreFact exploreFact) fact.Entry.ExploreFacts.Remove(exploreFact);
+                        if (target is RumorFactAsset rumor) fact.Entry.RumorFacts.Remove(rumor);
+                        if (target is ExploreFactAsset exploreFact) fact.Entry.ExploreFacts.Remove(exploreFact);
                         fact.Entry = null;
                         AssetDatabase.RemoveObjectFromAsset(target);
                         AssetDatabase.SaveAssets();

@@ -7,7 +7,7 @@ using ModDataTools.Assets;
 namespace ModDataTools.Editors
 {
     [CanEditMultipleObjects]
-    [CustomEditor(typeof(Assets.DialogueNode), true)]
+    [CustomEditor(typeof(DialogueNodeAsset), true)]
     public class DialogueNodeEditor : DataAssetEditor
     {
 
@@ -25,7 +25,7 @@ namespace ModDataTools.Editors
             base.OnInspectorGUI();
             if (!serializedObject.isEditingMultipleObjects)
             {
-                if (target is Assets.DialogueNode node)
+                if (target is DialogueNodeAsset node)
                 {
                     if (GUILayout.Button("Delete"))
                     {
@@ -42,7 +42,7 @@ namespace ModDataTools.Editors
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
             if (GUILayout.Button("Open Dialogue Editor"))
             {
-                if (!serializedObject.isEditingMultipleObjects && target is Assets.DialogueNode node)
+                if (!serializedObject.isEditingMultipleObjects && target is DialogueNodeAsset node)
                     DialogueEditorWindow.Open(node.Dialogue);
                 else
                     DialogueEditorWindow.Open(null);

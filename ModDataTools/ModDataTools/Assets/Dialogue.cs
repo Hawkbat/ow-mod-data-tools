@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 using UnityEngine;
 using ModDataTools.Utilities;
 using System.Xml;
+using ModDataTools.Assets.Resources;
 
 namespace ModDataTools.Assets
 {
-    [CreateAssetMenu]
-    public class Dialogue : DataAsset, IValidateableAsset, IXmlAsset
+    [CreateAssetMenu(menuName = ASSET_MENU_PREFIX + nameof(DialogueAsset))]
+    public class DialogueAsset : DataAsset, IValidateableAsset, IXmlSerializable
     {
         [Tooltip("The planet this dialogue is associated with")]
-        public Planet Planet;
+        public PlanetAsset Planet;
         [Header("Export")]
         [Tooltip("Whether to export a dialogue .xml file")]
         public bool ExportXmlFile = true;
@@ -26,11 +27,11 @@ namespace ModDataTools.Assets
         [ConditionalField(nameof(Type), DialogueType.Character)]
         public string CharacterName;
         [Tooltip("The dialogue node that will be used if no other conditions are met")]
-        public DialogueNode DefaultNode;
+        public DialogueNodeAsset DefaultNode;
         [Header("Children")]
         [Tooltip("The flattened list of dialogue nodes")]
         [HideInInspector]
-        public List<DialogueNode> Nodes = new();
+        public List<DialogueNodeAsset> Nodes = new();
 
         public enum DialogueType
         {
@@ -57,7 +58,7 @@ namespace ModDataTools.Assets
             {
                 node.Validate(validator);
                 if (node.Target && !Nodes.Any(n => n == node.Target))
-                    validator.Error(this, $"Node '{node.GetFullName()}' is targeting a non-existent node");
+                    validator.Error(this, $"Node '{node.FullName}' is targeting a non-existent node");
             }
         }
 
@@ -72,11 +73,23 @@ namespace ModDataTools.Assets
             else if (Type == DialogueType.Character)
                 writer.WriteElementString("NameField", CharacterName);
             else
-                writer.WriteElementString("NameField", GetFullName());
+                writer.WriteElementString("NameField", FullName);
             foreach (var node in Nodes)
                 node.ToXml(writer);
             writer.WriteEndElement();
         }
-        public string ToXmlString() => ExportUtility.ToXmlString(this);
+        public string GetXmlOutputPath() =>
+            $"dialogue/{Planet.StarSystem.FullName}/{Planet.FullName}/{FullName}.xml";
+
+        public override IEnumerable<AssetResource> GetResources()
+        {
+            if (ExportXmlFile)
+            {
+                if (OverrideXmlFile)
+                    yield return new TextResource(OverrideXmlFile, GetXmlOutputPath());
+                else
+                    yield return new TextResource(ExportUtility.ToXmlString(this), GetXmlOutputPath());
+            }
+        }
     }
 }

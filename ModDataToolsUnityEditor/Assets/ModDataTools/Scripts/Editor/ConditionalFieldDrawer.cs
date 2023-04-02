@@ -3,22 +3,42 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using ModDataTools.Utilities;
+using System.Reflection;
 
 namespace ModDataTools.Editors
 {
     [CustomPropertyDrawer(typeof(ConditionalFieldAttribute))]
     public class ConditionalFieldDrawer : PropertyDrawer
     {
+        PropertyDrawer baseDrawer;
+
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             if (attribute is ConditionalFieldAttribute conditional && !IsConditionTrue(property, conditional)) return -EditorGUIUtility.standardVerticalSpacing;
+            if (property.type.StartsWith("Nullish"))
+            {
+                if (baseDrawer == null || !(baseDrawer is NullishDrawer)) baseDrawer = new NullishDrawer();
+                return baseDrawer.GetPropertyHeight(property, label);
+            }
             return EditorGUI.GetPropertyHeight(property, label, true);
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             if (attribute is ConditionalFieldAttribute conditional && !IsConditionTrue(property, conditional)) return;
-            EditorGUI.PropertyField(position, property, label, true);
+            var enumValuePickerAttribute = fieldInfo.GetCustomAttribute<EnumValuePickerAttribute>();
+            if (enumValuePickerAttribute != null)
+            {
+                if (baseDrawer == null || !(baseDrawer is EnumValuePickerDrawer)) baseDrawer = new EnumValuePickerDrawer();
+                baseDrawer.OnGUI(position, property, label);
+            } else if (property.type.StartsWith("Nullish"))
+            {
+                if (baseDrawer == null || !(baseDrawer is NullishDrawer)) baseDrawer = new NullishDrawer();
+                baseDrawer.OnGUI(position, property, label);
+            } else
+            {
+                EditorGUI.PropertyField(position, property, label, true);
+            }
         }
 
         bool IsConditionTrue(SerializedProperty property, ConditionalFieldAttribute conditional)
@@ -35,6 +55,11 @@ namespace ModDataTools.Editors
             {
                 foreach (var value in conditional.Values)
                 {
+                    if (prop.type.StartsWith("Nullish"))
+                    {
+                        var hasValueProp = prop.FindPropertyRelative("hasValue");
+                        if (value is bool b && hasValueProp.boolValue == b) return true;
+                    }
                     switch (prop.propertyType)
                     {
                         case SerializedPropertyType.Boolean:
@@ -54,7 +79,7 @@ namespace ModDataTools.Editors
                             if (prop.objectReferenceValue == (Object)value) return true;
                             break;
                         default:
-                            Debug.LogError("Unsupported property type: " + prop.propertyType);
+                            Debug.LogError("Unsupported property type: " + prop.propertyType + " at " + prop.propertyPath);
                             return false;
                     }
                 }
@@ -62,6 +87,11 @@ namespace ModDataTools.Editors
             }
             else
             {
+                if (prop.type.StartsWith("Nullish"))
+                {
+                    var hasValueProp = prop.FindPropertyRelative("hasValue");
+                    return hasValueProp.boolValue;
+                }
                 switch (prop.propertyType)
                 {
                     case SerializedPropertyType.Boolean:
@@ -76,7 +106,7 @@ namespace ModDataTools.Editors
                     case SerializedPropertyType.ObjectReference:
                         return prop.objectReferenceValue != null;
                     default:
-                        Debug.LogError("Unsupported property type: " + prop.propertyType);
+                        Debug.LogError("Unsupported property type: " + prop.propertyType + " at " + prop.propertyPath);
                         return false;
                 }
             }

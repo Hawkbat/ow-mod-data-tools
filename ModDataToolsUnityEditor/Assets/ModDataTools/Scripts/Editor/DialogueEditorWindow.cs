@@ -9,11 +9,11 @@ namespace ModDataTools.Editors
 {
     public class DialogueEditorWindow : EditorWindow
     {
-        Dialogue dialogue;
+        DialogueAsset dialogue;
 
         [MenuItem("Window/Dialogue Editor")]
         public static void Open() => Open(null);
-        public static void Open(Dialogue dialogue)
+        public static void Open(DialogueAsset dialogue)
         {
             var window = GetWindow<DialogueEditorWindow>();
             if (dialogue) window.dialogue = dialogue;
@@ -28,10 +28,10 @@ namespace ModDataTools.Editors
 
             if (!dialogue)
             {
-                dialogue = Selection.activeObject as Dialogue;
+                dialogue = Selection.activeObject as DialogueAsset;
                 if (!dialogue)
                 {
-                    var node = Selection.activeObject as Assets.DialogueNode;
+                    var node = Selection.activeObject as DialogueNodeAsset;
                     if (node)
                     {
                         dialogue = node.Dialogue;
@@ -40,14 +40,14 @@ namespace ModDataTools.Editors
             }
             if (!dialogue)
             {
-                GUILayout.Label($"Select a {nameof(Dialogue)} asset");
+                GUILayout.Label($"Select a {nameof(DialogueAsset)} asset");
                 return;
             }
-            EditorGUILayout.ObjectField(dialogue, typeof(Dialogue), false);
+            EditorGUILayout.ObjectField(dialogue, typeof(DialogueAsset), false);
             foreach (var node in dialogue.Nodes)
             {
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-                EditorGUILayout.ObjectField(node, typeof(Assets.DialogueNode), false);
+                EditorGUILayout.ObjectField(node, typeof(DialogueNodeAsset), false);
                 if (node.Pages.Any())
                 {
                     var pageIndex = 0;
@@ -93,7 +93,7 @@ namespace ModDataTools.Editors
                 EditorGUILayout.EndHorizontal();
                 if (!node.Options.Any())
                 {
-                    var nodeOptions = dialogue.Nodes.Select(n => n.GetFullName()).ToList();
+                    var nodeOptions = dialogue.Nodes.Select(n => n.FullName).ToList();
                     nodeOptions.Insert(0, "(Exit Dialogue)");
                     var currentIndex = node.Target ? dialogue.Nodes.IndexOf(node.Target) : -1;
                     var targetIndex = EditorGUILayout.Popup("Target", currentIndex + 1, nodeOptions.ToArray()) - 1;
@@ -136,7 +136,7 @@ namespace ModDataTools.Editors
                             node.Options.RemoveAt(optionIndex);
                         }
                         EditorGUILayout.EndHorizontal();
-                        var nodeOptions = dialogue.Nodes.Select(n => n.GetFullName()).ToList();
+                        var nodeOptions = dialogue.Nodes.Select(n => n.FullName).ToList();
                         nodeOptions.Insert(0, "(Exit Dialogue)");
                         var currentIndex = option.Target ? dialogue.Nodes.IndexOf(option.Target) : -1;
                         var targetIndex = EditorGUILayout.Popup("Target", currentIndex + 1, nodeOptions.ToArray()) - 1;
@@ -152,7 +152,7 @@ namespace ModDataTools.Editors
                     if (GUILayout.Button("+ Add Option", GUILayout.ExpandWidth(false)))
                     {
                         Undo.RecordObject(node, "Add option");
-                        node.Options.Add(new Assets.DialogueNode.Option());
+                        node.Options.Add(new DialogueNodeAsset.Option());
                     }
                     EditorGUILayout.EndHorizontal();
                 }
@@ -160,7 +160,7 @@ namespace ModDataTools.Editors
             }
             if (GUILayout.Button("+ Add Node"))
             {
-                var node = CreateInstance<Assets.DialogueNode>();
+                var node = CreateInstance<DialogueNodeAsset>();
 
                 node.Dialogue = dialogue;
                 node.name = "New Node";

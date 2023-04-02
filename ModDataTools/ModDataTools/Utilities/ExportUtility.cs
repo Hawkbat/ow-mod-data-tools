@@ -12,7 +12,7 @@ namespace ModDataTools.Utilities
 {
     public static class ExportUtility
     {
-        public static string ToJsonString(IJsonAsset asset)
+        public static string ToJsonString(IJsonSerializable asset)
         {
             using var stringWriter = new Utf8StringWriter();
             using var jsonWriter = new JsonTextWriter(stringWriter);
@@ -21,7 +21,7 @@ namespace ModDataTools.Utilities
             jsonWriter.Close();
             return stringWriter.ToString();
         }
-        public static string ToXmlString(IXmlAsset asset)
+        public static string ToXmlString(IXmlSerializable asset)
         {
             using var stringWriter = new Utf8StringWriter();
             using var xmlWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings()

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -227740777, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
+  m_Name: Activated a Reveal Volume
+  m_EditorClassIdentifier: 
+  OverrideFullName: 
+  OverrideFullID: 
+  ID: 
+  Mod: {fileID: 11400000, guid: 25927d5d3f87cdf4182aa978103dbfd1, type: 2}
+  Icon: {fileID: 2800000, guid: d0a1989bfdb4ab747a28220eb5379ffa, type: 3}
+  Secret: 0
+  Facts: []
+  Signals:
+  - {fileID: 11400000, guid: 73bc2dc10d0ac1945be8e1c8c063c297, type: 2}
+  Conditions: []

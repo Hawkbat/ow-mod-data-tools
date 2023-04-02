@@ -7,7 +7,7 @@ using ModDataTools.Assets;
 
 namespace ModDataTools.Editors
 {
-    [CustomPropertyDrawer(typeof(StarSystem.Coordinates))]
+    [CustomPropertyDrawer(typeof(StarSystemAsset.Coordinates))]
     public class WarpCoordinatesDrawer : PropertyDrawer
     {
         const int COORD_TEX_SIZE = 50;

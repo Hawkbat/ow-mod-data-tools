@@ -6,6 +6,7 @@ using ModDataTools.Assets;
 
 namespace ModDataTools.Editors
 {
+    [CanEditMultipleObjects]
     [CustomEditor(typeof(DataAsset), true)]
     public class DataAssetEditor : Editor
     {
@@ -19,10 +20,10 @@ namespace ModDataTools.Editors
                     EditorGUILayout.Space(EditorGUIUtility.singleLineHeight * 0.5f);
                     EditorGUILayout.LabelField("Computed", EditorStyles.boldLabel);
                     EditorGUI.indentLevel++;
-                    EditorGUILayout.LabelField("Full ID", asset.GetFullID());
-                    EditorGUILayout.LabelField("Full Name", asset.GetFullName());
+                    EditorGUILayout.LabelField("Full ID", asset.FullID);
+                    EditorGUILayout.LabelField("Full Name", asset.FullName);
                     GUI.enabled = false;
-                    EditorGUILayout.ObjectField("Mod", asset.GetMod(), typeof(ModManifest), false);
+                    EditorGUILayout.ObjectField("Mod", asset.GetMod(), typeof(ModManifestAsset), false);
                     GUI.enabled = true;
                     EditorGUI.indentLevel--;
 

@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 516522442, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
+  m_Name: New Dialogue Asset
+  m_EditorClassIdentifier: 
+  OverrideFullName: 
+  OverrideFullID: 
+  ID: 
+  Planet: {fileID: 11400000, guid: 5fc288192e46ba84d9fa8f070c3b4ad4, type: 2}
+  ExportXmlFile: 1
+  OverrideXmlFile: {fileID: 0}
+  Type: 0
+  CharacterName: 
+  DefaultNode: {fileID: 6770986479386769777}
+  Nodes:
+  - {fileID: 6770986479386769777}
+--- !u!114 &6770986479386769777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1295355200, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
+  m_Name: New Node
+  m_EditorClassIdentifier: 
+  OverrideFullName: 
+  OverrideFullID: 
+  ID: 
+  Dialogue: {fileID: 11400000}
+  EntryConditions: []
+  Randomize: 0
+  Pages: []
+  Options: []
+  RevealFacts: []
+  SetConditions: []
+  RequiredTargetFacts: []
+  Target: {fileID: 0}
