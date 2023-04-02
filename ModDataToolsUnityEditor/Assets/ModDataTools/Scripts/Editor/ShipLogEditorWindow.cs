@@ -26,6 +26,8 @@ namespace ModDataTools.Editors
         static GUIStyle entryBackStyle;
         static GUIStyle entryHeadStyle;
         static GUIStyle entryBodyStyle;
+        static GUIStyle rumorLineStyle;
+        static GUIStyle rumorArrowStyle;
 
         [MenuItem("Window/Ship Log Editor")]
         public static void Open()
@@ -44,6 +46,10 @@ namespace ModDataTools.Editors
             black.SetPixel(0, 0, Color.black);
             black.Apply();
 
+            Texture2D grey = new Texture2D(1, 1);
+            black.SetPixel(0, 0, Color.grey);
+            black.Apply();
+
             entryBackStyle = new GUIStyle();
             entryBackStyle.name = nameof(entryBackStyle);
             entryBackStyle.imagePosition = ImagePosition.ImageOnly;
@@ -52,9 +58,9 @@ namespace ModDataTools.Editors
             entryHeadStyle = new GUIStyle();
             entryHeadStyle.name = nameof(entryHeadStyle);
             entryHeadStyle.imagePosition = ImagePosition.TextOnly;
-            entryHeadStyle.font = EditorGUIUtility.Load("Fonts/RobotoMono/RobotoMono-Regular.ttf") as Font;
+            entryHeadStyle.font = Resources.Load<Font>("ModDataTools/Fonts/SpaceMono-Bold");
+            entryHeadStyle.fontSize = 14;
             entryHeadStyle.wordWrap = true;
-            entryHeadStyle.richText = true;
             entryHeadStyle.alignment = TextAnchor.MiddleCenter;
             entryHeadStyle.normal.textColor = Color.black;
 
@@ -62,28 +68,22 @@ namespace ModDataTools.Editors
             entryBodyStyle.name = nameof(entryBodyStyle);
             entryBodyStyle.imagePosition = ImagePosition.ImageOnly;
             entryBodyStyle.normal.background = black;
-        }
 
-        int GetFontSize(EntryAsset entry, EntryAsset parentEntry)
-        {
-            var baseSize = 14;
-            var multiplier =
-                    parentEntry != null ?
-                        parentEntry.IsCuriosity ?
-                            0.8f
-                            : 0.6f
-                    : entry.IsCuriosity ?
-                        2f
-                        : 1f;
-            return Mathf.RoundToInt(baseSize * multiplier * zoom);
-        }
+            rumorLineStyle = new GUIStyle();
+            rumorLineStyle.name = nameof(rumorLineStyle);
+            rumorLineStyle.imagePosition = ImagePosition.ImageOnly;
+            rumorLineStyle.normal.background = grey;
+            rumorLineStyle.onNormal.background = rumorLineStyle.normal.background;
+            rumorLineStyle.hover.background = white;
+            rumorLineStyle.onHover.background = rumorLineStyle.hover.background;
 
-        private List<T> LoadAllAssetsOfType<T>() where T : Object
-        {
-            return AssetDatabase.FindAssets("t:" + typeof(T).Name)
-                .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
-                .Select(path => AssetDatabase.LoadAssetAtPath<T>(path))
-                .ToList();
+            rumorArrowStyle = new GUIStyle();
+            rumorArrowStyle.name = nameof(rumorArrowStyle);
+            rumorArrowStyle.imagePosition = ImagePosition.ImageOnly;
+            rumorArrowStyle.normal.background = Resources.Load<Texture2D>("ModDataTools/Textures/RumorArrowGrey");
+            rumorArrowStyle.onNormal.background = rumorArrowStyle.normal.background;
+            rumorArrowStyle.hover.background = Resources.Load<Texture2D>("ModDataTools/Textures/RumorArrow");
+            rumorArrowStyle.onHover.background = rumorArrowStyle.hover.background;
         }
 
         private void OnGUI()
@@ -149,22 +149,36 @@ namespace ModDataTools.Editors
             {
                 if (fact.Entry && fact.Source && entryRects.ContainsKey(fact.Entry) && entryRects.ContainsKey(fact.Source))
                 {
-                    var start = entryRects[fact.Source].center;
-                    var end = entryRects[fact.Entry].center;
+                    var isTwoWayRumor = rumorFacts.Any(r => r.Source == fact.Entry && r.Entry == fact.Source);
+
+                    var startRect = entryRects[fact.Source];
+                    var start = startRect.center;
+                    var endRect = entryRects[fact.Entry];
+                    var end = endRect.center;
+
+                    if (RectIntersect(start, end, startRect, out Vector2 intersectStart))
+                        start = intersectStart;
+                    if (RectIntersect(start, end, endRect, out Vector2 intersectEnd))
+                        end = intersectEnd;
+
+                    var dir = (end - start).normalized;
                     var dist = (end - start).magnitude;
-                    var count = Mathf.FloorToInt(dist / 30f);
-                    for (var i = 1; i < count; i++)
+                    var mid = Vector2.Lerp(start, end, 0.5f);
+                    var matrix = GUI.matrix;
+                    GUIUtility.RotateAroundPivot(Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg, mid);
+                    GUI.backgroundColor = new Color(1f, 1f, 1f, 0.5f);
+                    if (GUI.Button(new Rect(mid.x - dist * 0.5f, mid.y - 5f, dist, 10f), string.Empty, rumorLineStyle))
                     {
-                        var p = Vector2.Lerp(start, end, Mathf.InverseLerp(0, count, i));
-                        if (GUI.Button(new Rect(p.x - 5f, p.y - 5f, 10f, 10f), ""))
-                        {
-                            Selection.activeObject = fact;
-                        }
+                        Selection.activeObject = fact;
                     }
+                    GUI.backgroundColor = Color.white;
+                    if (GUI.Button(new Rect(mid.x - 20f + (isTwoWayRumor ? 30f : 0f), mid.y - 20f, 40f, 40f), string.Empty, rumorArrowStyle)) {
+                        Selection.activeObject = fact;
+                    }
+                    GUI.matrix = matrix;
                 }
             }
 
-            // 3.125 pixels per unit
             // EntryCard: t:None AnchoredPosition (X, Y) AnchorMin (0.5, 0.5) OffsetMin(X, Y) AnchorMax (0.5, 0.5) OffsetMax(X, Y) Pivot (0.5, 0.5) SizeDelta (110, 145)
             // > EntryCardRoot: t:None AnchoredPosition (0, 0) AnchorMin (0, 0) OffsetMin(0, 0) AnchorMax (1, 1) OffsetMax(0, 0) Pivot (0.5, 0.5) SizeDelta (0, 0)
             // > > Background: t:Image (solid black) AnchoredPosition (0, 0) AnchorMin (0.5, 0) OffsetMin(-55, 0) AnchorMax (0.5, 0) OffsetMax(55, 110) Pivot (0.5, 0) SizeDelta (110, 110)
@@ -173,35 +187,48 @@ namespace ModDataTools.Editors
             // > > EntryCardBackground: t:Image (solid black) AnchoredPosition (0, 0) AnchorMin (0, 0) OffsetMin(0, 0) AnchorMax (1, 0) OffsetMax(0, 110) Pivot (0.5, 0) SizeDelta (0, 110)
             // > > > PhotoImage: t:Image (entry photo) AnchoredPosition (0, 0) AnchorMin (0, 0) OffsetMin (0, 0) AnchorMax (1, 1) OffsetMax (0, 0) Pivot (0.5, 0.5) SizeDelta (0, 0)
             // > > Border: t:Image (entry-colored image with solid 4px (of 512px) border and transparent interior) AnchoredPosition (0, 0) AnchorMin (0, 0) OffsetMin (0, 0) AnchorMax (1, 1) OffsetMax (0, 0) Pivot (0.5, 0.5) SizeDelta (0, 0)
+            
+            // 32 reference pixels per unit, 15x scale, calculated 3.125 pixels per unit
+            // 110x145 base size, increases to 110x151.3333 for two-line text, 110x167.9583 for three-line text
 
             foreach (var entry in sortedEntries)
             {
                 bool isSelected = selected.Contains(entry);
                 var parentEntry = entry is EntryAsset e ? e.Parent : null;
                 var scale = entry.IsCuriosity ? 2f : parentEntry != null ? parentEntry.IsCuriosity ? 0.8f : 0.6f : 1f;
-                var size = new Vector2(110f, 110f) * scale * zoom;
+
+                var size = new Vector2(110f, 145f);
                 var parentCuriosity = entry.IsCuriosity ? entry : entry.Curiosity ? entry.Curiosity : null;
-                var label = new GUIContent("<size=" + GetFontSize(entry, parentEntry) + ">" + entry.FullName + "</size>");
-                size.y += entryHeadStyle.CalcHeight(label, size.x);
+                var label = new GUIContent(entry.FullName);
+
+                var lineCount = Mathf.RoundToInt(entryHeadStyle.CalcHeight(label, size.x) / 21f);
+                size.y = Mathf.Max(145f, 134.70833f + (lineCount - 1) * 16.62497f);
 
                 var entryOffset = offset;
                 if (isSelected && wasEntryClick) entryOffset += dragOffset;
 
-                var rect = new Rect((entry.EditorPosition + entryOffset) * zoom - size * 0.5f, size);
-                entryRects[entry] = rect;
-                var isHovered = rect.Contains(Event.current.mousePosition);
+                var center = entry.EditorPosition + entryOffset;
+                var rect = new Rect(center - size * 0.5f, size);
+                var scaledRect = new Rect(center - (size * scale * zoom) * 0.5f, size * scale * zoom);
+                entryRects[entry] = scaledRect;
+                var isHovered = scaledRect.Contains(Event.current.mousePosition);
                 if (isHovered)
                     hovered = entry;
-                var isDragSelected = !wasEntryClick && rect.Overlaps(GetDragRect());
+                var isDragSelected = !wasEntryClick && scaledRect.Overlaps(GetDragRect());
+                EditorGUIUtility.AddCursorRect(scaledRect, MouseCursor.MoveArrow);
 
                 var color = parentCuriosity != null ? isSelected ? parentCuriosity.HighlightColor : isHovered || isDragSelected ? Color.Lerp(parentCuriosity.NormalColor, parentCuriosity.HighlightColor, 0.5f) : parentCuriosity.NormalColor : Color.white;
 
-                EditorGUIUtility.AddCursorRect(rect, MouseCursor.MoveArrow);
+                var matrix = GUI.matrix;
+
+                GUIUtility.ScaleAroundPivot(Vector2.one * scale * zoom, scaledRect.center);
                 GUI.color = color;
                 GUI.Box(rect, "", entryBackStyle);
                 GUI.color = Color.white;
-                GUI.Label(new Rect(rect.position, new Vector2(rect.width, rect.height - rect.width)), label, entryHeadStyle);
+                GUI.Label(new Rect(rect.position.x + 2f, rect.position.y + 2f, rect.width - 4f, rect.height - rect.width - 4f), label, entryHeadStyle);
                 GUI.Box(new Rect(rect.position.x + 1f, rect.position.y + 1f + (rect.height - rect.width), rect.width - 2f, rect.width - 2f), new GUIContent("", entry.Photo), entryBodyStyle);
+
+                GUI.matrix = matrix;
             }
 
             if (Event.current.type == EventType.MouseDown)
@@ -354,6 +381,41 @@ namespace ModDataTools.Editors
             }
 
             lastHovered = hovered;
+        }
+
+        bool LineIntersect(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, out Vector2 result)
+        {
+            var denominator = (b2.y - b1.y) * (a2.x - a1.x) - (b2.x - b1.x) * (a2.y - a1.y);
+            if (denominator == 0)
+            {
+                result = Vector2.zero;
+                return false;
+            }
+            var ua = ((b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x)) / denominator;
+            var ub = ((a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x)) / denominator;
+            if (ua < 0f || ua > 1f || ub < 0f || ub > 1f)
+            {
+                result = Vector2.zero;
+                return false;
+            }
+            var x = a1.x + ua * (a2.x - a1.x);
+            var y = a1.y + ua * (a2.y - a1.y);
+            result = new Vector2(x, y);
+            return true;
+        }
+
+        bool RectIntersect(Vector2 start, Vector2 end, Rect rect, out Vector2 result)
+        {
+            var tl = new Vector2(rect.xMin, rect.yMin);
+            var tr = new Vector2(rect.xMax, rect.yMin);
+            var bl = new Vector2(rect.xMin, rect.yMax);
+            var br = new Vector2(rect.xMax, rect.yMax);
+            if (LineIntersect(start, end, tl, tr, out result)) return true;
+            if (LineIntersect(start, end, tr, br, out result)) return true;
+            if (LineIntersect(start, end, br, bl, out result)) return true;
+            if (LineIntersect(start, end, bl, tl, out result)) return true;
+            result = Vector2.zero;
+            return false;
         }
 
         Rect GetDragRect()

@@ -34,7 +34,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -460767994, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
-  m_Name: A Curiosity
+  m_Name: Ash Twin Project
   m_EditorClassIdentifier: 
   OverrideFullName: 
   OverrideFullID: 
@@ -74,7 +74,7 @@ MonoBehaviour:
   ID: 
   Entry: {fileID: 11400000}
   IgnoreMoreToExplore: 0
-  Text: 
+  Text: Stuff here
   AltTextCondition: {fileID: 0}
   AltText: 
   InitiallyRevealed: 0

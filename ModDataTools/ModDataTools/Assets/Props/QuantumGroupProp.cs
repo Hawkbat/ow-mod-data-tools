@@ -6,9 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using static ModDataTools.Assets.Props.QuantumGroupPropData;
-using UnityEngine.Assertions;
-using System.ComponentModel;
 
 namespace ModDataTools.Assets.Props
 {
@@ -24,7 +21,7 @@ namespace ModDataTools.Assets.Props
         [Tooltip("If this is true, then the states will be presented in order, rather than in a random order")]
         public bool Sequential;
         [ConditionalField(nameof(Type), QuantumGroupType.States)]
-        [ConditionalField(nameof(Sequential))]
+        [Tooltip($"Only applicable if {nameof(Sequential)} is set. If this is false, then after the last state has appeared, the object will no longer change state")]
         public bool Loop = true;
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
@@ -52,7 +49,7 @@ namespace ModDataTools.Assets.Props
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
             writer.WriteProperty("id", FullID);
-            if (Data.Type == QuantumGroupType.Sockets)
+            if (Data.Type == QuantumGroupPropData.QuantumGroupType.Sockets)
             {
                 var childSockets = AssetRepository.GetProps<QuantumSocketPropData>(context.Planet)
                 .Where(ctx => (ctx.Prop is QuantumSocketPropAsset sa && sa.QuantumGroup == this)
@@ -72,7 +69,7 @@ namespace ModDataTools.Assets.Props
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
             writer.WriteProperty("id", GroupID);
-            if (Data.Type == QuantumGroupType.Sockets)
+            if (Data.Type == QuantumGroupPropData.QuantumGroupType.Sockets)
             {
                 var childSockets = AssetRepository.GetProps<QuantumSocketPropData>(context.Planet)
                     .Where(ctx => ctx.Prop is QuantumSocketPropComponent sc && sc.QuantumGroup == this);

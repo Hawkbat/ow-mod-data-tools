@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace ModDataTools.Utilities
 {
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Field, Inherited = true)]
     public class ConditionalFieldAttribute : PropertyAttribute
     {
         public string Field;
