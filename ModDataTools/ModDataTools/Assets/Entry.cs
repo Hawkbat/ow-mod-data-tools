@@ -43,7 +43,6 @@ namespace ModDataTools.Assets
         public EntryAsset Parent;
 
         [Tooltip("The color of the curiosity and associated entries when highlighted")]
-        [ColorUsage(false)]
         [ConditionalField(nameof(IsCuriosity))]
         public Color Color = Color.white;
         [Tooltip("If set, will override the default behavior of making the non-highlighted color a slightly darker version of the primary color")]

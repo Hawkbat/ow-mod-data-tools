@@ -23,8 +23,8 @@ namespace ModDataTools.Assets
         [ConditionalField(nameof(Scope), ScopeType.Planet)]
         public PlanetAsset Planet;
         [Tooltip("A solar system to make this condition unique to")]
-        [ConditionalField(nameof(Scope), ScopeType.SolarSystem)]
-        public StarSystemAsset SolarSystem;
+        [ConditionalField(nameof(Scope), ScopeType.StarSystem)]
+        public StarSystemAsset StarSystem;
         [Header("Data")]
         [Tooltip("Whether the condition will only last for the current loop or (if persistent) indefinitely in the current save, unless cancelled or deleted")]
         public bool Persistent;
@@ -34,7 +34,7 @@ namespace ModDataTools.Assets
             if (Scope == ScopeType.Mod && Mod) yield return Mod;
             if (Scope == ScopeType.Dialogue && Dialogue) yield return Dialogue;
             if (Scope == ScopeType.Planet && Planet) yield return Planet;
-            if (Scope == ScopeType.SolarSystem && SolarSystem) yield return SolarSystem;
+            if (Scope == ScopeType.StarSystem && StarSystem) yield return StarSystem;
         }
 
         public enum ScopeType
@@ -42,7 +42,7 @@ namespace ModDataTools.Assets
             Mod,
             Dialogue,
             Planet,
-            SolarSystem,
+            StarSystem,
         }
 
         public override void Validate(IAssetValidator validator)
@@ -54,8 +54,8 @@ namespace ModDataTools.Assets
                 validator.Error(this, $"Missing ${nameof(Dialogue)}");
             if (Scope == ScopeType.Planet && !Planet)
                 validator.Error(this, $"Missing ${nameof(Planet)}");
-            if (Scope == ScopeType.SolarSystem && !SolarSystem)
-                validator.Error(this, $"Missing ${nameof(SolarSystem)}");
+            if (Scope == ScopeType.StarSystem && !StarSystem)
+                validator.Error(this, $"Missing ${nameof(StarSystem)}");
         }
     }
 }

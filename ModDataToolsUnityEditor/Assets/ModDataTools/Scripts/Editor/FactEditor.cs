@@ -36,12 +36,12 @@ namespace ModDataTools.Editors
                         AssetDatabase.SaveAssets();
                         AssetDatabase.Refresh();
                     }
+                    GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                    if (GUILayout.Button("Open Ship Log Editor"))
+                    {
+                        ShipLogEditorWindow.Open(fact.Entry?.Planet?.StarSystem);
+                    }
                 }
-            }
-            GUILayout.Space(EditorGUIUtility.singleLineHeight);
-            if (GUILayout.Button("Open Ship Log Editor"))
-            {
-                ShipLogEditorWindow.Open();
             }
         }
     }

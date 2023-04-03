@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-4767344939252680674
+--- !u!114 &-3938709342694220902
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -1272283372, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
-  m_Name: A Rumor
+  m_Name: New Rumor
   m_EditorClassIdentifier: 
   OverrideFullName: 
   OverrideFullID: 
   ID: 
   Entry: {fileID: 11400000}
   IgnoreMoreToExplore: 0
-  Text: There's a thing out there.
+  Text: 
   AltTextCondition: {fileID: 0}
   AltText: 
   InitiallyRevealed: 0
-  Source: {fileID: 11400000, guid: 61661a5b21f16d44b973400253118af3, type: 2}
+  Source: {fileID: 0}
   RumorName: 
   RumorNamePriority: 0
 --- !u!114 &11400000
@@ -34,25 +34,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -460767994, guid: 5a4b5afa9d54a8641821ee88caa5093b, type: 3}
-  m_Name: Some Entry
+  m_Name: Another Entry
   m_EditorClassIdentifier: 
   OverrideFullName: 
   OverrideFullID: 
   ID: 
   Planet: {fileID: 11400000, guid: 5fc288192e46ba84d9fa8f070c3b4ad4, type: 2}
-  RumorModePosition: {x: 330, y: 220}
+  RumorModePosition: {x: 120, y: -100}
   IgnoreMoreToExplore: 0
   IgnoreMoreToExploreCondition: {fileID: 0}
-  Photo: {fileID: 2800000, guid: d0a1989bfdb4ab747a28220eb5379ffa, type: 3}
+  Photo: {fileID: 0}
   AltPhoto: {fileID: 0}
   AltPhotoCondition: {fileID: 0}
   IsCuriosity: 0
-  Curiosity: {fileID: 11400000, guid: 61661a5b21f16d44b973400253118af3, type: 2}
+  Curiosity: {fileID: 0}
   Parent: {fileID: 0}
   Color: {r: 1, g: 1, b: 1, a: 1}
   OverrideNormalColor:
     hasValue: 0
     value: {r: 0, g: 0, b: 0, a: 0}
   RumorFacts:
-  - {fileID: -4767344939252680674}
+  - {fileID: -3938709342694220902}
   ExploreFacts: []

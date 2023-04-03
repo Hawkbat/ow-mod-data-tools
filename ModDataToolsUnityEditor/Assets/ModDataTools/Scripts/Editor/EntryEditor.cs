@@ -76,12 +76,12 @@ namespace ModDataTools.Editors
                     }
                     EditorGUI.indentLevel--;
                     EditorGUI.indentLevel--;
+                    GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                    if (GUILayout.Button("Open Ship Log Editor"))
+                    {
+                        ShipLogEditorWindow.Open(entry?.Planet?.StarSystem);
+                    }
                 }
-            }
-            GUILayout.Space(EditorGUIUtility.singleLineHeight);
-            if (GUILayout.Button("Open Ship Log Editor"))
-            {
-                ShipLogEditorWindow.Open();
             }
         }
     }

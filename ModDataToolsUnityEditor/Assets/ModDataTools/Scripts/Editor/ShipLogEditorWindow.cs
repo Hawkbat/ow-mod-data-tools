@@ -10,8 +10,13 @@ namespace ModDataTools.Editors
 {
     public class ShipLogEditorWindow : EditorWindow
     {
+        const float MIN_ZOOM = 0.25f;
+        const float MAX_ZOOM = 4f;
+
+        StarSystemAsset starSystem;
+
+        Vector2 pan = Vector2.zero;
         float zoom = 1f;
-        Vector2 areaScrollPosition;
         Rect areaScrollRect;
         Dictionary<EntryAsset, Rect> entryRects = new Dictionary<EntryAsset, Rect>();
         HashSet<EntryAsset> selected = new HashSet<EntryAsset>();
@@ -20,6 +25,8 @@ namespace ModDataTools.Editors
         bool wasAreaClick = false;
         bool wasEntryClick = false;
         bool wasModifiedClick = false;
+        bool wasDragClick = false;
+        bool wasPanClick = false;
         Vector2 dragStart = Vector2.zero;
         Vector2 dragOffset = Vector2.zero;
 
@@ -30,10 +37,18 @@ namespace ModDataTools.Editors
         static GUIStyle rumorArrowStyle;
 
         [MenuItem("Window/Ship Log Editor")]
-        public static void Open()
+        public static void Open() => Open(null);
+        public static void Open(StarSystemAsset starSystem)
         {
             var window = GetWindow<ShipLogEditorWindow>();
+            if (starSystem) window.starSystem = starSystem;
             window.Show();
+        }
+
+        private void OnEnable()
+        {
+            AssetRepository.Initialize(new ModDataAdapter(false));
+            RegenerateStyles();
         }
 
         void RegenerateStyles()
@@ -72,18 +87,12 @@ namespace ModDataTools.Editors
             rumorLineStyle = new GUIStyle();
             rumorLineStyle.name = nameof(rumorLineStyle);
             rumorLineStyle.imagePosition = ImagePosition.ImageOnly;
-            rumorLineStyle.normal.background = grey;
-            rumorLineStyle.onNormal.background = rumorLineStyle.normal.background;
-            rumorLineStyle.hover.background = white;
-            rumorLineStyle.onHover.background = rumorLineStyle.hover.background;
+            rumorLineStyle.normal.background = white;
 
             rumorArrowStyle = new GUIStyle();
             rumorArrowStyle.name = nameof(rumorArrowStyle);
             rumorArrowStyle.imagePosition = ImagePosition.ImageOnly;
-            rumorArrowStyle.normal.background = Resources.Load<Texture2D>("ModDataTools/Textures/RumorArrowGrey");
-            rumorArrowStyle.onNormal.background = rumorArrowStyle.normal.background;
-            rumorArrowStyle.hover.background = Resources.Load<Texture2D>("ModDataTools/Textures/RumorArrow");
-            rumorArrowStyle.onHover.background = rumorArrowStyle.hover.background;
+            rumorArrowStyle.normal.background = Resources.Load<Texture2D>("ModDataTools/Textures/RumorArrow");
         }
 
         private void OnGUI()
@@ -92,41 +101,58 @@ namespace ModDataTools.Editors
             wantsMouseMove = true;
             wantsMouseEnterLeaveWindow = true;
 
-            if (entryBackStyle == null || entryBackStyle.name != nameof(entryHeadStyle))
+            if (entryBackStyle == null || entryBackStyle.name != nameof(entryBackStyle))
                 RegenerateStyles();
 
-            var entries = AssetRepository.GetAllAssets<EntryAsset>();
-            var rumorFacts = AssetRepository.GetAllAssets<RumorFactAsset>();
-
-            EditorGUILayout.BeginVertical();
-            var newAreaScrollPosition = EditorGUILayout.BeginScrollView(areaScrollPosition, "TE BoxBackground");
-            if (newAreaScrollPosition != areaScrollPosition)
+            if (!starSystem)
             {
-                var delta = newAreaScrollPosition - areaScrollPosition;
-                if (Event.current.shift)
+                starSystem = Selection.activeObject as StarSystemAsset;
+                if (!starSystem)
                 {
-                    areaScrollPosition += new Vector2(delta.y, delta.x);
+                    var entry = Selection.activeObject as EntryAsset;
+                    if (entry) starSystem = entry.Planet?.StarSystem;
                 }
-                else
+                if (!starSystem)
                 {
-                    areaScrollPosition = newAreaScrollPosition;
+                    var fact = Selection.activeObject as FactAsset;
+                    if (fact) starSystem = fact.Entry?.Planet?.StarSystem;
+                }
+                if (!starSystem)
+                {
+                    var planet = Selection.activeObject as PlanetAsset;
+                    if (planet) starSystem = planet.StarSystem;
                 }
             }
+            if (!starSystem)
+            {
+                GUILayout.Label($"Select a {nameof(StarSystemAsset)} asset");
+                return;
+            }
+            EditorGUILayout.ObjectField(starSystem, typeof(StarSystemAsset), false);
 
-            var min = -Vector2.one * 500f;
-            foreach (var entry in entries) min = Vector2.Min(min, entry.EditorPosition);
-
-            var max = Vector2.one * 500f;
-            foreach (var entry in entries) max = Vector2.Max(max, entry.EditorPosition);
-
-            min -= Vector2.one * 500f;
-            max += Vector2.one * 500f;
-
-            GUILayoutUtility.GetRect((max.x - min.x) * zoom, (max.y - min.y) * zoom);
-
-            var offset = -min;
+            var entries = AssetRepository.GetAllAssets<EntryAsset>()
+                .Where(e => e.Planet && e.Planet.StarSystem == starSystem);
+            var rumorFacts = entries.SelectMany(e => e.RumorFacts);
 
             hovered = null;
+            var offset = areaScrollRect.size * 0.5f;
+
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.BeginScrollView(Vector2.zero, "TE BoxBackground");
+
+            if (Event.current.type == EventType.ScrollWheel)
+            {
+                var previousPosition = Event.current.mousePosition;
+                var zoomDelta = -(Event.current.delta.y / 3f);
+
+                var canvasPos = Event.current.mousePosition - offset;
+                var currentPos = canvasPos / zoom;
+                zoom += zoom * 0.1f * zoomDelta;
+                zoom = Mathf.Clamp(zoom, MIN_ZOOM, MAX_ZOOM);
+                var newPos = canvasPos / zoom;
+                pan += newPos - currentPos;
+                Repaint();
+            }
 
             var sortedEntries = new List<EntryAsset>(entries);
             sortedEntries.Sort((a, b) =>
@@ -164,17 +190,33 @@ namespace ModDataTools.Editors
                     var dir = (end - start).normalized;
                     var dist = (end - start).magnitude;
                     var mid = Vector2.Lerp(start, end, 0.5f);
+                    var lineWidth = 5f * zoom;
+                    var arrowSize = 25f * zoom;
+                    var arrowSpacing = arrowSize * 0.75f + (isTwoWayRumor ? dist * 0.1875f : 0f);
+                    var innerArrowSpacing = arrowSize * -0.5f + (isTwoWayRumor ? dist * 0.1875f : 0f);
                     var matrix = GUI.matrix;
                     GUIUtility.RotateAroundPivot(Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg, mid);
-                    GUI.backgroundColor = new Color(1f, 1f, 1f, 0.5f);
-                    if (GUI.Button(new Rect(mid.x - dist * 0.5f, mid.y - 5f, dist, 10f), string.Empty, rumorLineStyle))
+
+                    GUI.color = Selection.activeObject == fact ? Color.white : Color.grey;
+
+                    if (!isTwoWayRumor && GUI.Button(new Rect(mid.x - dist * 0.5f, mid.y - lineWidth * 0.5f, dist * 0.5f - arrowSpacing, lineWidth), string.Empty, rumorLineStyle))
                     {
                         Selection.activeObject = fact;
                     }
-                    GUI.backgroundColor = Color.white;
-                    if (GUI.Button(new Rect(mid.x - 20f + (isTwoWayRumor ? 30f : 0f), mid.y - 20f, 40f, 40f), string.Empty, rumorArrowStyle)) {
+                    if (GUI.Button(new Rect(mid.x + arrowSpacing, mid.y - lineWidth * 0.5f, dist * 0.5f - arrowSpacing, lineWidth), string.Empty, rumorLineStyle))
+                    {
                         Selection.activeObject = fact;
                     }
+                    if (isTwoWayRumor && GUI.Button(new Rect(mid.x, mid.y - lineWidth * 0.5f, innerArrowSpacing, lineWidth), string.Empty, rumorLineStyle))
+                    {
+                        Selection.activeObject = fact;
+                    }
+
+                    if (GUI.Button(new Rect(mid.x - arrowSize * 0.5f + (isTwoWayRumor ? dist * 0.1875f : 0f), mid.y - arrowSize * 0.5f, arrowSize, arrowSize), string.Empty, rumorArrowStyle)) {
+                        Selection.activeObject = fact;
+                    }
+
+                    GUI.color = Color.white;
                     GUI.matrix = matrix;
                 }
             }
@@ -187,7 +229,7 @@ namespace ModDataTools.Editors
             // > > EntryCardBackground: t:Image (solid black) AnchoredPosition (0, 0) AnchorMin (0, 0) OffsetMin(0, 0) AnchorMax (1, 0) OffsetMax(0, 110) Pivot (0.5, 0) SizeDelta (0, 110)
             // > > > PhotoImage: t:Image (entry photo) AnchoredPosition (0, 0) AnchorMin (0, 0) OffsetMin (0, 0) AnchorMax (1, 1) OffsetMax (0, 0) Pivot (0.5, 0.5) SizeDelta (0, 0)
             // > > Border: t:Image (entry-colored image with solid 4px (of 512px) border and transparent interior) AnchoredPosition (0, 0) AnchorMin (0, 0) OffsetMin (0, 0) AnchorMax (1, 1) OffsetMax (0, 0) Pivot (0.5, 0.5) SizeDelta (0, 0)
-            
+
             // 32 reference pixels per unit, 15x scale, calculated 3.125 pixels per unit
             // 110x145 base size, increases to 110x151.3333 for two-line text, 110x167.9583 for three-line text
 
@@ -204,10 +246,9 @@ namespace ModDataTools.Editors
                 var lineCount = Mathf.RoundToInt(entryHeadStyle.CalcHeight(label, size.x) / 21f);
                 size.y = Mathf.Max(145f, 134.70833f + (lineCount - 1) * 16.62497f);
 
-                var entryOffset = offset;
-                if (isSelected && wasEntryClick) entryOffset += dragOffset;
+                var center = (entry.EditorPosition + pan) * zoom + offset;
+                if (isSelected && wasEntryClick) center += dragOffset;
 
-                var center = entry.EditorPosition + entryOffset;
                 var rect = new Rect(center - size * 0.5f, size);
                 var scaledRect = new Rect(center - (size * scale * zoom) * 0.5f, size * scale * zoom);
                 entryRects[entry] = scaledRect;
@@ -242,7 +283,7 @@ namespace ModDataTools.Editors
 
             EditorGUILayout.EndScrollView();
             if (Event.current.type == EventType.Repaint) areaScrollRect = GUILayoutUtility.GetLastRect();
-            zoom = EditorGUILayout.Slider("Zoom", zoom, 0.25f, 4f);
+            zoom = EditorGUILayout.Slider("Zoom", zoom, MIN_ZOOM, MAX_ZOOM);
             EditorGUILayout.EndVertical();
 
             if (Event.current.type == EventType.MouseDown)
@@ -250,131 +291,138 @@ namespace ModDataTools.Editors
                 wasAreaClick = areaScrollRect.Contains(Event.current.mousePosition);
                 wasEntryClick = wasAreaClick && hovered != null;
                 wasModifiedClick = Event.current.control || Event.current.command || Event.current.shift;
-                if (Event.current.button == 1 && wasAreaClick)
+                wasDragClick = wasAreaClick && Event.current.button == 0;
+                wasPanClick = wasAreaClick && Event.current.button != 0 && (!wasEntryClick || Event.current.button != 1);
+                if (Event.current.button == 1 && wasEntryClick)
                 {
                     wasAreaClick = false;
                     var menu = new GenericMenu();
-                    if (wasEntryClick)
+                    wasEntryClick = false;
+                    var sourceEntry = entries.FirstOrDefault(e => e == hovered);
+                    var sourcePath = AssetDatabase.GetAssetPath(sourceEntry);
+                    menu.AddItem(new GUIContent("Delete Entry"), false, () =>
                     {
-                        wasEntryClick = false;
-                        var sourceEntry = entries.FirstOrDefault(e => e == hovered);
-                        var sourcePath = AssetDatabase.GetAssetPath(sourceEntry);
-                        menu.AddItem(new GUIContent("Delete Entry"), false, () =>
-                        {
-                            AssetDatabase.DeleteAsset(sourcePath);
-                            AssetDatabase.SaveAssets();
-                            AssetDatabase.Refresh();
-                        });
-                        menu.AddItem(new GUIContent("Duplicate Entry"), false, () =>
-                        {
-                            var destPath = AssetDatabase.GenerateUniqueAssetPath(sourcePath);
-                            AssetDatabase.CopyAsset(sourcePath, destPath);
-                            var newAsset = AssetDatabase.LoadAssetAtPath<EntryAsset>(destPath);
-                            newAsset.EditorPosition = sourceEntry.EditorPosition + new Vector2(110f, 110f);
-                            if (!string.IsNullOrEmpty(sourceEntry.ID))
-                                newAsset.ID = sourceEntry.ID + "_COPY";
+                        AssetDatabase.DeleteAsset(sourcePath);
+                        AssetDatabase.SaveAssets();
+                        AssetDatabase.Refresh();
+                    });
+                    menu.AddItem(new GUIContent("Duplicate Entry"), false, () =>
+                    {
+                        var destPath = AssetDatabase.GenerateUniqueAssetPath(sourcePath);
+                        AssetDatabase.CopyAsset(sourcePath, destPath);
+                        var newAsset = AssetDatabase.LoadAssetAtPath<EntryAsset>(destPath);
+                        newAsset.EditorPosition = sourceEntry.EditorPosition + new Vector2(110f, 110f);
+                        if (!string.IsNullOrEmpty(sourceEntry.ID))
+                            newAsset.ID = sourceEntry.ID + "_COPY";
 
-                            selected.Clear();
-                            selected.Add(newAsset);
-                            AssetDatabase.SaveAssets();
-                            AssetDatabase.Refresh();
-                        });
-                        menu.AddItem(new GUIContent("Swap Entries"), false, () =>
+                        selected.Clear();
+                        selected.Add(newAsset);
+                        AssetDatabase.SaveAssets();
+                        AssetDatabase.Refresh();
+                    });
+                    menu.AddItem(new GUIContent("Swap Entries"), false, () =>
+                    {
+                        var targetEntry = entries.FirstOrDefault(e => e != sourceEntry && selected.Contains(e));
+                        if (targetEntry != null)
                         {
-                            var targetEntry = entries.FirstOrDefault(e => e != sourceEntry && selected.Contains(e));
-                            if (targetEntry != null)
-                            {
-                                Undo.RecordObjects(new[] { sourceEntry, targetEntry }, "Swap Entries");
-                                (targetEntry.EditorPosition, sourceEntry.EditorPosition) = (sourceEntry.EditorPosition, targetEntry.EditorPosition);
-                            }
-                        });
-                        menu.AddItem(new GUIContent("Add Rumor Fact"), false, () =>
-                        {
-                            var fact = CreateInstance<RumorFactAsset>();
-                            fact.Entry = sourceEntry;
-                            fact.name = "New Rumor";
-                            sourceEntry.RumorFacts.Add(fact);
-                            AssetDatabase.AddObjectToAsset(fact, sourceEntry);
-                            AssetDatabase.SaveAssets();
-                            AssetDatabase.Refresh();
-                        });
-                        menu.AddItem(new GUIContent("Add Explore Fact"), false, () =>
-                        {
-                            var fact = CreateInstance<ExploreFactAsset>();
-                            fact.Entry = sourceEntry;
-                            fact.name = "New Fact";
-                            sourceEntry.ExploreFacts.Add(fact);
-                            AssetDatabase.AddObjectToAsset(fact, sourceEntry);
-                            AssetDatabase.SaveAssets();
-                            AssetDatabase.Refresh();
-                        });
-                    }
+                            Undo.RecordObjects(new[] { sourceEntry, targetEntry }, "Swap Entries");
+                            (targetEntry.EditorPosition, sourceEntry.EditorPosition) = (sourceEntry.EditorPosition, targetEntry.EditorPosition);
+                        }
+                    });
+                    menu.AddItem(new GUIContent("Add Rumor Fact"), false, () =>
+                    {
+                        var fact = CreateInstance<RumorFactAsset>();
+                        fact.Entry = sourceEntry;
+                        fact.name = "New Rumor";
+                        sourceEntry.RumorFacts.Add(fact);
+                        AssetDatabase.AddObjectToAsset(fact, sourceEntry);
+                        AssetDatabase.SaveAssets();
+                        AssetDatabase.Refresh();
+                    });
+                    menu.AddItem(new GUIContent("Add Explore Fact"), false, () =>
+                    {
+                        var fact = CreateInstance<ExploreFactAsset>();
+                        fact.Entry = sourceEntry;
+                        fact.name = "New Fact";
+                        sourceEntry.ExploreFacts.Add(fact);
+                        AssetDatabase.AddObjectToAsset(fact, sourceEntry);
+                        AssetDatabase.SaveAssets();
+                        AssetDatabase.Refresh();
+                    });
                     menu.ShowAsContext();
                 }
             }
             else if (Event.current.type == EventType.MouseDrag && wasAreaClick)
             {
-                dragOffset += Event.current.delta / zoom;
+                if (wasPanClick)
+                {
+                    pan += Event.current.delta / zoom;
+                } else if (wasDragClick)
+                {
+                    dragOffset += Event.current.delta;
+                }
                 Repaint();
             }
             else if (Event.current.type == EventType.MouseUp && wasAreaClick)
             {
-                if (dragOffset.magnitude < 10f)
+                if (wasDragClick)
                 {
-                    if (hovered == null || !wasModifiedClick)
+                    if (dragOffset.magnitude < 10f)
                     {
-                        selected.Clear();
-                        Selection.activeObject = null;
-                    }
-                    if (hovered)
-                    {
-                        if (selected.Contains(hovered))
+                        if (hovered == null || !wasModifiedClick)
                         {
-                            selected.Remove(hovered);
-                            Selection.activeObject = selected.FirstOrDefault();
+                            selected.Clear();
+                            Selection.activeObject = null;
                         }
-                        else
+                        if (hovered)
                         {
-                            selected.Add(hovered);
-                            Selection.activeObject = hovered;
+                            if (selected.Contains(hovered))
+                            {
+                                selected.Remove(hovered);
+                                Selection.activeObject = selected.FirstOrDefault();
+                            }
+                            else
+                            {
+                                selected.Add(hovered);
+                                Selection.activeObject = hovered;
+                            }
                         }
                     }
-                }
-                else if (wasEntryClick)
-                {
-                    dragOffset = new Vector2(Mathf.Round(dragOffset.x / 10f) * 10f, Mathf.Round(dragOffset.y / 10f) * 10f);
-                    Undo.RecordObjects(selected.ToArray(), "Move Entries");
-                    foreach (var entry in selected)
+                    else if (wasEntryClick)
                     {
-                        entry.EditorPosition += dragOffset;
+                        Undo.RecordObjects(selected.ToArray(), "Move Entries");
+                        foreach (var entry in selected)
+                        {
+                            entry.EditorPosition += dragOffset / zoom;
+                            entry.EditorPosition = new Vector2(Mathf.Round(entry.EditorPosition.x / 10f) * 10f, Mathf.Round(entry.EditorPosition.y / 10f) * 10f);
+                        }
                     }
-                }
-                else
-                {
-                    var dragRect = GetDragRect();
-                    if (!wasModifiedClick)
+                    else
                     {
-                        selected.Clear();
-                        Selection.activeObject = null;
-                    }
+                        var dragRect = GetDragRect();
+                        if (!wasModifiedClick)
+                        {
+                            selected.Clear();
+                            Selection.activeObject = null;
+                        }
 
-                    foreach (var entry in entries)
-                    {
-                        if (entryRects[entry].Overlaps(dragRect) && !selected.Contains(entry))
+                        foreach (var entry in entries)
                         {
-                            selected.Add(entry);
-                            Selection.activeObject = entry;
+                            if (entryRects[entry].Overlaps(dragRect) && !selected.Contains(entry))
+                            {
+                                selected.Add(entry);
+                                Selection.activeObject = entry;
+                            }
                         }
                     }
+                    dragOffset = Vector2.zero;
                 }
-                dragOffset = Vector2.zero;
                 Repaint();
             }
             else if (Event.current.type == EventType.ValidateCommand)
             {
                 Repaint();
             }
-
             if (lastHovered != hovered)
             {
                 Repaint();
@@ -420,10 +468,10 @@ namespace ModDataTools.Editors
 
         Rect GetDragRect()
         {
-            var x = Mathf.Min(dragStart.x + dragOffset.x * zoom, dragStart.x);
-            var y = Mathf.Min(dragStart.y + dragOffset.y * zoom, dragStart.y);
-            var w = Mathf.Abs(dragOffset.x * zoom);
-            var h = Mathf.Abs(dragOffset.y * zoom);
+            var x = Mathf.Min(dragStart.x + dragOffset.x, dragStart.x);
+            var y = Mathf.Min(dragStart.y + dragOffset.y, dragStart.y);
+            var w = Mathf.Abs(dragOffset.x);
+            var h = Mathf.Abs(dragOffset.y);
             return new Rect(x, y, w, h);
         }
     }

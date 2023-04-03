@@ -23,6 +23,12 @@ namespace ModDataTools.Editors
             OutputToConsole = outputToConsole;
         }
 
+        [MenuItem("Export/Reload Assets")]
+        public static void ReloadAssets()
+        {
+            AssetRepository.Initialize(new ModDataAdapter(false));
+        }
+
         public void Error(DataAsset asset, string message)
         {
             if (!errors.ContainsKey(asset)) errors[asset] = new List<string>();
