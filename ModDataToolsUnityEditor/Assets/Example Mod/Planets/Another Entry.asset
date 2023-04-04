@@ -17,11 +17,11 @@ MonoBehaviour:
   ID: 
   Entry: {fileID: 11400000}
   IgnoreMoreToExplore: 0
-  Text: 
+  Text: Bah
   AltTextCondition: {fileID: 0}
   AltText: 
   InitiallyRevealed: 0
-  Source: {fileID: 0}
+  Source: {fileID: 11400000, guid: 61661a5b21f16d44b973400253118af3, type: 2}
   RumorName: 
   RumorNamePriority: 0
 --- !u!114 &11400000
@@ -40,7 +40,7 @@ MonoBehaviour:
   OverrideFullID: 
   ID: 
   Planet: {fileID: 11400000, guid: 5fc288192e46ba84d9fa8f070c3b4ad4, type: 2}
-  RumorModePosition: {x: 120, y: -100}
+  RumorModePosition: {x: -400, y: -110}
   IgnoreMoreToExplore: 0
   IgnoreMoreToExploreCondition: {fileID: 0}
   Photo: {fileID: 0}

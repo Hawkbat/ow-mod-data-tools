@@ -13,13 +13,21 @@ namespace ModDataTools.Editors
         const float MIN_ZOOM = 0.25f;
         const float MAX_ZOOM = 4f;
 
+        [SerializeField]
         StarSystemAsset starSystem;
-
+        
+        [SerializeField]
         Vector2 pan = Vector2.zero;
+        [SerializeField]
         float zoom = 1f;
+        [SerializeField]
+        HashSet<EntryAsset> selected = new HashSet<EntryAsset>();
+        [SerializeField]
+        bool showFactCounts;
+
         Rect areaScrollRect;
         Dictionary<EntryAsset, Rect> entryRects = new Dictionary<EntryAsset, Rect>();
-        HashSet<EntryAsset> selected = new HashSet<EntryAsset>();
+        
         EntryAsset hovered = null;
         EntryAsset lastHovered = null;
         bool wasAreaClick = false;
@@ -30,11 +38,14 @@ namespace ModDataTools.Editors
         Vector2 dragStart = Vector2.zero;
         Vector2 dragOffset = Vector2.zero;
 
+        static GUIStyle textStyle;
         static GUIStyle entryBackStyle;
         static GUIStyle entryHeadStyle;
         static GUIStyle entryBodyStyle;
+        static GUIStyle entryBorderStyle;
         static GUIStyle rumorLineStyle;
         static GUIStyle rumorArrowStyle;
+        static GUIStyle factBoxStyle;
 
         [MenuItem("Window/Ship Log Editor")]
         public static void Open() => Open(null);
@@ -65,6 +76,13 @@ namespace ModDataTools.Editors
             black.SetPixel(0, 0, Color.grey);
             black.Apply();
 
+            textStyle = new GUIStyle();
+            textStyle.name = nameof(textStyle);
+            textStyle.font = Resources.Load<Font>("ModDataTools/Fonts/SpaceMono-Regular");
+            textStyle.fontSize = 20;
+            textStyle.richText = true;
+            textStyle.normal.textColor = Color.white;
+
             entryBackStyle = new GUIStyle();
             entryBackStyle.name = nameof(entryBackStyle);
             entryBackStyle.imagePosition = ImagePosition.ImageOnly;
@@ -84,6 +102,12 @@ namespace ModDataTools.Editors
             entryBodyStyle.imagePosition = ImagePosition.ImageOnly;
             entryBodyStyle.normal.background = black;
 
+            entryBorderStyle = new GUIStyle();
+            entryBorderStyle.name = nameof(entryBorderStyle);
+            entryBorderStyle.imagePosition = ImagePosition.ImageOnly;
+            entryBorderStyle.normal.background = Resources.Load<Texture2D>("ModDataTools/Textures/EntryBorder");
+            entryBorderStyle.border = new RectOffset(1, 1, 1, 1);
+
             rumorLineStyle = new GUIStyle();
             rumorLineStyle.name = nameof(rumorLineStyle);
             rumorLineStyle.imagePosition = ImagePosition.ImageOnly;
@@ -93,6 +117,14 @@ namespace ModDataTools.Editors
             rumorArrowStyle.name = nameof(rumorArrowStyle);
             rumorArrowStyle.imagePosition = ImagePosition.ImageOnly;
             rumorArrowStyle.normal.background = Resources.Load<Texture2D>("ModDataTools/Textures/RumorArrow");
+
+            factBoxStyle = new GUIStyle();
+            factBoxStyle.name = nameof(factBoxStyle);
+            factBoxStyle.imagePosition = ImagePosition.ImageOnly;
+            factBoxStyle.normal.background = Resources.Load<Texture2D>("ModDataTools/Textures/FactBoxBorder");
+            factBoxStyle.border = new RectOffset(2, 2, 2, 2);
+            factBoxStyle.padding = new RectOffset(0, 5, 5, 5);
+            factBoxStyle.margin = new RectOffset(25, 25, 25, 25);
         }
 
         private void OnGUI()
@@ -267,8 +299,11 @@ namespace ModDataTools.Editors
                 GUI.Box(rect, "", entryBackStyle);
                 GUI.color = Color.white;
                 GUI.Label(new Rect(rect.position.x + 2f, rect.position.y + 2f, rect.width - 4f, rect.height - rect.width - 4f), label, entryHeadStyle);
-                GUI.Box(new Rect(rect.position.x + 1f, rect.position.y + 1f + (rect.height - rect.width), rect.width - 2f, rect.width - 2f), new GUIContent("", entry.Photo), entryBodyStyle);
-
+                GUI.Box(new Rect(rect.position.x, rect.position.y + (rect.height - rect.width), rect.width, rect.width), new GUIContent("", entry.Photo), entryBodyStyle);
+                GUI.color = color;
+                GUI.Box(new Rect(rect.position.x, rect.position.y + (rect.height - rect.width), rect.width, rect.width), string.Empty, entryBorderStyle);
+                GUI.color = Color.white;
+                if (showFactCounts) GUI.Label(new Rect(rect.position.x + rect.width + 10f, rect.position.y, 100f, 25f), $"{entry.ExploreFacts.Count()}", textStyle);
                 GUI.matrix = matrix;
             }
 
@@ -283,7 +318,38 @@ namespace ModDataTools.Editors
 
             EditorGUILayout.EndScrollView();
             if (Event.current.type == EventType.Repaint) areaScrollRect = GUILayoutUtility.GetLastRect();
+
+            IEnumerable<FactAsset> factsToDisplay = Enumerable.Empty<FactAsset>();
+
+            if (Selection.activeObject is EntryAsset selectedEntry)
+                factsToDisplay = selectedEntry.ExploreFacts;
+            if (Selection.activeObject is RumorFactAsset selectedRumorFact)
+                factsToDisplay = rumorFacts.Where(r => r.Source == selectedRumorFact.Source && r.Entry == selectedRumorFact.Entry);
+            if (Selection.activeObject is ExploreFactAsset selectedExploreFact)
+                factsToDisplay = new List<ExploreFactAsset>() {  selectedExploreFact };
+
+            if (factsToDisplay.Any())
+            {
+                GUILayout.BeginArea(new Rect(areaScrollRect.x + 25f, areaScrollRect.y + 25f, areaScrollRect.width - 50f, areaScrollRect.height - 50f));
+                GUILayout.BeginVertical();
+                GUILayout.FlexibleSpace();
+                GUI.color = new Color(0.3882f, 0.498f, 0.8431f, 1f);
+                GUILayout.BeginVertical(factBoxStyle);
+                foreach (var fact in factsToDisplay)
+                {
+                    var hex = ColorUtility.ToHtmlStringRGB(GUI.color);
+                    GUI.color = Color.white;
+                    GUILayout.Label($"<size=24><b><color=#{hex}>-</color></b></size> {fact.Text}", textStyle);
+                    GUI.color = new Color(0.3882f, 0.498f, 0.8431f, 1f);
+                }
+                GUILayout.EndVertical();
+                GUI.color = Color.white;
+                GUILayout.EndVertical();
+                GUILayout.EndArea();
+            }
+
             zoom = EditorGUILayout.Slider("Zoom", zoom, MIN_ZOOM, MAX_ZOOM);
+            showFactCounts = EditorGUILayout.Toggle("Show Fact Counts", showFactCounts);
             EditorGUILayout.EndVertical();
 
             if (Event.current.type == EventType.MouseDown)
