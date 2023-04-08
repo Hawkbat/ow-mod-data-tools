@@ -7,7 +7,7 @@ using UnityEngine;
 
 [CanEditMultipleObjects]
 [CustomEditor(typeof(PlanetAsset), true)]
-public class PlanetEditor : Editor
+public class PlanetEditor : DataAssetEditor
 {
     public override void OnInspectorGUI()
     {

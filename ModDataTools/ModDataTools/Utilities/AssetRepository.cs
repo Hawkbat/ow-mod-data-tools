@@ -41,6 +41,12 @@ namespace ModDataTools.Utilities
             => store == null ? null : store.GetAssetBundle(obj);
         public static string GetAssetPath(UnityEngine.Object obj)
             => store == null ? null : store.GetAssetPath(obj);
+        public static string GetAssetBundlePath(UnityEngine.Object obj)
+        {
+            var bundle = GetAssetBundle(obj);
+            if (string.IsNullOrEmpty(bundle)) return null;
+            return $"assetbundles/{bundle}";
+        }
         public static string GetAssetFileName(UnityEngine.Object obj)
         {
             var path = GetAssetPath(obj);

@@ -217,48 +217,48 @@ namespace ModDataTools.Assets
             [Tooltip("Add ambient lights to this body")]
             public List<AmbientLightModule> AmbientLights = new();
             [Tooltip("Generate asteroids around this body")]
-            public AsteroidBeltModule AsteroidBelt;
+            public AsteroidBeltModule AsteroidBelt = new();
             [Tooltip("Describes this body's atmosphere")]
-            public AtmosphereModule Atmosphere;
+            public AtmosphereModule Atmosphere = new();
             [Tooltip("Make this planet a bramble dimension")]
-            public BrambleModule Bramble;
+            public BrambleModule Bramble = new();
             [Tooltip("Add a cloaking field for this planet")]
-            public CloakModule Cloak;
+            public CloakModule Cloak = new();
             [Tooltip("Make this body into a focal point (barycenter)")]
-            public FocalPointModule FocalPoint;
+            public FocalPointModule FocalPoint = new();
             [Tooltip("Add funnel from this planet to another")]
-            public FunnelModule Funnel;
+            public FunnelModule Funnel = new();
             [Tooltip("Generate the surface of this planet using a heightmap")]
-            public HeightMapModule HeightMap;
+            public HeightMapModule HeightMap = new();
             [Tooltip("Add lava on this planet")]
-            public LavaModule Lava;
+            public LavaModule Lava = new();
             [Tooltip("Describes this Body's orbit (or lack there of)")]
             public OrbitModule Orbit = new OrbitModule() { IsEnabled = true };
             [Tooltip("Procedurally generated mesh for this planet's surface")]
-            public ProcGenModule ProcGen;
+            public ProcGenModule ProcGen = new();
             [Tooltip("Spawn various objects on this body")]
             [HideInInspector]
-            public PropsModule Props;
+            public PropsModule Props = new();
             [Tooltip("Reference frame properties of this body")]
             public ReferenceFrameModule ReferenceFrame = new ReferenceFrameModule() { IsEnabled = true };
             [Tooltip("Add rings around the planet")]
-            public RingsModule Rings;
+            public RingsModule Rings = new();
             [Tooltip("Add sand on this planet")]
-            public SandModule Sand;
+            public SandModule Sand = new();
             [Tooltip("Describe how the planet looks in map mode")]
-            public ShipLogModule ShipLog;
+            public ShipLogModule ShipLog = new();
             [Tooltip("Does this planet have a shock effect when the nearest star goes supernova? Should be disabled for stars, focal points, and stellar remnants.")]
-            public ShockEffect ShockEffect;
+            public ShockEffect ShockEffect = new();
             [Tooltip("Spawn the player at this planet")]
             [HideInInspector]
-            public SpawnModule Spawn;
+            public SpawnModule Spawn = new();
             [Tooltip("Make this body a star")]
-            public StarModule Star;
+            public StarModule Star = new();
             [Tooltip("Add water on this planet")]
-            public WaterModule Water;
+            public WaterModule Water = new();
             [Tooltip("Add various volumes on this body")]
             [HideInInspector]
-            public VolumesModule Volumes;
+            public VolumesModule Volumes = new();
 
             public IEnumerable<PlanetModule> GetPlanetModules()
             {

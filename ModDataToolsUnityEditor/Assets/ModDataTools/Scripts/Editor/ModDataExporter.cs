@@ -45,10 +45,10 @@ namespace ModDataTools.Editors
                 modExportPath = settings.ModExportPath.Replace("%APPDATA%", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
                 modExportPath = JoinPaths(modExportPath, modManifest.FullID);
 
-                Dictionary<string, UnityEngine.Object> exportedResources = new Dictionary<string, UnityEngine.Object>();
-
-                foreach (var asset in adapter.LoadAllAssets<DataAsset>().Where(a => a.GetMod() == modManifest))
+                foreach (var asset in AssetRepository.GetAllAssets<DataAsset>().Where(a => a.GetMod() == modManifest))
                 {
+                    if (!adapter.Validate(asset)) continue;
+
                     foreach (var resource in asset.GetResources())
                     {
                         if (string.IsNullOrEmpty(resource.OutputPath) && string.IsNullOrEmpty(resource.AssetBundle))

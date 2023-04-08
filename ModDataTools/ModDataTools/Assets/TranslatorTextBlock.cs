@@ -66,7 +66,6 @@ namespace ModDataTools.Assets
             public Vector2 Position;
             [Tooltip("The z euler angle for this arc.")]
             [ConditionalField(nameof(AutoPlacement), false)]
-            [Range(0f, 360f)]
             public float ZRotation;
             [Tooltip("The type of text to display")]
             public ArcType Type;

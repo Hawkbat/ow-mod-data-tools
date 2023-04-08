@@ -24,7 +24,7 @@ namespace ModDataTools.Assets.PlanetModules
                 writer.WriteProperty("radius", Radius);
                 if (Mesh)
                 {
-                    writer.WriteProperty("assetBundle", AssetRepository.GetAssetBundle(Mesh));
+                    writer.WriteProperty("assetBundle", AssetRepository.GetAssetBundlePath(Mesh));
                     writer.WriteProperty("meshPath", AssetRepository.GetAssetPath(Mesh));
                 }
             } else

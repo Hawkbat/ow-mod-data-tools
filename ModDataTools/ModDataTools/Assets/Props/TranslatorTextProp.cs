@@ -23,8 +23,12 @@ namespace ModDataTools.Assets.Props
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
-            writer.WriteProperty("arcInfo", TranslatorText.TextBlocks.Select(b => b.Arc));
-            writer.WriteProperty("seed", TranslatorText.Seed);
+            if (TranslatorText)
+            {
+                writer.WriteProperty("xmlFile", TranslatorText.GetXmlOutputPath());
+                writer.WriteProperty("arcInfo", TranslatorText.TextBlocks.Select(b => b.Arc));
+                writer.WriteProperty("seed", TranslatorText.Seed);
+            }
             writer.WriteProperty("type", Type);
             if (Location != TranslatorTextAsset.Location.Unspecified)
                 writer.WriteProperty("location", Location);

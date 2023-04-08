@@ -11,6 +11,7 @@ It is not without its drawbacks, as it currently follows an all-or-nothing appro
 - Generate New Horizons .json and .xml files automatically from the data assets.
 - Automatically export other assets referenced in the data assets, such as ship log entry photos, solar system skybox images, and more.
 - Override generated files with statically defined .json or .xml files, as needed.
+- Component-based system for placing props and other prop-like things directly in your planet prefabs.
 - Visual ship log editor to arrange and edit ship log entries, with click-and-drag support.
 - Tooltips explaining each field are available by mousing over the field names in the Unity inspector.
 - Preliminary (non-visual) dialogue tree and translator text editors.
@@ -19,7 +20,6 @@ It is not without its drawbacks, as it currently follows an all-or-nothing appro
 - Visual dialogue tree editor
 - Visual translator text editor
 - Localization support
-- New Horizons planet Props editing
 
 ## Usage
 

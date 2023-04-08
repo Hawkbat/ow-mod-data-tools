@@ -1,0 +1,33 @@
+
+Localization/Translations
+
+By default, generate English translation file using names of all assets/props at export time and leave FullIDs in the actual XML/json files
+
+Make sure starsystems and planets use FullIDs too
+
+UI
+    Planet Names
+    Solar System Names
+    LoadCreditsVolume gameOverText
+    NotificationVolume entryNotification/exitNotification displayMessage
+    Remote ids
+    AddonManifest credits records and popupMessage
+    Signal name
+    Signal frequency
+
+SHIPLOG
+    RumorFact text
+    RumorFact rumorName
+    RumorFact altText
+    ExploreFact text
+    ExploreFact altText
+    Entry name
+
+DIALOGUE
+    Dialogue characterName
+    DialogueNode page
+    DialogueNode option text
+
+Achievements
+    Achievement uniqueID
+

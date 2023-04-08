@@ -121,6 +121,8 @@ namespace ModDataTools.Assets
                 else
                     yield return new TextResource(ExportUtility.ToJsonString(NewHorizons), "addon-manifest.json");
             }
+            if (NewHorizons.Subtitle)
+                yield return new ImageResource(NewHorizons.Subtitle, "subtitle.png");
             if (NewHorizons.Icon)
                 yield return new ImageResource(NewHorizons.Icon, $"icons/{FullID}.png");
         }
@@ -143,6 +145,8 @@ namespace ModDataTools.Assets
             [ConditionalField(nameof(ExportJsonFile))]
             public TextAsset OverrideJsonFile;
             [Header("Data")]
+            [Tooltip("A subtitle image to display on the main menu.")]
+            public Texture2D Subtitle;
             [Tooltip("The icon to display for this addon.")]
             public Texture2D Icon;
             [Tooltip("Credits info for this mod. A list of contributors and their roles.")]

@@ -24,7 +24,6 @@ namespace ModDataTools.Assets.PlanetModules
         [Tooltip("Whether the planet has fog")]
         public bool HasFog;
         [Tooltip("How dense the fog is.")]
-        [Range(0f, 1f)]
         [ConditionalField(nameof(HasFog))]
         public float FogDensity;
         [Tooltip("Radius of fog sphere, independent of the atmosphere. This has to be set for there to be fog.")]

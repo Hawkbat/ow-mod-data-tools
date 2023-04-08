@@ -14,7 +14,7 @@ namespace ModDataTools.Editors
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            if (attribute is ConditionalFieldAttribute conditional && !IsConditionTrue(property, conditional)) return -EditorGUIUtility.standardVerticalSpacing;
+            if (attribute is ConditionalFieldAttribute conditional && !CheckCondition(property, conditional)) return -EditorGUIUtility.standardVerticalSpacing;
             if (property.type.StartsWith("Nullish"))
             {
                 if (baseDrawer == null || !(baseDrawer is NullishDrawer)) baseDrawer = new NullishDrawer();
@@ -25,7 +25,7 @@ namespace ModDataTools.Editors
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (attribute is ConditionalFieldAttribute conditional && !IsConditionTrue(property, conditional)) return;
+            if (attribute is ConditionalFieldAttribute conditional && !CheckCondition(property, conditional)) return;
             var enumValuePickerAttribute = fieldInfo.GetCustomAttribute<EnumValuePickerAttribute>();
             if (enumValuePickerAttribute != null)
             {
@@ -39,6 +39,13 @@ namespace ModDataTools.Editors
             {
                 EditorGUI.PropertyField(position, property, label, true);
             }
+        }
+
+        bool CheckCondition(SerializedProperty property, ConditionalFieldAttribute conditional)
+        {
+            var isTrue = IsConditionTrue(property, conditional);
+            if (conditional.Invert) return !isTrue;
+            return isTrue;
         }
 
         bool IsConditionTrue(SerializedProperty property, ConditionalFieldAttribute conditional)

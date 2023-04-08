@@ -26,8 +26,7 @@ namespace ModDataTools.Assets.Props
         public SingularityType Type;
         [Tooltip("Whether a black hole emits blue particles upon warping. It doesn't scale, so disabling this for small black holes is recommended")]
         public bool HasWarpEffects = true;
-        [Tooltip("Optional override for the render queue. If the singularity is rendering oddly, increasing this to 3000 can help")]
-        [Range(2501f, 3500f)]
+        [Tooltip("Optional override for the render queue. If the singularity is rendering oddly, increasing this to 3000 can help. Value must be between 2501 and 3500")]
         public NullishInt RenderQueueOverride;
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
@@ -37,7 +36,7 @@ namespace ModDataTools.Assets.Props
             writer.WriteProperty("horizonRadius", HorizonRadius);
             writer.WriteProperty("distortRadius", DistortRadius);
             if (TargetStarSystem)
-                writer.WriteProperty("targetStarSystem", TargetStarSystem.FullID);
+                writer.WriteProperty("targetStarSystem", TargetStarSystem.FullName);
             writer.WriteProperty("type", Type);
             if (!HasWarpEffects)
                 writer.WriteProperty("hasWarpEffects", HasWarpEffects);

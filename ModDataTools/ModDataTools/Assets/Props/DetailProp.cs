@@ -44,7 +44,7 @@ namespace ModDataTools.Assets.Props
         {
             if (Prefab)
             {
-                writer.WriteProperty("assetBundle", AssetRepository.GetAssetBundle(Prefab));
+                writer.WriteProperty("assetBundle", AssetRepository.GetAssetBundlePath(Prefab));
                 writer.WriteProperty("path", AssetRepository.GetAssetPath(Prefab));
             }
             else

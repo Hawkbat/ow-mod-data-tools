@@ -41,13 +41,13 @@ namespace ModDataTools.Assets.PlanetModules
             if (details.Any())
                 writer.WriteProperty("details", details);
             if (dialogues.Any())
-                writer.WriteProperty("dialogues", dialogues);
+                writer.WriteProperty("dialogue", dialogues);
             if (entryLocations.Any())
-                writer.WriteProperty("entryLocations", entryLocations);
+                writer.WriteProperty("entryLocation", entryLocations);
             if (geysers.Any())
                 writer.WriteProperty("geysers", geysers);
             if (translatorTexts.Any())
-                writer.WriteProperty("translatorTexts", translatorTexts);
+                writer.WriteProperty("translatorText", translatorTexts);
             if (proxyDetails.Any())
                 writer.WriteProperty("proxyDetails", proxyDetails);
             if (rafts.Any())

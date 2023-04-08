@@ -70,18 +70,18 @@ namespace ModDataTools.Assets
             if (nh.Skybox.HasCustomSkybox)
             {
                 writer.WriteProperty("useCube", nh.Skybox.UseCube);
-                writer.WriteProperty("rightPath", $"systems/{FullID}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Right)}");
-                writer.WriteProperty("leftPath", $"systems/{FullID}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Left)}");
-                writer.WriteProperty("topPath", $"systems/{FullID}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Top)}");
-                writer.WriteProperty("bottomPath", $"systems/{FullID}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Bottom)}");
-                writer.WriteProperty("frontPath", $"systems/{FullID}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Front)}");
-                writer.WriteProperty("backPath", $"systems/{FullID}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Back)}");
+                writer.WriteProperty("rightPath", $"systems/{FullName}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Right)}");
+                writer.WriteProperty("leftPath", $"systems/{FullName}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Left)}");
+                writer.WriteProperty("topPath", $"systems/{FullName}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Top)}");
+                writer.WriteProperty("bottomPath", $"systems/{FullName}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Bottom)}");
+                writer.WriteProperty("frontPath", $"systems/{FullName}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Front)}");
+                writer.WriteProperty("backPath", $"systems/{FullName}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Back)}");
             }
             writer.WriteEndObject();
             writer.WriteProperty("startHere", nh.StartHere);
             writer.WriteProperty("respawnHere", nh.RespawnHere);
             if (nh.TravelAudio)
-                writer.WriteProperty("travelAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.TravelAudio)}");
+                writer.WriteProperty("travelAudio", $"systems/{FullName}/{AssetRepository.GetAssetFileName(nh.TravelAudio)}");
             else if (nh.TravelAudioType != AudioType.None)
                 writer.WriteProperty("travelAudio", nh.TravelAudioType, false);
 
@@ -191,9 +191,9 @@ namespace ModDataTools.Assets
             if (ExportConfigFile)
             {
                 if (OverrideConfigFile)
-                    yield return new TextResource(OverrideConfigFile, $"systems/{FullID}.json");
+                    yield return new TextResource(OverrideConfigFile, $"systems/{FullName}.json");
                 else
-                    yield return new TextResource(ExportUtility.ToJsonString(this), $"systems/{FullID}.json");
+                    yield return new TextResource(ExportUtility.ToJsonString(this), $"systems/{FullName}.json");
             }
             if (NewHorizons.TravelAudio)
                 yield return new AudioResource(NewHorizons.TravelAudio, this);

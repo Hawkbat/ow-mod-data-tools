@@ -66,7 +66,9 @@ namespace ModDataTools.Editors
 
         public string GetAssetBundle(UnityEngine.Object obj)
         {
-            return AssetDatabase.GetImplicitAssetBundleName(GetAssetPath(obj));
+            var path = GetAssetPath(obj);
+            if (string.IsNullOrEmpty(path)) return null;
+            return AssetDatabase.GetImplicitAssetBundleName(path);
         }
 
         public string GetAssetPath(UnityEngine.Object obj)
@@ -76,9 +78,10 @@ namespace ModDataTools.Editors
 
         public IEnumerable<T> LoadAllAssets<T>() where T : DataAsset
         {
-            return AssetDatabase.FindAssets("t:" + typeof(T).Name)
+            return AssetDatabase.FindAssets("t:" + nameof(DataAsset))
                 .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
                 .Select(path => AssetDatabase.LoadAssetAtPath<T>(path))
+                .Where(v => !!v)
                 .ToList();
         }
     }

@@ -110,13 +110,13 @@ namespace ModDataTools.Utilities
             }
             writer.WriteEndArray();
         }
-        public static void WriteProperty(this JsonTextWriter writer, string name, PlanetModule module, PlanetAsset planet)
+        public static void WriteProperty<T>(this JsonTextWriter writer, string name, T module, PlanetAsset planet) where T : PlanetModule
         {
             if (!module.ShouldWrite(planet)) return;
             writer.WritePropertyName(name);
             module.WriteJsonObject(planet, writer);
         }
-        public static void WriteProperty(this JsonTextWriter writer, string name, IEnumerable<PlanetModule> modules, PlanetAsset planet)
+        public static void WriteProperty<T>(this JsonTextWriter writer, string name, IEnumerable<T> modules, PlanetAsset planet) where T : PlanetModule
         {
             if (!modules.Any(m => m.ShouldWrite(planet))) return;
             writer.WritePropertyName(name);
