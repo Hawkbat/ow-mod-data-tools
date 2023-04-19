@@ -14,6 +14,9 @@ namespace ModDataTools.Assets.Props
         [Tooltip("The planet this prop will be placed on")]
         public PlanetAsset Planet;
 
+        public string PropID => FullID;
+        public string PropName => FullName;
+
         public abstract PropData GetData();
 
         public virtual void WriteJsonProps(PropContext context, JsonTextWriter writer)

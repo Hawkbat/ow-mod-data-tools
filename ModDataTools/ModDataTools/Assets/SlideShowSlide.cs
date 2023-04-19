@@ -66,13 +66,13 @@ namespace ModDataTools.Assets
                 writer.WriteProperty("spotIntensityMod", SpotIntensityMod);
             }
             if (BackdropAudio)
-                writer.WriteProperty("backdropAudio", $"slides/{SlideShow.Planet.StarSystem.FullName}/{SlideShow.Planet.FullName}/{AssetRepository.GetAssetFileName(BackdropAudio)}");
+                writer.WriteProperty("backdropAudio", $"slides/{SlideShow.Planet.StarSystem.FullID}/{SlideShow.Planet.FullID}/{AssetRepository.GetAssetFileName(BackdropAudio)}");
             else if (BackdropAudioType != AudioType.None)
                 writer.WriteProperty("backdropAudio", BackdropAudioType, false);
             if (BackdropFadeTime != 0f && (BackdropAudio || BackdropAudioType != AudioType.None))
                 writer.WriteProperty("backdropFadeTime", BackdropFadeTime);
             if (BeatAudio)
-                writer.WriteProperty("beatAudio", $"slides/{SlideShow.Planet.StarSystem.FullName}/{SlideShow.Planet.FullName}/{AssetRepository.GetAssetFileName(BeatAudio)}");
+                writer.WriteProperty("beatAudio", $"slides/{SlideShow.Planet.StarSystem.FullID}/{SlideShow.Planet.FullID}/{AssetRepository.GetAssetFileName(BeatAudio)}");
             else if (BeatAudioType != AudioType.None)
                 writer.WriteProperty("beatAudio", BeatAudioType, false);
             if (BeatDelay != 0f && (BeatAudio || BeatAudioType != AudioType.None))
@@ -81,7 +81,7 @@ namespace ModDataTools.Assets
                 writer.WriteProperty("blackFrameDuration", BlackFrameDuration);
             if (PlayTimeDuration != 0f)
                 writer.WriteProperty("playTimeDuration", PlayTimeDuration);
-            writer.WriteProperty("imagePath", $"slides/{SlideShow.Planet.StarSystem.FullName}/{SlideShow.Planet.FullName}/{AssetRepository.GetAssetFileName(Image)}");
+            writer.WriteProperty("imagePath", $"slides/{SlideShow.Planet.StarSystem.FullID}/{SlideShow.Planet.FullID}/{AssetRepository.GetAssetFileName(Image)}");
             if (RevealFact)
                 writer.WriteProperty("reveal", RevealFact.FullID);
             writer.WriteEndObject();
@@ -90,11 +90,11 @@ namespace ModDataTools.Assets
         public override IEnumerable<AssetResource> GetResources()
         {
             if (Image)
-                yield return new ImageResource(Image, $"slides/{SlideShow.Planet.StarSystem.FullName}/{SlideShow.Planet.FullName}/{AssetRepository.GetAssetFileName(Image)}");
+                yield return new ImageResource(Image, $"slides/{SlideShow.Planet.StarSystem.FullID}/{SlideShow.Planet.FullID}/{AssetRepository.GetAssetFileName(Image)}");
             if (BackdropAudio)
-                yield return new AudioResource(BackdropAudio, $"slides/{SlideShow.Planet.StarSystem.FullName}/{SlideShow.Planet.FullName}/{AssetRepository.GetAssetFileName(BackdropAudio)}");
+                yield return new AudioResource(BackdropAudio, $"slides/{SlideShow.Planet.StarSystem.FullID}/{SlideShow.Planet.FullID}/{AssetRepository.GetAssetFileName(BackdropAudio)}");
             if (BeatAudio)
-                yield return new AudioResource(BeatAudio, $"slides/{SlideShow.Planet.StarSystem.FullName}/{SlideShow.Planet.FullName}/{AssetRepository.GetAssetFileName(BeatAudio)}");
+                yield return new AudioResource(BeatAudio, $"slides/{SlideShow.Planet.StarSystem.FullID}/{SlideShow.Planet.FullID}/{AssetRepository.GetAssetFileName(BeatAudio)}");
         }
     }
 }

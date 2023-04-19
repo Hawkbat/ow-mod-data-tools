@@ -18,6 +18,8 @@ namespace ModDataTools.Assets
         [Tooltip("The mod this asset belongs to")]
         public ModManifestAsset Mod;
         [Header("Data")]
+        [Tooltip("The short description for this achievement.")]
+        public string Description;
         [Tooltip("The icon to display for this achievement.")]
         public Texture2D Icon;
         [Tooltip("Should the name and description of the achievement be hidden until it is unlocked. Good for hiding spoilers!")]
@@ -62,6 +64,11 @@ namespace ModDataTools.Assets
             var revealVolumes = AssetRepository.GetAllProps<RevealVolumeData>().Where(r => r.Data.Achievement == this);
             if (!Facts.Any() && !Signals.Any() && !Conditions.Any() && !revealVolumes.Any())
                 validator.Warn(this, $"No unlock criteria defined");
+        }
+
+        public override void Localize(Localization l10n)
+        {
+            l10n.AddAchivement(FullID, FullName, Description);
         }
 
         public override IEnumerable<AssetResource> GetResources()

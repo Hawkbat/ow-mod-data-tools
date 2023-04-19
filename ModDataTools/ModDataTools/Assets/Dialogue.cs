@@ -48,6 +48,8 @@ namespace ModDataTools.Assets
 
         public override IEnumerable<DataAsset> GetNestedAssets() => Nodes;
 
+        public override string GetChildIDPrefix() => $"{FullID}_";
+
         public override void Validate(IAssetValidator validator)
         {
             base.Validate(validator);
@@ -58,7 +60,7 @@ namespace ModDataTools.Assets
             {
                 node.Validate(validator);
                 if (node.Target && !Nodes.Any(n => n == node.Target))
-                    validator.Error(this, $"Node '{node.FullName}' is targeting a non-existent node");
+                    validator.Error(this, $"Node '{node.FullID}' is targeting a non-existent node");
             }
         }
 
@@ -71,15 +73,25 @@ namespace ModDataTools.Assets
             else if (Type == DialogueType.Recording)
                 writer.WriteElementString("NameField", "RECORDING");
             else if (Type == DialogueType.Character)
-                writer.WriteElementString("NameField", CharacterName);
+                writer.WriteElementString("NameField", FullID);
             else
-                writer.WriteElementString("NameField", FullName);
+                writer.WriteElementString("NameField", FullID);
             foreach (var node in Nodes)
                 node.ToXml(writer);
             writer.WriteEndElement();
         }
         public string GetXmlOutputPath() =>
-            $"dialogue/{Planet.StarSystem.FullName}/{Planet.FullName}/{FullName}.xml";
+            $"dialogue/{Planet.StarSystem.FullID}/{Planet.FullID}/{FullID}.xml";
+
+        public override void Localize(Localization l10n)
+        {
+            if (Type == DialogueType.Character)
+                l10n.AddDialogue(FullID, CharacterName);
+            else if (Type == DialogueType.Unknown)
+                l10n.AddDialogue(FullID, FullName);
+            foreach (var node in Nodes)
+                node.Localize(l10n);
+        }
 
         public override IEnumerable<AssetResource> GetResources()
         {
@@ -90,6 +102,9 @@ namespace ModDataTools.Assets
                 else
                     yield return new TextResource(ExportUtility.ToXmlString(this), GetXmlOutputPath());
             }
+            foreach (var node in Nodes)
+                foreach (var resource in node.GetResources())
+                    yield return resource;
         }
     }
 }

@@ -26,9 +26,14 @@ namespace ModDataTools.Assets.Volumes
             if (Type != CreditsType.Fast)
                 writer.WriteProperty("creditsType", Type);
             if (!string.IsNullOrEmpty(GameOverText))
-                writer.WriteProperty("gameOverText", GameOverText);
+                writer.WriteProperty("gameOverText", context.GetProp().PropID);
             if (DeathType != DeathType.Default)
                 writer.WriteProperty("deathType", DeathType);
+        }
+
+        public override void Localize(PropContext context, Localization l10n)
+        {
+            l10n.AddUI(context.GetProp().PropID, GameOverText);
         }
 
         public enum CreditsType

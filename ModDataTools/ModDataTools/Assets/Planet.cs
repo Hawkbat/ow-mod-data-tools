@@ -47,6 +47,13 @@ namespace ModDataTools.Assets
             return base.GetChildIDPrefix();
         }
 
+        public override void Localize(Localization l10n)
+        {
+            l10n.AddUI(FullID, FullName);
+            foreach (var module in NewHorizons.GetPlanetModules().Where(m => m.ShouldWrite(this)))
+                module.Localize(this, l10n);
+        }
+
         public override void Validate(IAssetValidator validator)
         {
             base.Validate(validator);
@@ -74,7 +81,7 @@ namespace ModDataTools.Assets
             writer.WriteStartObject();
             writer.WriteProperty("$schema", "https://raw.githubusercontent.com/Outer-Wilds-New-Horizons/new-horizons/main/NewHorizons/Schemas/body_schema.json");
             writer.WriteProperty("name", FullID);
-            writer.WriteProperty("starSystem", StarSystem.FullName);
+            writer.WriteProperty("starSystem", StarSystem.FullID);
             writer.WriteProperty("Base", nh.Base, this);
             writer.WriteProperty("AmbientLights", nh.AmbientLights, this);
             writer.WriteProperty("AsteroidBelt", nh.AsteroidBelt, this);
@@ -109,9 +116,9 @@ namespace ModDataTools.Assets
             writer.WriteEndObject();
         }
 
-        public string GetConfigFilePath() => $"planets/{StarSystem.FullName}/{FullName}.json";
-        public string GetShipLogFilePath() => $"shiplogs/{StarSystem.FullName}/{FullName}.xml";
-        public string GetShipLogPhotoPath() => $"shiplogs/{StarSystem.FullName}/{FullName}/sprites/";
+        public string GetConfigFilePath() => $"planets/{StarSystem.FullID}/{FullID}.json";
+        public string GetShipLogFilePath() => $"shiplogs/{StarSystem.FullID}/{FullID}.xml";
+        public string GetShipLogPhotoPath() => $"shiplogs/{StarSystem.FullID}/{FullID}/sprites/";
 
         public override IEnumerable<AssetResource> GetResources()
         {
@@ -136,7 +143,7 @@ namespace ModDataTools.Assets
             }
         }
 
-        public string GetResourcePath(UnityEngine.Object resource) => $"planets/{StarSystem.FullName}/{FullName}/{AssetRepository.GetAssetFileName(resource)}";
+        public string GetResourcePath(UnityEngine.Object resource) => $"planets/{StarSystem.FullID}/{FullID}/{AssetRepository.GetAssetFileName(resource)}";
 
         public string GetSectorPath()
         {

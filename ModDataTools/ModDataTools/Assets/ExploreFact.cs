@@ -17,15 +17,22 @@ namespace ModDataTools.Assets
             writer.WriteElementString("ID", FullID);
             if (IgnoreMoreToExplore)
                 writer.WriteEmptyElement("IgnoreMoreToExplore");
-            writer.WriteElementString("Text", Text);
+            writer.WriteElementString("Text", FullID);
             if (!string.IsNullOrEmpty(AltText) || AltTextCondition)
             {
                 writer.WriteStartElement("AltText");
-                writer.WriteElementString("Text", AltText);
+                writer.WriteElementString("Text", $"{FullID}_ALT");
                 writer.WriteElementString("Condition", AltTextCondition.FullID);
                 writer.WriteEndElement();
             }
             writer.WriteEndElement();
+        }
+
+        public override void Localize(Localization l10n)
+        {
+            l10n.AddShipLog(FullID, Text);
+            if (!string.IsNullOrEmpty(AltText))
+                l10n.AddShipLog($"{FullID}_ALT", AltText);
         }
     }
 }

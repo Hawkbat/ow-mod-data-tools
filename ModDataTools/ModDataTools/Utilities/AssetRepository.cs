@@ -57,6 +57,7 @@ namespace ModDataTools.Utilities
         internal static class AssetCache<T> where T : DataAsset
         {
             static DateTime? reloadTime;
+            static readonly List<T> values = new();
             static readonly Dictionary<string, T> valuesByName = new();
             static readonly Dictionary<string, T> valuesByID = new();
 
@@ -65,6 +66,7 @@ namespace ModDataTools.Utilities
                 if (force || !reloadTime.HasValue || reloadTime.Value < AssetRepository.reloadTime)
                 {
                     reloadTime = AssetRepository.reloadTime;
+                    values.Clear();
                     valuesByName.Clear();
                     valuesByID.Clear();
                     if (store == null)
@@ -74,6 +76,7 @@ namespace ModDataTools.Utilities
                     }
                     foreach (var asset in store.LoadAllAssets<T>())
                     {
+                        values.Add(asset);
                         if (!valuesByName.ContainsKey(asset.FullName))
                             valuesByName.Add(asset.FullName, asset);
                         if (!valuesByID.ContainsKey(asset.FullID))
@@ -97,7 +100,7 @@ namespace ModDataTools.Utilities
             public static IEnumerable<T> GetAllAssets()
             {
                 Reload();
-                return valuesByID.Values;
+                return values;
             }
         }
 
@@ -156,7 +159,7 @@ namespace ModDataTools.Utilities
                                 planetValues.Add(new PropContext<T>
                                 {
                                     Planet = planet,
-                                    DetailPath = propComponent.GetPlanetPath(detailProp),
+                                    DetailPath = detailProp.DetailPath,
                                     Prop = propComponent,
                                 });
                             }

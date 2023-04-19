@@ -75,7 +75,7 @@ namespace ModDataTools.Assets.Props
         {
             base.WriteJsonProps(context, writer);
             if (AnimController)
-                writer.WriteProperty("pathToAnimController", context.DetailPath + "/" + UnityUtility.GetTransformPath(AnimController, true));
+                writer.WriteProperty("pathToAnimController", UnityUtility.ResolvePaths(context.DetailPath + "/" + UnityUtility.GetTransformPath(AnimController, true)));
             else if (!string.IsNullOrEmpty(PathToAnimController))
                 writer.WriteProperty("pathToAnimController", PathToAnimController);
             if (RemoteTriggerAsset)

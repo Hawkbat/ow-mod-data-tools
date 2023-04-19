@@ -50,7 +50,7 @@ namespace ModDataTools.Editors
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 EditorGUILayout.ObjectField(block, typeof(TranslatorTextBlockAsset), false);
                 EditorGUILayout.BeginHorizontal();
-                var text = EditorGUILayout.DelayedTextField(block.Text);
+                var text = EditorGUILayout.TextField(block.Text);
                 if (text != block.Text)
                 {
                     Undo.RecordObject(block, "Change block text");

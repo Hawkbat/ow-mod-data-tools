@@ -81,6 +81,15 @@ namespace ModDataTools.Assets.PlanetModules
             }
         }
 
+        public override IEnumerable<AssetResource> GetResources(PlanetAsset planet)
+        {
+            if (Clouds.ShouldWrite(planet))
+            {
+                foreach (var resource in Clouds.GetResources(planet))
+                    yield return resource;
+            }
+        }
+
         [Serializable]
         public class CloudsSubModule : PlanetModule
         {

@@ -113,7 +113,7 @@ namespace ModDataTools.Editors
                     case SerializedPropertyType.ObjectReference:
                         return prop.objectReferenceValue != null;
                     default:
-                        Debug.LogError("Unsupported property type: " + prop.propertyType + " at " + prop.propertyPath);
+                        Debug.LogError($"Unsupported property type: {prop.propertyType} ({prop.type}) at {prop.propertyPath}");
                         return false;
                 }
             }

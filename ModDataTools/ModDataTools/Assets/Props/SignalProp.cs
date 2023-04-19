@@ -41,13 +41,14 @@ namespace ModDataTools.Assets.Props
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
+            writer.WriteProperty("name", context.GetProp().PropID);
             if (Audio)
                 writer.WriteProperty("audio", context.Planet.GetResourcePath(Audio));
             else if (AudioType != AudioType.None)
                 writer.WriteProperty("audio", AudioType, false);
             writer.WriteProperty("detectionRadius", DetectionRadius);
             if (Frequency)
-                writer.WriteProperty("frequency", Frequency.FullName);
+                writer.WriteProperty("frequency", Frequency.FullID);
             else
                 writer.WriteProperty("frequency", SignalFrequency, false);
             if (IdentificationRadius != 10f)
@@ -60,6 +61,11 @@ namespace ModDataTools.Assets.Props
                 writer.WriteProperty("sourceRadius", SourceRadius);
         }
 
+        public override void Localize(PropContext context, Localization l10n)
+        {
+            l10n.AddUI(context.GetProp().PropID, context.GetProp().PropName);
+        }
+
         public override IEnumerable<AssetResource> GetResources(PropContext context)
         {
             if (Audio)
@@ -68,20 +74,6 @@ namespace ModDataTools.Assets.Props
     }
 
     [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(SignalPropAsset))]
-    public class SignalPropAsset : GeneralPointPropAsset<SignalPropData>
-    {
-        public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
-        {
-            writer.WriteProperty("name", FullName);
-            base.WriteJsonProps(context, writer);
-        }
-    }
-    public class SignalPropComponent : GeneralPointPropComponent<SignalPropData>
-    {
-        public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
-        {
-            writer.WriteProperty("name", gameObject.name);
-            base.WriteJsonProps(context, writer);
-        }
-    }
+    public class SignalPropAsset : GeneralPointPropAsset<SignalPropData> { }
+    public class SignalPropComponent : GeneralPointPropComponent<SignalPropData> { }
 }

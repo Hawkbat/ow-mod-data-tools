@@ -45,9 +45,13 @@ namespace ModDataTools.Editors
                 modExportPath = settings.ModExportPath.Replace("%APPDATA%", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
                 modExportPath = JoinPaths(modExportPath, modManifest.FullID);
 
+                var localization = new Localization("english");
+
                 foreach (var asset in AssetRepository.GetAllAssets<DataAsset>().Where(a => a.GetMod() == modManifest))
                 {
                     if (!adapter.Validate(asset)) continue;
+
+                    asset.Localize(localization);
 
                     foreach (var resource in asset.GetResources())
                     {
@@ -65,11 +69,15 @@ namespace ModDataTools.Editors
                             WriteSoundToMod(snd.Audio, snd.OutputPath);
                         else if (resource is TextResource txt)
                             WriteTextToMod(txt.Text.text, txt.OutputPath);
+                        else if (resource is AssemblyResource asm)
+                            CopyAssetToMod(asm.Assembly, asm.OutputPath);
                         else
                             Log(LogLevel.Error, $"Unspported resource type encountered (Resource {resource.GetResource()}) (Type {resource.GetType().Name})");
 
                     }
                 }
+
+                WriteTextToMod(ExportUtility.ToJsonString(localization), $"translations/{localization.LanguageName}.json");
 
                 Log(LogLevel.Info, "Mod data exported.");
 

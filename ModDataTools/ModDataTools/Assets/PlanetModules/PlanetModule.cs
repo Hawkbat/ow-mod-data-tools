@@ -27,6 +27,11 @@ namespace ModDataTools.Assets.PlanetModules
 
         public virtual bool ShouldWrite(PlanetAsset planet) => IsEnabled && !planet.NewHorizons.Destroy;
 
+        public virtual void Localize(PlanetAsset planet, Localization l10n)
+        {
+
+        }
+
         public virtual IEnumerable<AssetResource> GetResources(PlanetAsset planet)
             => Enumerable.Empty<AssetResource>();
     }

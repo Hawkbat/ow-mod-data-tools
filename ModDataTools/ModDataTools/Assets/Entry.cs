@@ -89,6 +89,11 @@ namespace ModDataTools.Assets
             foreach (var fact in ExploreFacts) yield return fact;
         }
 
+        public override void Localize(Localization l10n)
+        {
+            l10n.AddShipLog(FullID, FullName);
+        }
+
         public override void Validate(IAssetValidator validator)
         {
             base.Validate(validator);
@@ -104,8 +109,9 @@ namespace ModDataTools.Assets
         {
             writer.WriteStartElement("Entry");
             writer.WriteElementString("ID", FullID);
-            writer.WriteElementString("Name", FullName);
-            writer.WriteElementString("Curiosity", GetCuriosity().FullID);
+            writer.WriteElementString("Name", FullID);
+            if (GetCuriosity())
+                writer.WriteElementString("Curiosity", GetCuriosity().FullID);
             if (IsCuriosity)
                 writer.WriteEmptyElement("IsCuriosity");
             if (IgnoreMoreToExplore && IgnoreMoreToExploreCondition)

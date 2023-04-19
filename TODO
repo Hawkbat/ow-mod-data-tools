@@ -8,7 +8,7 @@ Make sure starsystems and planets use FullIDs too
 UI
     Planet Names
     Solar System Names
-    LoadCreditsVolume gameOverText
+    CreditsVolume gameOverText
     NotificationVolume entryNotification/exitNotification displayMessage
     Remote ids
     AddonManifest credits records and popupMessage
@@ -27,6 +27,7 @@ DIALOGUE
     Dialogue characterName
     DialogueNode page
     DialogueNode option text
+    TranslatorTextNode text
 
 Achievements
     Achievement uniqueID

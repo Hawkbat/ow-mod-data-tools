@@ -11,6 +11,9 @@ namespace ModDataTools.Assets.Props
 {
     public abstract class PropDataComponent : MonoBehaviour, IProp
     {
+        public string PropID => GetInstanceID().ToString();
+        public string PropName => transform.name;
+
         public abstract PropData GetData();
         public virtual void WriteJsonProps(PropContext context, JsonTextWriter writer)
             => GetData().WriteJsonProps(context, writer);

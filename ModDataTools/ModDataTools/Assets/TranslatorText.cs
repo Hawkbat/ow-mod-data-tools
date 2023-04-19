@@ -37,6 +37,8 @@ namespace ModDataTools.Assets
 
         public override IEnumerable<DataAsset> GetNestedAssets() => TextBlocks;
 
+        public override string GetChildIDPrefix() => $"{FullID}_";
+
         public override void Validate(IAssetValidator validator)
         {
             base.Validate(validator);
@@ -87,7 +89,13 @@ namespace ModDataTools.Assets
             }
             writer.WriteEndElement();
         }
-        public string GetXmlOutputPath() => $"text/{Planet.StarSystem.FullName}/{Planet.FullName}/{FullName}.xml";
+        public string GetXmlOutputPath() => $"text/{Planet.StarSystem.FullID}/{Planet.FullID}/{FullID}.xml";
+
+        public override void Localize(Localization l10n)
+        {
+            foreach (var block in TextBlocks)
+                block.Localize(l10n);
+        }
 
         public override IEnumerable<AssetResource> GetResources()
         {
@@ -98,6 +106,9 @@ namespace ModDataTools.Assets
                 else
                     yield return new TextResource(ExportUtility.ToXmlString(this), GetXmlOutputPath());
             }
+            foreach (var block in TextBlocks)
+                foreach (var resource in block.GetResources())
+                    yield return resource;
         }
 
         public enum TextType

@@ -54,7 +54,7 @@ namespace ModDataTools.Editors
                     foreach (var page in node.Pages.ToList())
                     {
                         EditorGUILayout.BeginHorizontal();
-                        var text = EditorGUILayout.DelayedTextField(page);
+                        var text = EditorGUILayout.TextField(page);
                         if (text != page)
                         {
                             Undo.RecordObject(node, "Change page text");
@@ -110,7 +110,7 @@ namespace ModDataTools.Editors
                     {
                         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                         EditorGUILayout.BeginHorizontal();
-                        string text = EditorGUILayout.DelayedTextField("Option", option.Text);
+                        string text = EditorGUILayout.TextField("Option", option.Text);
                         if (text != option.Text)
                         {
                             Undo.RecordObject(node, "Change option text");

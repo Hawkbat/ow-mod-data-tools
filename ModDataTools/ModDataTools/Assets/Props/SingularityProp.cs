@@ -36,7 +36,7 @@ namespace ModDataTools.Assets.Props
             writer.WriteProperty("horizonRadius", HorizonRadius);
             writer.WriteProperty("distortRadius", DistortRadius);
             if (TargetStarSystem)
-                writer.WriteProperty("targetStarSystem", TargetStarSystem.FullName);
+                writer.WriteProperty("targetStarSystem", TargetStarSystem.FullID);
             writer.WriteProperty("type", Type);
             if (!HasWarpEffects)
                 writer.WriteProperty("hasWarpEffects", HasWarpEffects);
@@ -72,15 +72,13 @@ namespace ModDataTools.Assets.Props
         [Tooltip("The white hole or black hole that is paired to this one. If you don't set a value, entering will kill the player")]
         public SingularityPropComponent PairedSingularity;
 
-        public string UniqueID => GetInstanceID().ToString();
-
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
             if (PairedSingularityAsset)
                 writer.WriteProperty("pairedSingularity", PairedSingularityAsset.FullID);
             else if (PairedSingularity)
-                writer.WriteProperty("pairedSingularity", PairedSingularity.UniqueID);
-            writer.WriteProperty("uniqueID", UniqueID);
+                writer.WriteProperty("pairedSingularity", PairedSingularity.PropID);
+            writer.WriteProperty("uniqueID", PropID);
             base.WriteJsonProps(context, writer);
         }
     }

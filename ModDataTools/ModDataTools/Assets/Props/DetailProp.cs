@@ -111,7 +111,7 @@ namespace ModDataTools.Assets.Props
             if (QuantumGroupAsset)
                 writer.WriteProperty("quantumGroupID", QuantumGroupAsset.FullID);
             else if (QuantumGroup)
-                writer.WriteProperty("quantumGroupID", QuantumGroup.GroupID);
+                writer.WriteProperty("quantumGroupID", QuantumGroup.PropID);
             base.WriteJsonProps(context, writer);
         }
     }

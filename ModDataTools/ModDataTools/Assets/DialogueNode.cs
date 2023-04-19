@@ -39,8 +39,6 @@ namespace ModDataTools.Assets
             if (Dialogue) yield return Dialogue;
         }
 
-        public override string GetIDPrefix() => string.Empty;
-
         public override void Validate(IAssetValidator validator)
         {
             base.Validate(validator);
@@ -48,6 +46,14 @@ namespace ModDataTools.Assets
                 validator.Error(this, $"Target node does not belong to the same dialogue");
             if (Target && Options.Any())
                 validator.Error(this, $"Both a target node and dialogue options are set; they are mutually exclusive");
+        }
+
+        public override void Localize(Localization l10n)
+        {
+            for (int i = 0; i < Pages.Count; i++)
+                l10n.AddDialogue($"{FullID}_PAGE_{i}", Pages[i]);
+            for (int i = 0; i < Options.Count; i++)
+                Options[i].Localize($"{FullID}_OPTION_{i}", l10n);
         }
 
         public void ToXml(XmlWriter writer)
@@ -67,8 +73,8 @@ namespace ModDataTools.Assets
             if (Options.Any())
             {
                 writer.WriteStartElement("DialogueOptionsList");
-                foreach (var option in Options)
-                    option.ToXml(writer);
+                for (int i = 0; i < Options.Count; i++)
+                    Options[i].ToXml($"{FullID}_OPTION_{i}", writer);
                 writer.WriteEndElement();
             }
             if (RevealFacts.Any())
@@ -90,7 +96,7 @@ namespace ModDataTools.Assets
         }
 
         [Serializable]
-        public class Option : IXmlSerializable
+        public class Option
         {
             [Tooltip("The text to show for this option")]
             public string Text;
@@ -107,7 +113,7 @@ namespace ModDataTools.Assets
             [Tooltip("The dialogue node to go to when this option is selected")]
             public DialogueNodeAsset Target;
 
-            public void ToXml(XmlWriter writer)
+            public void ToXml(string id, XmlWriter writer)
             {
                 writer.WriteStartElement("DialogueOption");
                 foreach (var condition in RequiredConditions.Where(c => c.Persistent))
@@ -120,7 +126,7 @@ namespace ModDataTools.Assets
                     writer.WriteElementString("CancelledCondition", condition.FullID);
                 foreach (var fact in RequiredFacts)
                     writer.WriteElementString("RequiredLogCondition", fact.FullID);
-                writer.WriteElementString("Text", Text);
+                writer.WriteElementString("Text", id);
                 foreach (var condition in ConditionsToSet)
                     writer.WriteElementString("ConditionToSet", condition.FullID);
                 foreach (var condition in ConditionsToCancel)
@@ -128,6 +134,11 @@ namespace ModDataTools.Assets
                 if (Target)
                     writer.WriteElementString("DialogueTarget", Target.FullID);
                 writer.WriteEndElement();
+            }
+
+            public void Localize(string id, Localization l10n)
+            {
+                l10n.AddDialogue(id, Text);
             }
         }
     }

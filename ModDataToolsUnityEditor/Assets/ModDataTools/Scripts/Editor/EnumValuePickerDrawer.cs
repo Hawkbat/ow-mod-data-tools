@@ -15,7 +15,7 @@ namespace ModDataTools.Editors
             var textRect = new Rect(rect.x, rect.y, rect.width - 50f, rect.height);
             var searchRect = new Rect(rect.x + (rect.width - 50f), rect.y, 50f, rect.height);
             EditorGUI.BeginChangeCheck();
-            string value = EditorGUI.DelayedTextField(textRect, label, property.enumNames[property.enumValueIndex]);
+            string value = EditorGUI.TextField(textRect, label, property.enumNames[property.enumValueIndex]);
             if (EditorGUI.EndChangeCheck())
             {
                 int index = Array.IndexOf(property.enumNames, value);

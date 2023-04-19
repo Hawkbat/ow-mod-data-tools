@@ -38,23 +38,27 @@ namespace ModDataTools.Assets.Props
             base.WriteJsonProps(context, writer);
         }
 
+        public string GetParentPlanetPath(PropContext context) => !string.IsNullOrEmpty(ParentPath) ? ParentPath : context.DetailPath;
+
         public override string GetPlanetPath(PropContext context)
-            => (!string.IsNullOrEmpty(ParentPath) ? ParentPath : context.DetailPath) + "/" + FullName;
+            => GetParentPlanetPath(context) + "/" + FullName;
     }
 
     public abstract class GeneralPointPropComponent<T> : PropDataComponent<T> where T : GeneralPointPropData
     {
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
-            writer.WriteProperty("rename", gameObject.name);
-            writer.WriteProperty("parentPath", GetPlanetPath(context));
+            writer.WriteProperty("rename", transform.name);
+            writer.WriteProperty("parentPath", GetParentPlanetPath(context));
             writer.WriteProperty("isRelativeToParent", true);
             if (!Data.SkipPosition)
                 writer.WriteProperty("position", transform.localPosition);
             base.WriteJsonProps(context, writer);
         }
 
+        public string GetParentPlanetPath(PropContext context) => UnityUtility.ResolvePaths(context.DetailPath + "/" + UnityUtility.GetTransformPath(transform.parent, true));
+
         public override string GetPlanetPath(PropContext context)
-            => context.DetailPath + "/" + UnityUtility.GetTransformPath(transform, true);
+            => UnityUtility.ResolvePaths(context.DetailPath + "/" + UnityUtility.GetTransformPath(transform, true));
     }
 }

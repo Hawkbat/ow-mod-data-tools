@@ -11,6 +11,8 @@ namespace ModDataTools.Assets.Props
 {
     public interface IProp
     {
+        public abstract string PropID { get; }
+        public abstract string PropName { get; }
         public PropData GetData();
         public void WriteJsonProps(PropContext context, JsonTextWriter writer);
         public string GetPlanetPath(PropContext context);

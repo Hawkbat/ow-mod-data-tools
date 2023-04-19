@@ -144,7 +144,7 @@ namespace ModDataTools.Assets.PlanetModules
         public override IEnumerable<AssetResource> GetResources(PlanetAsset planet)
         {
             foreach (var prop in GetProps(planet))
-                foreach (var resource in prop.GetData().GetResources(prop))
+                foreach (var resource in prop.GetProp().GetData().GetResources(prop))
                     yield return resource;
         }
 

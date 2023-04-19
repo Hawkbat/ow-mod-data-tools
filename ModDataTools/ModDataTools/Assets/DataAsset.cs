@@ -43,7 +43,20 @@ namespace ModDataTools.Assets
                     return OverrideFullID;
                 if (!string.IsNullOrEmpty(ID))
                     return GetIDPrefix() + ID;
-                return GetIDPrefix() + FullName.ToUpper().Replace(' ', '_');
+
+                var fallbackID = "";
+                for (int i = 0; i < FullName.Length; i++)
+                {
+                    if (FullName[i] == ' ' || FullName[i] == '_') fallbackID += '_';
+                    else if (char.IsSymbol(FullName[i])) continue;
+                    else if (i > 0 && char.IsLower(FullName[i - 1]) && char.IsUpper(FullName[i]))
+                    {
+                        fallbackID += "_" + FullName[i];
+                    }
+                    else fallbackID += char.ToUpper(FullName[i]);
+                }
+
+                return GetIDPrefix() + fallbackID;
             }
         }
 
@@ -64,6 +77,11 @@ namespace ModDataTools.Assets
 
         public virtual IEnumerable<AssetResource> GetResources()
             => Enumerable.Empty<AssetResource>();
+
+        public virtual void Localize(Localization l10n)
+        {
+
+        }
 
         public virtual string GetIDPrefix()
         {

@@ -12,8 +12,6 @@ namespace ModDataTools.Assets.Props
         public PlanetAsset Planet;
         public string DetailPath;
 
-        public PropData GetData() => GetProp().GetData();
-
         public abstract IProp GetProp();
 
         public PropContext<T> MakeSibling<T>(IProp<T> prop) where T : PropData

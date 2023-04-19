@@ -20,7 +20,7 @@ namespace ModDataTools.Assets.Volumes
         {
             base.WriteJsonProps(context, writer);
             if (TargetStarSystem)
-                writer.WriteProperty("targetStarSystem", TargetStarSystem.FullName);
+                writer.WriteProperty("targetStarSystem", TargetStarSystem.FullID);
         }
     }
 

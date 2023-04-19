@@ -46,6 +46,8 @@ namespace ModDataTools.Editors
         static GUIStyle rumorLineStyle;
         static GUIStyle rumorArrowStyle;
         static GUIStyle factBoxStyle;
+        static Texture2D texWhitePixel;
+        static Texture2D texBlackPixel;
 
         [MenuItem("Window/Ship Log Editor")]
         public static void Open() => Open(null);
@@ -64,67 +66,93 @@ namespace ModDataTools.Editors
 
         void RegenerateStyles()
         {
-            Texture2D white = new Texture2D(1, 1);
-            white.SetPixel(0, 0, Color.white);
-            white.Apply();
+            if (texWhitePixel == null)
+            {
+                texWhitePixel = new Texture2D(1, 1);
+                texWhitePixel.SetPixel(0, 0, Color.white);
+                texWhitePixel.Apply();
+            }
 
-            Texture2D black = new Texture2D(1, 1);
-            black.SetPixel(0, 0, Color.black);
-            black.Apply();
+            if (texBlackPixel == null)
+            {
+                texBlackPixel = new Texture2D(1, 1);
+                texBlackPixel.SetPixel(0, 0, Color.black);
+                texBlackPixel.Apply();
+            }
 
-            Texture2D grey = new Texture2D(1, 1);
-            black.SetPixel(0, 0, Color.grey);
-            black.Apply();
+            if (textStyle == null || textStyle.name != nameof(textStyle))
+            {
+                textStyle = new GUIStyle();
+                textStyle.name = nameof(textStyle);
+                textStyle.font = Resources.Load<Font>("ModDataTools/Fonts/SpaceMono-Regular");
+                textStyle.fontSize = 20;
+                textStyle.richText = true;
+                textStyle.normal.textColor = Color.white;
+            }
 
-            textStyle = new GUIStyle();
-            textStyle.name = nameof(textStyle);
-            textStyle.font = Resources.Load<Font>("ModDataTools/Fonts/SpaceMono-Regular");
-            textStyle.fontSize = 20;
-            textStyle.richText = true;
-            textStyle.normal.textColor = Color.white;
+            if (entryBackStyle == null || entryBackStyle.name != nameof(entryBackStyle))
+            {
+                entryBackStyle = new GUIStyle();
+                entryBackStyle.name = nameof(entryBackStyle);
+                entryBackStyle.imagePosition = ImagePosition.ImageOnly;
+                entryBackStyle.normal.background = texWhitePixel;
+            }
 
-            entryBackStyle = new GUIStyle();
-            entryBackStyle.name = nameof(entryBackStyle);
-            entryBackStyle.imagePosition = ImagePosition.ImageOnly;
-            entryBackStyle.normal.background = white;
+            if (entryHeadStyle == null || entryHeadStyle.name != nameof(entryHeadStyle))
+            {
+                entryHeadStyle = new GUIStyle();
+                entryHeadStyle.name = nameof(entryHeadStyle);
+                entryHeadStyle.imagePosition = ImagePosition.TextOnly;
+                entryHeadStyle.font = Resources.Load<Font>("ModDataTools/Fonts/SpaceMono-Bold");
+                entryHeadStyle.fontSize = 14;
+                entryHeadStyle.wordWrap = true;
+                entryHeadStyle.alignment = TextAnchor.MiddleCenter;
+                entryHeadStyle.normal.textColor = Color.black;
+            }
 
-            entryHeadStyle = new GUIStyle();
-            entryHeadStyle.name = nameof(entryHeadStyle);
-            entryHeadStyle.imagePosition = ImagePosition.TextOnly;
-            entryHeadStyle.font = Resources.Load<Font>("ModDataTools/Fonts/SpaceMono-Bold");
-            entryHeadStyle.fontSize = 14;
-            entryHeadStyle.wordWrap = true;
-            entryHeadStyle.alignment = TextAnchor.MiddleCenter;
-            entryHeadStyle.normal.textColor = Color.black;
+            if (entryBodyStyle == null || entryBodyStyle.name != nameof(entryBodyStyle))
+            {
+                entryBodyStyle = new GUIStyle();
+                entryBodyStyle.name = nameof(entryBodyStyle);
+                entryBodyStyle.imagePosition = ImagePosition.ImageOnly;
+                entryBodyStyle.normal.background = texBlackPixel;
+            }
 
-            entryBodyStyle = new GUIStyle();
-            entryBodyStyle.name = nameof(entryBodyStyle);
-            entryBodyStyle.imagePosition = ImagePosition.ImageOnly;
-            entryBodyStyle.normal.background = black;
+            if (entryBorderStyle == null || entryBorderStyle.name != nameof(entryBorderStyle))
+            {
+                entryBorderStyle = new GUIStyle();
+                entryBorderStyle.name = nameof(entryBorderStyle);
+                entryBorderStyle.imagePosition = ImagePosition.ImageOnly;
+                entryBorderStyle.normal.background = Resources.Load<Texture2D>("ModDataTools/Textures/EntryBorder");
+                entryBorderStyle.border = new RectOffset(1, 1, 1, 1);
+            }
 
-            entryBorderStyle = new GUIStyle();
-            entryBorderStyle.name = nameof(entryBorderStyle);
-            entryBorderStyle.imagePosition = ImagePosition.ImageOnly;
-            entryBorderStyle.normal.background = Resources.Load<Texture2D>("ModDataTools/Textures/EntryBorder");
-            entryBorderStyle.border = new RectOffset(1, 1, 1, 1);
+            if (rumorLineStyle == null || rumorLineStyle.name != nameof(rumorLineStyle))
+            {
+                rumorLineStyle = new GUIStyle();
+                rumorLineStyle.name = nameof(rumorLineStyle);
+                rumorLineStyle.imagePosition = ImagePosition.ImageOnly;
+                rumorLineStyle.normal.background = texWhitePixel;
+            }
 
-            rumorLineStyle = new GUIStyle();
-            rumorLineStyle.name = nameof(rumorLineStyle);
-            rumorLineStyle.imagePosition = ImagePosition.ImageOnly;
-            rumorLineStyle.normal.background = white;
+            if (rumorArrowStyle == null || rumorArrowStyle.name != nameof(rumorArrowStyle))
+            {
+                rumorArrowStyle = new GUIStyle();
+                rumorArrowStyle.name = nameof(rumorArrowStyle);
+                rumorArrowStyle.imagePosition = ImagePosition.ImageOnly;
+                rumorArrowStyle.normal.background = Resources.Load<Texture2D>("ModDataTools/Textures/RumorArrow");
+            }
 
-            rumorArrowStyle = new GUIStyle();
-            rumorArrowStyle.name = nameof(rumorArrowStyle);
-            rumorArrowStyle.imagePosition = ImagePosition.ImageOnly;
-            rumorArrowStyle.normal.background = Resources.Load<Texture2D>("ModDataTools/Textures/RumorArrow");
-
-            factBoxStyle = new GUIStyle();
-            factBoxStyle.name = nameof(factBoxStyle);
-            factBoxStyle.imagePosition = ImagePosition.ImageOnly;
-            factBoxStyle.normal.background = Resources.Load<Texture2D>("ModDataTools/Textures/FactBoxBorder");
-            factBoxStyle.border = new RectOffset(2, 2, 2, 2);
-            factBoxStyle.padding = new RectOffset(0, 5, 5, 5);
-            factBoxStyle.margin = new RectOffset(25, 25, 25, 25);
+            if (factBoxStyle == null || factBoxStyle.name != nameof(factBoxStyle))
+            {
+                factBoxStyle = new GUIStyle();
+                factBoxStyle.name = nameof(factBoxStyle);
+                factBoxStyle.imagePosition = ImagePosition.ImageOnly;
+                factBoxStyle.normal.background = Resources.Load<Texture2D>("ModDataTools/Textures/FactBoxBorder");
+                factBoxStyle.border = new RectOffset(2, 2, 2, 2);
+                factBoxStyle.padding = new RectOffset(0, 5, 5, 5);
+                factBoxStyle.margin = new RectOffset(25, 25, 25, 25);
+            }
         }
 
         private void OnGUI()

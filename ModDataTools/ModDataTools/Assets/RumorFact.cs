@@ -26,21 +26,30 @@ namespace ModDataTools.Assets
             writer.WriteElementString("SourceID", Source.FullID);
             if (!string.IsNullOrEmpty(RumorName))
             {
-                writer.WriteElementString("RumorName", RumorName);
+                writer.WriteElementString("RumorName", $"{FullID}_NAME");
                 if (RumorNamePriority != 0)
                     writer.WriteElementString("RumorNamePriority", RumorNamePriority.ToString());
             }
             if (IgnoreMoreToExplore)
                 writer.WriteEmptyElement("IgnoreMoreToExplore");
-            writer.WriteElementString("Text", Text);
+            writer.WriteElementString("Text", FullID);
             if (!string.IsNullOrEmpty(AltText) || AltTextCondition)
             {
                 writer.WriteStartElement("AltText");
-                writer.WriteElementString("Text", AltText);
+                writer.WriteElementString("Text", $"{FullID}_ALT");
                 writer.WriteElementString("Condition", AltTextCondition.FullID);
                 writer.WriteEndElement();
             }
             writer.WriteEndElement();
+        }
+
+        public override void Localize(Localization l10n)
+        {
+            l10n.AddShipLog(FullID, Text);
+            if (!string.IsNullOrEmpty(RumorName))
+                l10n.AddShipLog($"{FullID}_NAME", RumorName);
+            if (!string.IsNullOrEmpty(AltText))
+                l10n.AddShipLog($"{FullID}_ALT", AltText);
         }
 
         public override void Validate(IAssetValidator validator)

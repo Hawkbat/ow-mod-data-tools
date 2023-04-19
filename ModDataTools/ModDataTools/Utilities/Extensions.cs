@@ -193,7 +193,7 @@ namespace ModDataTools.Utilities
             {
                 writer.WriteStartObject();
                 writer.WriteProperty("time", time);
-                writer.WriteProperty("value", (Color32)gradient.Evaluate(time));
+                writer.WriteProperty("tint", (Color32)gradient.Evaluate(time));
                 writer.WriteEndObject();
             }
             writer.WriteEndArray();

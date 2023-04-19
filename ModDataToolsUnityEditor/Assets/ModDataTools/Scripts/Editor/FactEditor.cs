@@ -15,7 +15,7 @@ namespace ModDataTools.Editors
         {
             var nameProp = serializedObject.FindProperty("m_Name");
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.DelayedTextField(nameProp);
+            EditorGUILayout.PropertyField(nameProp);
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();

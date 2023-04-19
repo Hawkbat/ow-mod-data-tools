@@ -23,6 +23,8 @@ namespace ModDataTools.Assets
         [Header("Data")]
         [Tooltip("The author of the mod")]
         public string Author;
+        [Tooltip($"The DLL file to load (copies to mod folder using {nameof(FileName)})")]
+        public AssemblyResource ModAssembly;
         [Tooltip("The name of the dll file to load")]
         public string FileName;
         [Tooltip("The version of the mod (should follow semver)")]
@@ -57,6 +59,12 @@ namespace ModDataTools.Assets
         public override string GetIDPrefix() => $"{Author}.";
 
         public override string GetChildIDPrefix() => string.Empty;
+
+        public override void Localize(Localization l10n)
+        {
+            if (NewHorizons.ExportJsonFile)
+                NewHorizons.Localize(l10n);
+        }
 
         public override void Validate(IAssetValidator validator)
         {
@@ -113,6 +121,8 @@ namespace ModDataTools.Assets
                     yield return new TextResource(OverrideJsonFile, "manifest.json");
                 else
                     yield return new TextResource(ExportUtility.ToJsonString(this), "manifest.json");
+                if (ModAssembly.Assembly)
+                    yield return new AssemblyResource(ModAssembly.Assembly, string.IsNullOrEmpty(FileName) ? ModAssembly.Assembly.name + ".dll" : FileName);
             }
             if (NewHorizons.ExportJsonFile)
             {
@@ -162,11 +172,21 @@ namespace ModDataTools.Assets
                 if (achievements.Any())
                     writer.WriteProperty("achievements", achievements);
                 if (Credits.Any())
-                    writer.WriteProperty("credits", Credits.Select(c => $"{c.Name}#{c.Role}"));
+                    writer.WriteProperty("credits", Credits.Select((c, i) => $"CREDITS_{i}"));
                 if (!string.IsNullOrEmpty(PopUpMessage))
-                    writer.WriteProperty("popupMessage", PopUpMessage);
+                    writer.WriteProperty("popupMessage", "POPUP");
 
                 writer.WriteEndObject();
+            }
+
+            public void Localize(Localization l10n)
+            {
+                for (int i = 0; i < Credits.Count; i++)
+                {
+                    l10n.AddUI($"CREDITS_{i}", $"{Credits[i].Name}#{Credits[i].Role}");
+                }
+                if (!string.IsNullOrEmpty(PopUpMessage))
+                    l10n.AddUI("POPUP", PopUpMessage);
             }
 
             [Serializable]

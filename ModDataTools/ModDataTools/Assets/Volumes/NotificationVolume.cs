@@ -26,9 +26,31 @@ namespace ModDataTools.Assets.Volumes
             if (Target != NotificationTarget.All)
                 writer.WriteProperty("target", Target);
             if (!string.IsNullOrEmpty(EntryNotification.DisplayMessage))
-                writer.WriteProperty("entryNotification", EntryNotification);
+            {
+                writer.WritePropertyName("entryNotification");
+                writer.WriteStartObject();
+                writer.WriteProperty("displayMessage", $"{context.GetProp().PropID}_ENTRY");
+                if (EntryNotification.Duration != 5f)
+                    writer.WriteProperty("duration", EntryNotification.Duration);
+                writer.WriteEndObject();
+            }
             if (!string.IsNullOrEmpty(ExitNotification.DisplayMessage))
-                writer.WriteProperty("exitNotification", ExitNotification);
+            {
+                writer.WritePropertyName("exitNotification");
+                writer.WriteStartObject();
+                writer.WriteProperty("displayMessage", $"{context.GetProp().PropID}_EXIT");
+                if (ExitNotification.Duration != 5f)
+                    writer.WriteProperty("duration", ExitNotification.Duration);
+                writer.WriteEndObject();
+            }
+        }
+
+        public override void Localize(PropContext context, Localization l10n)
+        {
+            if (!string.IsNullOrEmpty(EntryNotification.DisplayMessage))
+                l10n.AddUI($"{context.GetProp().PropID}_ENTRY", EntryNotification.DisplayMessage);
+            if (!string.IsNullOrEmpty(ExitNotification.DisplayMessage))
+                l10n.AddUI($"{context.GetProp().PropID}_EXIT", ExitNotification.DisplayMessage);
         }
 
         public enum NotificationTarget
@@ -39,21 +61,12 @@ namespace ModDataTools.Assets.Volumes
         }
 
         [Serializable]
-        public class Notification : IJsonSerializable
+        public class Notification
         {
             [Tooltip("The message that will be displayed.")]
             public string DisplayMessage;
             [Tooltip("The duration this notification will be displayed.")]
             public float Duration = 5f;
-
-            public void ToJson(JsonTextWriter writer)
-            {
-                writer.WriteStartObject();
-                writer.WriteProperty("displayMessage", DisplayMessage);
-                if (Duration != 5f)
-                    writer.WriteProperty("duration", Duration);
-                writer.WriteEndObject();
-            }
         }
     }
 

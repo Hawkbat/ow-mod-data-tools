@@ -22,7 +22,7 @@ namespace ModDataTools.Assets.PlanetModules
             var geysers = AssetRepository.GetProps<GeyserPropData>(planet);
             var translatorTexts = AssetRepository.GetProps<TranslatorTextPropData>(planet);
             var proxyDetails = AssetRepository.GetProps<DetailPropData>(planet)
-                .Where(p => !p.Data.IsProxyDetail);
+                .Where(p => p.Data.IsProxyDetail);
             var rafts = AssetRepository.GetProps<RaftPropData>(planet);
             var scatters = AssetRepository.GetProps<ScatterPropData>(planet);
             var slideShows = AssetRepository.GetProps<SlideShowPropData>(planet);
@@ -132,8 +132,14 @@ namespace ModDataTools.Assets.PlanetModules
         public override IEnumerable<AssetResource> GetResources(PlanetAsset planet)
         {
             foreach (var prop in GetProps(planet))
-                foreach (var resource in prop.GetData().GetResources(prop))
+                foreach (var resource in prop.GetProp().GetData().GetResources(prop))
                     yield return resource;
+        }
+
+        public override void Localize(PlanetAsset planet, Localization l10n)
+        {
+            foreach (var prop in GetProps(planet))
+                prop.GetProp().GetData().Localize(prop, l10n);
         }
 
         public override bool ShouldWrite(PlanetAsset planet) => GetProps(planet).Any();

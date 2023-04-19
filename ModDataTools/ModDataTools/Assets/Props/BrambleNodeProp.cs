@@ -63,12 +63,11 @@ namespace ModDataTools.Assets.Props
         }
     }
     public class BrambleNodePropComponent : GeneralPropComponent<BrambleNodePropData> {
-        public string NodeName => GetInstanceID().ToString();
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
             writer.WriteProperty("scale", transform.localScale.Average());
-            writer.WriteProperty("name", NodeName);
+            writer.WriteProperty("name", PropID);
             base.WriteJsonProps(context, writer);
         }
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModDataTools.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,11 @@ namespace ModDataTools.Assets
         public override IEnumerable<DataAsset> GetParentAssets()
         {
             if (Mod) yield return Mod;
+        }
+
+        public override void Localize(Localization l10n)
+        {
+            l10n.AddUI(FullID, FullName);
         }
     }
 }

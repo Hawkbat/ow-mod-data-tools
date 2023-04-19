@@ -34,11 +34,17 @@ namespace ModDataTools.Assets
             if (Mod) yield return Mod;
         }
 
+        public override string GetIDPrefix()
+        {
+            if (Mod) return $"{Mod.Author}.";
+            return string.Empty;
+        }
+
         public override string GetChildIDPrefix()
         {
             if (!string.IsNullOrEmpty(ChildIDPrefix))
-                return base.GetChildIDPrefix() + ChildIDPrefix + "_";
-            return base.GetChildIDPrefix();
+                return ChildIDPrefix + "_";
+            return string.Empty;
         }
 
         public override void Validate(IAssetValidator validator)
@@ -70,18 +76,18 @@ namespace ModDataTools.Assets
             if (nh.Skybox.HasCustomSkybox)
             {
                 writer.WriteProperty("useCube", nh.Skybox.UseCube);
-                writer.WriteProperty("rightPath", $"systems/{FullName}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Right)}");
-                writer.WriteProperty("leftPath", $"systems/{FullName}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Left)}");
-                writer.WriteProperty("topPath", $"systems/{FullName}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Top)}");
-                writer.WriteProperty("bottomPath", $"systems/{FullName}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Bottom)}");
-                writer.WriteProperty("frontPath", $"systems/{FullName}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Front)}");
-                writer.WriteProperty("backPath", $"systems/{FullName}/skybox/{AssetRepository.GetAssetFileName(nh.Skybox.Back)}");
+                writer.WriteProperty("rightPath", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.Skybox.Right)}");
+                writer.WriteProperty("leftPath", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.Skybox.Left)}");
+                writer.WriteProperty("topPath", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.Skybox.Top)}");
+                writer.WriteProperty("bottomPath", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.Skybox.Bottom)}");
+                writer.WriteProperty("frontPath", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.Skybox.Front)}");
+                writer.WriteProperty("backPath", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.Skybox.Back)}");
             }
             writer.WriteEndObject();
             writer.WriteProperty("startHere", nh.StartHere);
             writer.WriteProperty("respawnHere", nh.RespawnHere);
             if (nh.TravelAudio)
-                writer.WriteProperty("travelAudio", $"systems/{FullName}/{AssetRepository.GetAssetFileName(nh.TravelAudio)}");
+                writer.WriteProperty("travelAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.TravelAudio)}");
             else if (nh.TravelAudioType != AudioType.None)
                 writer.WriteProperty("travelAudio", nh.TravelAudioType, false);
 
@@ -186,14 +192,19 @@ namespace ModDataTools.Assets
             writer.WriteEndObject();
         }
 
+        public override void Localize(Localization l10n)
+        {
+            l10n.AddUI(FullID, FullName);
+        }
+
         public override IEnumerable<AssetResource> GetResources()
         {
             if (ExportConfigFile)
             {
                 if (OverrideConfigFile)
-                    yield return new TextResource(OverrideConfigFile, $"systems/{FullName}.json");
+                    yield return new TextResource(OverrideConfigFile, $"systems/{FullID}.json");
                 else
-                    yield return new TextResource(ExportUtility.ToJsonString(this), $"systems/{FullName}.json");
+                    yield return new TextResource(ExportUtility.ToJsonString(this), $"systems/{FullID}.json");
             }
             if (NewHorizons.TravelAudio)
                 yield return new AudioResource(NewHorizons.TravelAudio, this);
@@ -214,7 +225,7 @@ namespace ModDataTools.Assets
             }
         }
 
-        public string GetResourcePath(UnityEngine.Object resource) => $"systems/{FullName}/{AssetRepository.GetAssetFileName(resource)}";
+        public string GetResourcePath(UnityEngine.Object resource) => $"systems/{FullID}/{AssetRepository.GetAssetFileName(resource)}";
 
         [Serializable]
         public class NewHorizonsConfig

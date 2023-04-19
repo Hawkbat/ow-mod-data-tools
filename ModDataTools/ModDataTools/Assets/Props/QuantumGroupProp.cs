@@ -64,11 +64,9 @@ namespace ModDataTools.Assets.Props
 
     public class QuantumGroupPropComponent : PropDataComponent<QuantumGroupPropData> {
 
-        public string GroupID => GetInstanceID().ToString();
-
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
-            writer.WriteProperty("id", GroupID);
+            writer.WriteProperty("id", PropID);
             if (Data.Type == QuantumGroupPropData.QuantumGroupType.Sockets)
             {
                 var childSockets = AssetRepository.GetProps<QuantumSocketPropData>(context.Planet)
@@ -78,6 +76,6 @@ namespace ModDataTools.Assets.Props
             base.WriteJsonProps(context, writer);
         }
 
-        public override string GetPlanetPath(PropContext context) => context.DetailPath + "/" + $"Quantum Sockets - " + GroupID;
+        public override string GetPlanetPath(PropContext context) => context.DetailPath + "/" + $"Quantum Sockets - " + PropID;
     }
 }

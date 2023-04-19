@@ -25,25 +25,30 @@ namespace ModDataTools.Assets
         [Tooltip("Nomai wall text arc")]
         public ArcInfo Arc;
 
+        public string XmlID => (TranslatorText.TextBlocks.IndexOf(this) + 1).ToString();
+
         public override IEnumerable<DataAsset> GetParentAssets()
         {
             if (TranslatorText) yield return TranslatorText;
         }
 
-        public override string GetIDPrefix() => string.Empty;
-
         public void ToXml(XmlWriter writer)
         {
             writer.WriteStartElement("TextBlock");
-            writer.WriteElementString("ID", FullID);
+            writer.WriteElementString("ID", XmlID);
             if (Parent)
-                writer.WriteElementString("Parent", Parent.FullID);
+                writer.WriteElementString("Parent", Parent.XmlID);
             if (Location == TranslatorTextAsset.Location.A)
                 writer.WriteEmptyElement("LocationA");
             else if (Location == TranslatorTextAsset.Location.B)
                 writer.WriteEmptyElement("LocationB");
-            writer.WriteElementString("Text", Text);
+            writer.WriteElementString("Text", FullID);
             writer.WriteEndElement();
+        }
+
+        public override void Localize(Localization l10n)
+        {
+            l10n.AddDialogue(FullID, Text);
         }
 
         public override void Validate(IAssetValidator validator)

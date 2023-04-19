@@ -1,4 +1,5 @@
 ﻿using ModDataTools.Assets.Resources;
+using ModDataTools.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,11 @@ namespace ModDataTools.Assets
         {
             if (Decal)
                 yield return new ImageResource(Decal, StarSystem);
+        }
+
+        public override void Localize(Localization l10n)
+        {
+            l10n.AddUI(FullID, FullName);
         }
     }
 }
