@@ -19,6 +19,22 @@ namespace ModDataTools.Assets.Props
             => GetData().WriteJsonProps(context, writer);
 
         public abstract string GetPlanetPath(PropContext context);
+
+        Transform spawnedProp;
+
+        public void Start()
+        {
+            GetSpawnedProp();
+            gameObject.SetActive(false);
+        }
+
+        public Transform GetSpawnedProp()
+        {
+            if (spawnedProp != null) return spawnedProp;
+            spawnedProp = UnityUtility.GetChildren(transform.parent)
+                .FirstOrDefault(t => t != transform && t.name == PropName);
+            return spawnedProp;
+        }
     }
 
     public abstract class PropDataComponent<T> : PropDataComponent, IProp<T> where T : PropData

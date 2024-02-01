@@ -28,7 +28,7 @@ namespace ModDataTools.Assets.Props
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
-            writer.WriteProperty("rename", FullName);
+            writer.WriteProperty("rename", FullID);
             if (!string.IsNullOrEmpty(ParentPath))
                 writer.WriteProperty("parentPath", ParentPath);
             if (IsRelativeToParent)
@@ -41,7 +41,7 @@ namespace ModDataTools.Assets.Props
         public string GetParentPlanetPath(PropContext context) => !string.IsNullOrEmpty(ParentPath) ? ParentPath : context.DetailPath;
 
         public override string GetPlanetPath(PropContext context)
-            => GetParentPlanetPath(context) + "/" + FullName;
+            => GetParentPlanetPath(context) + "/" + FullID;
     }
 
     public abstract class GeneralPointPropComponent<T> : PropDataComponent<T> where T : GeneralPointPropData

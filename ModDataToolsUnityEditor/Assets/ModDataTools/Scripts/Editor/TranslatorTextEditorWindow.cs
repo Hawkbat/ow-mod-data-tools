@@ -10,6 +10,7 @@ namespace ModDataTools.Editors
     public class TranslatorTextEditorWindow : EditorWindow
     {
         TranslatorTextAsset translatorText;
+        Vector2 scrollPos;
 
         [MenuItem("Window/Translator Text Editor")]
         public static void Open() => Open(null);
@@ -44,6 +45,8 @@ namespace ModDataTools.Editors
                 return;
             }
             EditorGUILayout.ObjectField(translatorText, typeof(TranslatorTextAsset), false);
+
+            scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
             var blockIndex = 0;
             foreach (var block in translatorText.TextBlocks.ToList())
             {
@@ -98,6 +101,7 @@ namespace ModDataTools.Editors
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
             }
+            EditorGUILayout.EndScrollView();
         }
     }
 }

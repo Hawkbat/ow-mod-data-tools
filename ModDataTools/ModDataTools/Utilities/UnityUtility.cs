@@ -9,6 +9,14 @@ namespace ModDataTools.Utilities
 {
     public static class UnityUtility
     {
+        public static IEnumerable<Transform> GetChildren(Transform t)
+        {
+            for (int i = 0; i < t.childCount; i++)
+            {
+                yield return t.GetChild(i);
+            }
+        }
+
         public static string GetTransformPath(Transform t, bool skipRoot)
         {
             if (t == null) return null;

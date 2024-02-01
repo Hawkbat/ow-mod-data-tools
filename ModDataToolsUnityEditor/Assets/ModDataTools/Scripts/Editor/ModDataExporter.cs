@@ -70,7 +70,15 @@ namespace ModDataTools.Editors
                         else if (resource is TextResource txt)
                             WriteTextToMod(txt.Text.text, txt.OutputPath);
                         else if (resource is AssemblyResource asm)
-                            CopyAssetToMod(asm.Assembly, asm.OutputPath);
+                        {
+                            try
+                            {
+                                CopyAssetToMod(asm.Assembly, asm.OutputPath);
+                            } catch (Exception ex)
+                            {
+                                Log(LogLevel.Error, ex.ToString());
+                            }
+                        } 
                         else
                             Log(LogLevel.Error, $"Unspported resource type encountered (Resource {resource.GetResource()}) (Type {resource.GetType().Name})");
 

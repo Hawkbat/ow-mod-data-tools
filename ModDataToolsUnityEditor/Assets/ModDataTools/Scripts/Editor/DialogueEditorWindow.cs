@@ -10,6 +10,7 @@ namespace ModDataTools.Editors
     public class DialogueEditorWindow : EditorWindow
     {
         DialogueAsset dialogue;
+        Vector2 scrollPos;
 
         [MenuItem("Window/Dialogue Editor")]
         public static void Open() => Open(null);
@@ -44,6 +45,7 @@ namespace ModDataTools.Editors
                 return;
             }
             EditorGUILayout.ObjectField(dialogue, typeof(DialogueAsset), false);
+            scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
             foreach (var node in dialogue.Nodes)
             {
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
@@ -170,6 +172,7 @@ namespace ModDataTools.Editors
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
             }
+            EditorGUILayout.EndScrollView();
         }
     }
 }
