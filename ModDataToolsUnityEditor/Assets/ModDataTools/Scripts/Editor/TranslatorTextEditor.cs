@@ -39,6 +39,8 @@ namespace ModDataTools.Editors
                         block.name = "New Text Block";
                         text.TextBlocks.Add(block);
                         AssetDatabase.AddObjectToAsset(block, text);
+                        EditorUtility.SetDirty(block);
+                        EditorUtility.SetDirty(text);
                         AssetDatabase.SaveAssets();
                         AssetDatabase.Refresh();
                     }

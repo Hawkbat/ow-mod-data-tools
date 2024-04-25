@@ -39,6 +39,8 @@ namespace ModDataTools.Editors
                         node.name = "New Node";
                         dialogue.Nodes.Add(node);
                         if (!dialogue.DefaultNode) dialogue.DefaultNode = node;
+                        EditorUtility.SetDirty(node);
+                        EditorUtility.SetDirty(dialogue);
                         AssetDatabase.AddObjectToAsset(node, dialogue);
                         AssetDatabase.SaveAssets();
                         AssetDatabase.Refresh();

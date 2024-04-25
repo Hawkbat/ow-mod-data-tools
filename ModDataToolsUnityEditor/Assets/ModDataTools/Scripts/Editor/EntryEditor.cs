@@ -43,6 +43,8 @@ namespace ModDataTools.Editors
                         fact.Entry = entry;
                         fact.name = "New Fact";
                         entry.ExploreFacts.Add(fact);
+                        EditorUtility.SetDirty(fact);
+                        EditorUtility.SetDirty(entry);
                         AssetDatabase.AddObjectToAsset(fact, entry);
                         AssetDatabase.SaveAssets();
                         AssetDatabase.Refresh();
@@ -70,6 +72,8 @@ namespace ModDataTools.Editors
                         fact.Entry = entry;
                         fact.name = "New Rumor";
                         entry.RumorFacts.Add(fact);
+                        EditorUtility.SetDirty(fact);
+                        EditorUtility.SetDirty(entry);
                         AssetDatabase.AddObjectToAsset(fact, entry);
                         AssetDatabase.SaveAssets();
                         AssetDatabase.Refresh();
@@ -79,7 +83,10 @@ namespace ModDataTools.Editors
                     GUILayout.Space(EditorGUIUtility.singleLineHeight);
                     if (GUILayout.Button("Open Ship Log Editor"))
                     {
-                        ShipLogEditorWindow.Open(entry?.Planet?.StarSystem);
+                        if (entry && entry.Planet && entry.Planet.StarSystem)
+                        {
+                            ShipLogEditorWindow.Open(entry.Planet.StarSystem);
+                        }
                     }
                 }
             }

@@ -58,20 +58,23 @@ namespace ModDataTools.Editors
                 {
                     Undo.RecordObject(block, "Change block text");
                     block.Text = text;
+                    EditorUtility.SetDirty(block);
                 }
                 if (blockIndex > 0 && GUILayout.Button("↑", GUILayout.Width(25f)))
                 {
-                    Undo.RecordObject(block, "Change block order");
+                    Undo.RecordObject(translatorText, "Change block order");
                     translatorText.TextBlocks.RemoveAt(blockIndex);
                     translatorText.TextBlocks.Insert(blockIndex - 1, block);
                     blockIndex--;
+                    EditorUtility.SetDirty(translatorText);
                 }
                 if (blockIndex < translatorText.TextBlocks.Count - 1 && GUILayout.Button("↓", GUILayout.Width(25f)))
                 {
-                    Undo.RecordObject(block, "Change block order");
+                    Undo.RecordObject(translatorText, "Change block order");
                     translatorText.TextBlocks.RemoveAt(blockIndex);
                     translatorText.TextBlocks.Insert(blockIndex + 1, block);
                     blockIndex--;
+                    EditorUtility.SetDirty(translatorText);
                 }
                 EditorGUILayout.EndHorizontal();
                 //if (translatorText.Type == TranslatorText.TextType.Wall || translatorText.Type == TranslatorText.TextType.Scroll)
@@ -84,6 +87,7 @@ namespace ModDataTools.Editors
                     {
                         Undo.RecordObject(block, "Change block parent");
                         block.Parent = targetIndex == -1 ? null : translatorText.TextBlocks[targetIndex];
+                        EditorUtility.SetDirty(block);
                     }
                 }
                 EditorGUILayout.EndVertical();
@@ -97,6 +101,8 @@ namespace ModDataTools.Editors
                 block.TranslatorText = translatorText;
                 block.name = "New Text Block";
                 translatorText.TextBlocks.Add(block);
+                EditorUtility.SetDirty(block);
+                EditorUtility.SetDirty(translatorText);
                 AssetDatabase.AddObjectToAsset(block, translatorText);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();

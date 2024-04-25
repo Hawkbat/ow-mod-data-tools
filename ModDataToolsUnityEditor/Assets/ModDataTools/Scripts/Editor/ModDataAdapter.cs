@@ -80,6 +80,7 @@ namespace ModDataTools.Editors
         {
             return AssetDatabase.FindAssets("t:" + nameof(DataAsset))
                 .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
+                .Distinct()
                 .Select(path => AssetDatabase.LoadAssetAtPath<T>(path))
                 .Where(v => !!v)
                 .ToList();

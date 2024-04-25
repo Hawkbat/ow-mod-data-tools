@@ -48,6 +48,7 @@ namespace ModDataTools.Editors
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
             foreach (var node in dialogue.Nodes)
             {
+                EditorGUI.BeginChangeCheck();
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 EditorGUILayout.ObjectField(node, typeof(DialogueNodeAsset), false);
                 if (node.Pages.Any())
@@ -159,6 +160,10 @@ namespace ModDataTools.Editors
                     EditorGUILayout.EndHorizontal();
                 }
                 EditorGUILayout.EndVertical();
+                if (EditorGUI.EndChangeCheck())
+                {
+                    EditorUtility.SetDirty(node);
+                }
             }
             if (GUILayout.Button("+ Add Node"))
             {
@@ -169,6 +174,8 @@ namespace ModDataTools.Editors
                 dialogue.Nodes.Add(node);
                 if (!dialogue.DefaultNode) dialogue.DefaultNode = node;
                 AssetDatabase.AddObjectToAsset(node, dialogue);
+                EditorUtility.SetDirty(node);
+                EditorUtility.SetDirty(dialogue);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
             }

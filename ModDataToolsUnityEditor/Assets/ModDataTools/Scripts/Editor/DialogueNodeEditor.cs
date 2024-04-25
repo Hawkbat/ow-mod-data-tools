@@ -32,6 +32,7 @@ namespace ModDataTools.Editors
                         if (node.Dialogue.DefaultNode == node)
                             node.Dialogue.DefaultNode = null;
                         node.Dialogue.Nodes.Remove(node);
+                        EditorUtility.SetDirty(node.Dialogue);
                         node.Dialogue = null;
                         AssetDatabase.RemoveObjectFromAsset(target);
                         AssetDatabase.SaveAssets();

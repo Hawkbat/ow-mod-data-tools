@@ -30,6 +30,8 @@ namespace ModDataTools.Editors
                     if (GUILayout.Button("Delete"))
                     {
                         block.TranslatorText.TextBlocks.Remove(block);
+                        EditorUtility.SetDirty(block);
+                        EditorUtility.SetDirty(block.TranslatorText);
                         block.TranslatorText = null;
                         AssetDatabase.RemoveObjectFromAsset(target);
                         AssetDatabase.SaveAssets();

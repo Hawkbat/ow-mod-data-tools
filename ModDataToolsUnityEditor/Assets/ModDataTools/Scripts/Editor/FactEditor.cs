@@ -31,6 +31,8 @@ namespace ModDataTools.Editors
                     {
                         if (target is RumorFactAsset rumor) fact.Entry.RumorFacts.Remove(rumor);
                         if (target is ExploreFactAsset exploreFact) fact.Entry.ExploreFacts.Remove(exploreFact);
+                        EditorUtility.SetDirty(fact);
+                        EditorUtility.SetDirty(fact.Entry);
                         fact.Entry = null;
                         AssetDatabase.RemoveObjectFromAsset(target);
                         AssetDatabase.SaveAssets();
@@ -39,7 +41,10 @@ namespace ModDataTools.Editors
                     GUILayout.Space(EditorGUIUtility.singleLineHeight);
                     if (GUILayout.Button("Open Ship Log Editor"))
                     {
-                        ShipLogEditorWindow.Open(fact.Entry?.Planet?.StarSystem);
+                        if (fact && fact.Entry && fact.Entry.Planet && fact.Entry.Planet.StarSystem)
+                        {
+                            ShipLogEditorWindow.Open(fact.Entry.Planet.StarSystem);
+                        }
                     }
                 }
             }

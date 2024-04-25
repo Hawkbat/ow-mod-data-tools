@@ -15,7 +15,7 @@ namespace ModDataTools.Editors
 
         [SerializeField]
         StarSystemAsset starSystem;
-        
+
         [SerializeField]
         Vector2 pan = Vector2.zero;
         [SerializeField]
@@ -27,7 +27,7 @@ namespace ModDataTools.Editors
 
         Rect areaScrollRect;
         Dictionary<EntryAsset, Rect> entryRects = new Dictionary<EntryAsset, Rect>();
-        
+
         EntryAsset hovered = null;
         EntryAsset lastHovered = null;
         bool wasAreaClick = false;
@@ -170,12 +170,12 @@ namespace ModDataTools.Editors
                 if (!starSystem)
                 {
                     var entry = Selection.activeObject as EntryAsset;
-                    if (entry) starSystem = entry.Planet?.StarSystem;
+                    if (entry && entry.Planet) starSystem = entry.Planet.StarSystem;
                 }
                 if (!starSystem)
                 {
                     var fact = Selection.activeObject as FactAsset;
-                    if (fact) starSystem = fact.Entry?.Planet?.StarSystem;
+                    if (fact && fact.Entry && fact.Entry.Planet) starSystem = fact.Entry.Planet.StarSystem;
                 }
                 if (!starSystem)
                 {
@@ -272,7 +272,8 @@ namespace ModDataTools.Editors
                         Selection.activeObject = fact;
                     }
 
-                    if (GUI.Button(new Rect(mid.x - arrowSize * 0.5f + (isTwoWayRumor ? dist * 0.1875f : 0f), mid.y - arrowSize * 0.5f, arrowSize, arrowSize), string.Empty, rumorArrowStyle)) {
+                    if (GUI.Button(new Rect(mid.x - arrowSize * 0.5f + (isTwoWayRumor ? dist * 0.1875f : 0f), mid.y - arrowSize * 0.5f, arrowSize, arrowSize), string.Empty, rumorArrowStyle))
+                    {
                         Selection.activeObject = fact;
                     }
 
@@ -354,7 +355,7 @@ namespace ModDataTools.Editors
             if (Selection.activeObject is RumorFactAsset selectedRumorFact)
                 factsToDisplay = rumorFacts.Where(r => r.Source == selectedRumorFact.Source && r.Entry == selectedRumorFact.Entry);
             if (Selection.activeObject is ExploreFactAsset selectedExploreFact)
-                factsToDisplay = new List<ExploreFactAsset>() {  selectedExploreFact };
+                factsToDisplay = new List<ExploreFactAsset>() { selectedExploreFact };
 
             if (factsToDisplay.Any())
             {
@@ -411,6 +412,7 @@ namespace ModDataTools.Editors
 
                         selected.Clear();
                         selected.Add(newAsset);
+                        EditorUtility.SetDirty(newAsset);
                         AssetDatabase.SaveAssets();
                         AssetDatabase.Refresh();
                     });
@@ -430,6 +432,8 @@ namespace ModDataTools.Editors
                         fact.name = "New Rumor";
                         sourceEntry.RumorFacts.Add(fact);
                         AssetDatabase.AddObjectToAsset(fact, sourceEntry);
+                        EditorUtility.SetDirty(fact);
+                        EditorUtility.SetDirty(sourceEntry);
                         AssetDatabase.SaveAssets();
                         AssetDatabase.Refresh();
                     });
@@ -440,6 +444,8 @@ namespace ModDataTools.Editors
                         fact.name = "New Fact";
                         sourceEntry.ExploreFacts.Add(fact);
                         AssetDatabase.AddObjectToAsset(fact, sourceEntry);
+                        EditorUtility.SetDirty(fact);
+                        EditorUtility.SetDirty(sourceEntry);
                         AssetDatabase.SaveAssets();
                         AssetDatabase.Refresh();
                     });
@@ -451,7 +457,8 @@ namespace ModDataTools.Editors
                 if (wasPanClick)
                 {
                     pan += Event.current.delta / zoom;
-                } else if (wasDragClick)
+                }
+                else if (wasDragClick)
                 {
                     dragOffset += Event.current.delta;
                 }
@@ -489,6 +496,7 @@ namespace ModDataTools.Editors
                         {
                             entry.EditorPosition += dragOffset / zoom;
                             entry.EditorPosition = new Vector2(Mathf.Round(entry.EditorPosition.x / 10f) * 10f, Mathf.Round(entry.EditorPosition.y / 10f) * 10f);
+                            EditorUtility.SetDirty(entry);
                         }
                     }
                     else
