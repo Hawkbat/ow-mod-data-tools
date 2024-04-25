@@ -23,5 +23,12 @@ namespace ModDataTools.Assets.Volumes
     }
 
     public abstract class GeneralVolumeAsset<T> : GeneralPointPropAsset<T> where T : GeneralVolumeData { }
-    public abstract class GeneralVolumeComponent<T> : GeneralPointPropComponent<T> where T : GeneralVolumeData { }
+    public abstract class GeneralVolumeComponent<T> : GeneralPointPropComponent<T> where T : GeneralVolumeData
+    {
+        void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, Data.Radius);
+        }
+    }
 }
