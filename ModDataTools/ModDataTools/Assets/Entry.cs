@@ -92,6 +92,8 @@ namespace ModDataTools.Assets
         public override void Localize(Localization l10n)
         {
             l10n.AddShipLog(FullID, FullName);
+            foreach (var fact in RumorFacts) fact.Localize(l10n);
+            foreach (var fact in ExploreFacts) fact.Localize(l10n);
         }
 
         public override void Validate(IAssetValidator validator)
@@ -138,7 +140,7 @@ namespace ModDataTools.Assets
             if (Photo)
                 yield return new ImageResource(Photo, $"{Planet.GetShipLogPhotoPath()}/{FullID}.png");
             if (AltPhoto)
-                yield return new ImageResource(Photo, $"{Planet.GetShipLogPhotoPath()}/{FullID}_ALT.png");
+                yield return new ImageResource(AltPhoto, $"{Planet.GetShipLogPhotoPath()}/{FullID}_ALT.png");
         }
     }
 }
