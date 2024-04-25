@@ -10,7 +10,7 @@ using UnityEngine;
 namespace ModDataTools.Assets.Props
 {
     [Serializable]
-    public class GeyserPropData : GeneralPointPropData
+    public class GeyserPropData : GeneralPropData
     {
         [Tooltip("Vertical offset of the geyser. From 0, the bubbles start at a height of 10, the shaft at 67, and the spout at 97.5.")]
         public float Offset = -97.5f;
@@ -46,6 +46,6 @@ namespace ModDataTools.Assets.Props
     }
 
     [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(GeyserPropAsset))]
-    public class GeyserPropAsset : GeneralPointPropAsset<GeyserPropData> { }
-    public class GeyserPropComponent : GeneralPointPropComponent<GeyserPropData> { }
+    public class GeyserPropAsset : GeneralPropAsset<GeyserPropData> { }
+    public class GeyserPropComponent : GeneralPropComponent<GeyserPropData> { }
 }
