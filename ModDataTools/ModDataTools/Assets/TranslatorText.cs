@@ -83,7 +83,7 @@ namespace ModDataTools.Assets
                     writer.WriteEmptyElement("LocationB");
                 writer.WriteStartElement("RevealFact");
                 writer.WriteElementString("FactID", reveal.Fact.FullID);
-                writer.WriteElementString("Condition", string.Join(",", reveal.TextBlocks));
+                writer.WriteElementString("Condition", string.Join(",", reveal.TextBlocks.Select(b => b.XmlID)));
                 writer.WriteEndElement();
                 writer.WriteEndElement();
             }
