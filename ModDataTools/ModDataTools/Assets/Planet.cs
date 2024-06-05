@@ -66,7 +66,7 @@ namespace ModDataTools.Assets
             writer.WriteStartElement("AstroObjectEntry");
             writer.WriteSchemaAttributes("https://raw.githubusercontent.com/Outer-Wilds-New-Horizons/new-horizons/main/NewHorizons/Schemas/shiplog_schema.xsd");
             writer.WriteElementString("ID", FullID);
-            var entries = AssetRepository.GetAllAssets<EntryAsset>().Where(e => e.Planet == this);
+            var entries = AssetRepository.GetAllAssets<EntryAsset>().Where(e => e.Planet == this && !e.Parent);
             foreach (var entry in entries)
             {
                 entry.ToXml(writer);
