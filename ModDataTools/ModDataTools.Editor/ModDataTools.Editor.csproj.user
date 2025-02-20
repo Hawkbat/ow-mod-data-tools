@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <UnityDllsDir>..\..\ModDataToolsUnityEditor\Assets\ModDataTools\Plugins</UnityDllsDir>
+  </PropertyGroup>
+</Project>

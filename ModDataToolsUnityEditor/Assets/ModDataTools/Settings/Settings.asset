@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d83512ae92c9e6479cd43353250d33c, type: 3}
+  m_Script: {fileID: -550640379, guid: 3d53e06d10e70fa49870943f7f4a4045, type: 3}
   m_Name: Settings
   m_EditorClassIdentifier: 
   ModExportPath: '%APPDATA%/OuterWildsModManager/OWML/Mods/'
