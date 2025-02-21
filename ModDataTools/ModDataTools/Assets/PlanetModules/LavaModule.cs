@@ -21,9 +21,9 @@ namespace ModDataTools.Assets.PlanetModules
 
         public override void WriteJsonProps(PlanetAsset planet, JsonTextWriter writer)
         {
-            writer.WriteProperty("size", Size);
             if (Curve != null && Curve.keys.Any())
                 writer.WriteProperty("curve", Curve);
+            writer.WriteProperty("size", Size);
             writer.WriteProperty("tint", Tint);
         }
     }

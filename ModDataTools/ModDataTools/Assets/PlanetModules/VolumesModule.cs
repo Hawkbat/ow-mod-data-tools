@@ -17,6 +17,7 @@ namespace ModDataTools.Assets.PlanetModules
         public override void WriteJsonProps(PlanetAsset planet, JsonTextWriter writer)
         {
             var audioVolumes = AssetRepository.GetProps<AudioVolumeData>(planet);
+            var dayNightAudioVolumes = AssetRepository.GetProps<DayNightAudioVolumeData>(planet);
             var destructionVolumes = AssetRepository.GetProps<DestructionVolumeData>(planet);
             var fluidVolumes = AssetRepository.GetProps<FluidVolumeData>(planet);
             var hazardVolumes = AssetRepository.GetProps<HazardVolumeData>(planet);
@@ -44,6 +45,8 @@ namespace ModDataTools.Assets.PlanetModules
 
             if (audioVolumes.Any())
                 writer.WriteProperty("audioVolumes", audioVolumes);
+            if (dayNightAudioVolumes.Any())
+                writer.WriteProperty("dayNightAudioVolumes", dayNightAudioVolumes);
             if (destructionVolumes.Any())
                 writer.WriteProperty("destructionVolumes", destructionVolumes);
             if (fluidVolumes.Any())
@@ -115,6 +118,7 @@ namespace ModDataTools.Assets.PlanetModules
         public IEnumerable<PropContext> GetProps(PlanetAsset planet)
         {
             foreach (var prop in AssetRepository.GetProps<AudioVolumeData>(planet)) yield return prop;
+            foreach (var prop in AssetRepository.GetProps<DayNightAudioVolumeData>(planet)) yield return prop;
             foreach (var prop in AssetRepository.GetProps<DestructionVolumeData>(planet)) yield return prop;
             foreach (var prop in AssetRepository.GetProps<FluidVolumeData>(planet)) yield return prop;
             foreach (var prop in AssetRepository.GetProps<HazardVolumeData>(planet)) yield return prop;
@@ -146,6 +150,12 @@ namespace ModDataTools.Assets.PlanetModules
             foreach (var prop in GetProps(planet))
                 foreach (var resource in prop.GetProp().GetData().GetResources(prop))
                     yield return resource;
+        }
+
+        public override void Validate(PlanetAsset planet, IAssetValidator validator)
+        {
+            foreach (var prop in GetProps(planet))
+                prop.GetProp().GetData().Validate(prop, planet, validator);
         }
 
         public override bool ShouldWrite(PlanetAsset planet) => GetProps(planet).Any();

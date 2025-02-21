@@ -65,6 +65,12 @@ namespace ModDataTools.Assets.PlanetModules
                 writer.WriteProperty("nodes", nodes);
         }
 
+        public override void Validate(PlanetAsset planet, IAssetValidator validator)
+        {
+            foreach (var node in AssetRepository.GetProps<BrambleNodePropData>(planet))
+                node.Data.Validate(node, planet, validator);
+        }
+
         public override bool ShouldWrite(PlanetAsset planet)
             => base.ShouldWrite(planet) || AssetRepository.GetProps<BrambleNodePropData>(planet).Any();
     }

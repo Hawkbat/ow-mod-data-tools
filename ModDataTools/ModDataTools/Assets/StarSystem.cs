@@ -8,6 +8,7 @@ using ModDataTools.Assets.Props;
 using ModDataTools.Utilities;
 using Newtonsoft.Json;
 using ModDataTools.Assets.Resources;
+using System.EnterpriseServices.CompensatingResourceManager;
 
 namespace ModDataTools.Assets
 {
@@ -54,6 +55,13 @@ namespace ModDataTools.Assets
                 validator.Error(this, $"Invalid warp coordinates");
             if (NewHorizons.Skybox.HasCustomSkybox && !NewHorizons.Skybox.IsCustomSkyboxValid())
                 validator.Error(this, $"Missing some skybox images");
+            if (NewHorizons.ConditionalChecks.Any())
+            {
+                foreach (var check in NewHorizons.ConditionalChecks)
+                {
+                    check.Validate(this, validator);
+                }
+            }
         }
 
         public void ToJson(JsonTextWriter writer)
@@ -61,12 +69,19 @@ namespace ModDataTools.Assets
             var nh = NewHorizons;
             writer.WriteStartObject();
             writer.WriteProperty("$schema", "https://raw.githubusercontent.com/Outer-Wilds-New-Horizons/new-horizons/main/NewHorizons/Schemas/star_system_schema.json");
+            writer.WriteProperty("name", FullID);
+            writer.WriteProperty("allowOutsideItems", nh.AllowOutsideItems);
+            writer.WriteProperty("freeMapAngle", nh.FreeMapAngle);
+            writer.WriteProperty("returnToSolarSystemWhenTooFar", nh.ReturnToSolarSystemWhenTooFar);
             writer.WriteProperty("farClipPlaneOverride", nh.FarClipPlaneOverride);
             writer.WriteProperty("canEnterViaWarpDrive", nh.CanEnterViaWarpDrive);
+            if (nh.CanEnterViaWarpDrive && nh.FactRequiredForWarp)
+                writer.WriteProperty("factRequiredForWarp", nh.FactRequiredForWarp.FullID);
+            writer.WriteProperty("canExitViaWarpDrive", nh.CanExitViaWarpDrive);
+            if (nh.CanExitViaWarpDrive && nh.FactRequiredForWarp)
+                writer.WriteProperty("factRequiredToExitViaWarpDrive", nh.FactRequiredToExitViaWarpDrive.FullID);
             writer.WriteProperty("destroyStockPlanets", nh.DestroyStockPlanets);
             writer.WriteProperty("enableTimeLoop", nh.EnableTimeLoop);
-            if (nh.CanEnterViaWarpDrive && nh.FactRequiredForWarp)
-                writer.WriteProperty("factRequiredForWarp", nh.FactRequiredForWarp);
             if (nh.EnableTimeLoop)
                 writer.WriteProperty("loopDuration", nh.LoopDuration);
             writer.WriteProperty("mapRestricted", nh.MapRestricted);
@@ -86,10 +101,42 @@ namespace ModDataTools.Assets
             writer.WriteEndObject();
             writer.WriteProperty("startHere", nh.StartHere);
             writer.WriteProperty("respawnHere", nh.RespawnHere);
-            if (nh.TravelAudio)
-                writer.WriteProperty("travelAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.TravelAudio)}");
-            else if (nh.TravelAudioType != AudioType.None)
-                writer.WriteProperty("travelAudio", nh.TravelAudioType, false);
+            if (nh.GlobalMusic.HasCustomAudio)
+            {
+                writer.WritePropertyName("GlobalMusic");
+                writer.WriteStartObject();
+                if (nh.GlobalMusic.TravelAudio)
+                    writer.WriteProperty("travelAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.TravelAudio)}");
+                else if (nh.GlobalMusic.TravelAudioType != AudioType.None)
+                    writer.WriteProperty("travelAudio", nh.GlobalMusic.TravelAudioType, false);
+                if (nh.GlobalMusic.EndTimesAudio)
+                    writer.WriteProperty("endTimesAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.EndTimesAudio)}");
+                else if (nh.GlobalMusic.EndTimesAudioType != AudioType.None)
+                    writer.WriteProperty("endTimesAudio", nh.GlobalMusic.EndTimesAudioType, false);
+                if (nh.GlobalMusic.EndTimesDreamAudio)
+                    writer.WriteProperty("endTimesDreamAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.EndTimesDreamAudio)}");
+                else if (nh.GlobalMusic.EndTimesDreamAudioType != AudioType.None)
+                    writer.WriteProperty("endTimesDreamAudio", nh.GlobalMusic.EndTimesDreamAudioType, false);
+                if (nh.GlobalMusic.BrambleDimensionAudio)
+                    writer.WriteProperty("brambleDimensionAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.BrambleDimensionAudio)}");
+                else if (nh.GlobalMusic.BrambleDimensionAudioType != AudioType.None)
+                    writer.WriteProperty("brambleDimensionAudio", nh.GlobalMusic.BrambleDimensionAudioType, false);
+                if (nh.GlobalMusic.FinalEndTimesIntroAudio)
+                    writer.WriteProperty("finalEndTimesIntroAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.FinalEndTimesIntroAudio)}");
+                else if (nh.GlobalMusic.FinalEndTimesIntroAudioType != AudioType.None)
+                    writer.WriteProperty("finalEndTimesIntroAudio", nh.GlobalMusic.FinalEndTimesIntroAudioType, false);
+                if (nh.GlobalMusic.FinalEndTimesLoopAudio)
+                    writer.WriteProperty("finalEndTimesLoopAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.FinalEndTimesLoopAudio)}");
+                else if (nh.GlobalMusic.FinalEndTimesLoopAudioType != AudioType.None)
+                    writer.WriteProperty("finalEndTimesLoopAudio", nh.GlobalMusic.FinalEndTimesLoopAudioType, false);
+                if (nh.GlobalMusic.FinalEndTimesBrambleAudio)
+                    writer.WriteProperty("finalEndTimesBrambleAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.FinalEndTimesBrambleAudio)}");
+                else if (nh.GlobalMusic.FinalEndTimesBrambleAudioType != AudioType.None)
+                    writer.WriteProperty("finalEndTimesBrambleAudio", nh.GlobalMusic.FinalEndTimesBrambleAudioType, false);
+                writer.WriteEndObject();
+            }
+            if (nh.ConditionalChecks.Any())
+                writer.WriteProperty("conditionalChecks", nh.ConditionalChecks);
 
             var vesselProp = AssetRepository.GetAllProps<VesselPropData>().FirstOrDefault(c => c.Planet && c.Planet.StarSystem == this);
             var warpExitProp = AssetRepository.GetAllProps<VesselWarpExitPropData>().FirstOrDefault(c => c.Planet && c.Planet.StarSystem == this);
@@ -206,8 +253,6 @@ namespace ModDataTools.Assets
                 else
                     yield return new TextResource(ExportUtility.ToJsonString(this), $"systems/{FullID}.json");
             }
-            if (NewHorizons.TravelAudio)
-                yield return new AudioResource(NewHorizons.TravelAudio, this);
             if (NewHorizons.Skybox.HasCustomSkybox)
             {
                 if (NewHorizons.Skybox.Right)
@@ -223,6 +268,23 @@ namespace ModDataTools.Assets
                 if (NewHorizons.Skybox.Back)
                     yield return new ImageResource(NewHorizons.Skybox.Back, this);
             }
+            if (NewHorizons.GlobalMusic.HasCustomAudio)
+            {
+                if (NewHorizons.GlobalMusic.TravelAudio)
+                    yield return new AudioResource(NewHorizons.GlobalMusic.TravelAudio, this);
+                if (NewHorizons.GlobalMusic.EndTimesAudio)
+                    yield return new AudioResource(NewHorizons.GlobalMusic.EndTimesAudio, this);
+                if (NewHorizons.GlobalMusic.EndTimesDreamAudio)
+                    yield return new AudioResource(NewHorizons.GlobalMusic.EndTimesDreamAudio, this);
+                if (NewHorizons.GlobalMusic.BrambleDimensionAudio)
+                    yield return new AudioResource(NewHorizons.GlobalMusic.BrambleDimensionAudio, this);
+                if (NewHorizons.GlobalMusic.FinalEndTimesIntroAudio)
+                    yield return new AudioResource(NewHorizons.GlobalMusic.FinalEndTimesIntroAudio, this);
+                if (NewHorizons.GlobalMusic.FinalEndTimesLoopAudio)
+                    yield return new AudioResource(NewHorizons.GlobalMusic.FinalEndTimesLoopAudio, this);
+                if (NewHorizons.GlobalMusic.FinalEndTimesBrambleAudio)
+                    yield return new AudioResource(NewHorizons.GlobalMusic.FinalEndTimesBrambleAudio, this);
+            }
         }
 
         public string GetResourcePath(UnityEngine.Object resource) => $"systems/{FullID}/{AssetRepository.GetAssetFileName(resource)}";
@@ -230,13 +292,23 @@ namespace ModDataTools.Assets
         [Serializable]
         public class NewHorizonsConfig
         {
+            [Tooltip("When changing star systems are you allowed to bring items into this system?")]
+            public bool AllowOutsideItems = true;
+            [Tooltip("In this system should the player be able to rotate their map camera freely or be stuck above the plane of the solar system?")]
+            public bool FreeMapAngle;
+            [Tooltip("When well past the furthest orbit, should the player be summoned back to the star?")]
+            public bool ReturnToSolarSystemWhenTooFar;
             [Tooltip("An override value for the far clip plane. Allows you to see farther.")]
             public NullishSingle FarClipPlaneOverride;
-            [Tooltip("Whether this system can be warped to via the warp drive")]
+            [Tooltip("Whether this system can be warped to via the warp drive. Does NOT effect the base SolarSystem. For that, see `canExitViaWarpDrive` and `factRequiredToExitViaWarpDrive`")]
             public bool CanEnterViaWarpDrive = true;
             [Tooltip("Set to the Fact that must be revealed before it can be warped to.")]
             [ConditionalField(nameof(CanEnterViaWarpDrive))]
             public FactAsset FactRequiredForWarp;
+            [Tooltip("Can you use the warp drive to leave this system?")]
+            public bool CanExitViaWarpDrive = true;
+            [Tooltip("The FactID that must be revealed for you to warp back to the main solar system from here.")]
+            public FactAsset FactRequiredToExitViaWarpDrive;
             [Tooltip("Do you want a clean slate for this star system? Or will it be a modified version of the original.")]
             public bool DestroyStockPlanets = true;
             [Tooltip("Should the time loop be enabled in this system?")]
@@ -252,14 +324,14 @@ namespace ModDataTools.Assets
             public bool StartHere;
             [Tooltip("Set to true if you want the player to stay in this star system if they die in it.")]
             public bool RespawnHere;
-            [Tooltip("The music to play while flying between planets")]
-            public AudioClip TravelAudio;
-            [Tooltip("The music to play while flying between planets, if not using a custom audio clip")]
-            [ConditionalField(nameof(TravelAudio), (AudioClip)null)]
-            [EnumValuePicker]
-            public AudioType TravelAudioType;
+            [Tooltip("Replace music that plays globally")]
+            public GlobalMusicConfig GlobalMusic;
             [Tooltip("Settings for the vessel")]
             public VesselConfig Vessel;
+            [Tooltip("The planet to focus on when entering the ship log for the first time in a loop. If not set this will be the planet at navtigation position (1, 0)")]
+            public PlanetAsset ShipLogStartingPlanet;
+            [Tooltip("A list of conditional checks to be performed while in this star system.")]
+            public List<ConditionalCheckConfig> ConditionalChecks;
         }
 
         [Serializable]
@@ -284,6 +356,62 @@ namespace ModDataTools.Assets
 
             public bool HasCustomSkybox => Right || Left || Top || Bottom || Front || Back;
             public bool IsCustomSkyboxValid() => Right && Left && Top && Bottom && Front && Back;
+        }
+
+        [Serializable]
+        public class GlobalMusicConfig
+        {
+            [Tooltip("The audio that will play when travelling in space.")]
+            public AudioClip TravelAudio;
+            [Tooltip("The audio that will play when travelling in space, if not using a custom audio clip")]
+            [ConditionalField(nameof(TravelAudio), (AudioClip)null)]
+            [EnumValuePicker]
+            public AudioType TravelAudioType;
+            [Tooltip("The audio that will play right before the loop ends.")]
+            public AudioClip EndTimesAudio;
+            [Tooltip("The audio that will play right before the loop ends, if not using a custom audio clip")]
+            [ConditionalField(nameof(EndTimesAudio), (AudioClip)null)]
+            [EnumValuePicker]
+            public AudioType EndTimesAudioType;
+            [Tooltip("The audio that will play right before the loop ends while inside the dreamworld.")]
+            public AudioClip EndTimesDreamAudio;
+            [Tooltip("The audio that will play right before the loop ends while inside the dreamworld, if not using a custom audio clip")]
+            [ConditionalField(nameof(EndTimesDreamAudio), (AudioClip)null)]
+            [EnumValuePicker]
+            public AudioType EndTimesDreamAudioType;
+            [Tooltip("The audio that will play when travelling through a bramble dimension.")]
+            public AudioClip BrambleDimensionAudio;
+            [Tooltip("The audio that will play when travelling through a bramble dimension, if not using a custom audio clip")]
+            [ConditionalField(nameof(BrambleDimensionAudio), (AudioClip)null)]
+            [EnumValuePicker]
+            public AudioType BrambleDimensionAudioType;
+            [Tooltip("The audio that will play when you leave the ash twin project after taking out the advanced warp core.")]
+            public AudioClip FinalEndTimesIntroAudio;
+            [Tooltip("The audio that will play when you leave the ash twin project after taking out the advanced warp core, if not using a custom audio clip")]
+            [ConditionalField(nameof(FinalEndTimesIntroAudio), (AudioClip)null)]
+            [EnumValuePicker]
+            public AudioType FinalEndTimesIntroAudioType;
+            [Tooltip("The audio that will loop after the final end times intro.")]
+            public AudioClip FinalEndTimesLoopAudio;
+            [Tooltip("The audio that will loop after the final end times intro, if not using a custom audio clip")]
+            [ConditionalField(nameof(FinalEndTimesLoopAudio), (AudioClip)null)]
+            [EnumValuePicker]
+            public AudioType FinalEndTimesLoopAudioType;
+            [Tooltip("The audio that will loop after the final end times intro while inside a bramble dimension.")]
+            public AudioClip FinalEndTimesBrambleAudio;
+            [Tooltip("The audio that will loop after the final end times intro while inside a bramble dimension, if not using a custom audio clip")]
+            [ConditionalField(nameof(FinalEndTimesBrambleAudio), (AudioClip)null)]
+            [EnumValuePicker]
+            public AudioType FinalEndTimesBrambleAudioType;
+
+            public bool HasCustomAudio =>
+                TravelAudio || TravelAudioType != AudioType.None
+                || EndTimesAudio || EndTimesAudioType != AudioType.None
+                || EndTimesDreamAudio || EndTimesDreamAudioType != AudioType.None
+                || BrambleDimensionAudio || BrambleDimensionAudioType != AudioType.None
+                || FinalEndTimesIntroAudio || FinalEndTimesIntroAudioType != AudioType.None
+                || FinalEndTimesLoopAudio || FinalEndTimesLoopAudioType != AudioType.None
+                || FinalEndTimesBrambleAudio || FinalEndTimesBrambleAudioType != AudioType.None;
         }
 
         [Serializable]
@@ -334,6 +462,138 @@ namespace ModDataTools.Assets
                 arr != null && arr.Length >= 2 && arr.Length < 7 &&
                 arr.Distinct().Count() == arr.Count() &&
                 arr.All(n => n >= 0 && n < 6);
+        }
+
+        [Serializable]
+        public class ConditionalCheckConfig : IJsonSerializable
+        {
+            [Tooltip("The conditions that must be met for the check to pass.")]
+            public ConditionalCheckConditionsConfig Check;
+            [Tooltip("The effects of the check if it passes.")]
+            public ConditionalCheckEffectsConfig Then;
+
+            public void ToJson(JsonTextWriter writer)
+            {
+                writer.WriteStartObject();
+                writer.WriteProperty("check", Check);
+                writer.WriteProperty("then", Then);
+                writer.WriteEndObject();
+            }
+
+            public void Validate(DataAsset asset, IAssetValidator validator)
+            {
+                Check.Validate(asset, validator);
+                Then.Validate(asset, validator);
+            }
+        }
+
+        [Serializable]
+        public class ConditionalCheckConditionsConfig : IJsonSerializable
+        {
+            public List<ConditionAsset> AllConditionsSet;
+            public List<ConditionAsset> AnyConditionsSet;
+            public List<ConditionAsset> AllPersistentConditionsSet;
+            public List<ConditionAsset> AnyPersistentConditionsSet;
+            public List<FactAsset> AllFactsRevealed;
+            public List<FactAsset> AnyFactsRevealed;
+            public bool Invert;
+
+            public void ToJson(JsonTextWriter writer)
+            {
+                writer.WriteStartObject();
+                if (AllConditionsSet.Any())
+                    writer.WriteProperty("allConditionsSet", AllConditionsSet.Select(c => c.FullID));
+                if (AnyConditionsSet.Any())
+                    writer.WriteProperty("anyConditionsSet", AnyConditionsSet.Select(c => c.FullID));
+                if (AllPersistentConditionsSet.Any())
+                    writer.WriteProperty("allPersistentConditionsSet", AllPersistentConditionsSet.Select(c => c.FullID));
+                if (AnyPersistentConditionsSet.Any())
+                    writer.WriteProperty("anyPersistentConditionsSet", AnyPersistentConditionsSet.Select(c => c.FullID));
+                if (AllFactsRevealed.Any())
+                    writer.WriteProperty("allFactsRevealed", AllFactsRevealed.Select(f => f.FullID));
+                if (AnyFactsRevealed.Any())
+                    writer.WriteProperty("anyFactsRevealed", AnyFactsRevealed.Select(f => f.FullID));
+                if (Invert)
+                    writer.WriteProperty("invert", Invert);
+                writer.WriteEndObject();
+            }
+
+            public void Validate(DataAsset asset, IAssetValidator validator)
+            {
+                foreach (var condition in AnyConditionsSet)
+                {
+                    if (condition.Persistent)
+                        validator.Error(asset, $"Conditional checks cannot have persistent conditions in {nameof(AnyConditionsSet)} (found '{condition.FullID}')");
+                }
+                foreach (var condition in AllConditionsSet)
+                {
+                    if (condition.Persistent)
+                        validator.Error(asset, $"Conditional checks cannot have persistent conditions in {nameof(AllConditionsSet)} (found '{condition.FullID}')");
+                }
+                foreach (var condition in AnyPersistentConditionsSet)
+                {
+                    if (!condition.Persistent)
+                        validator.Error(asset, $"Conditional checks cannot have non-persistent conditions in {nameof(AnyPersistentConditionsSet)} (found '{condition.FullID}')");
+                }
+                foreach (var condition in AllPersistentConditionsSet)
+                {
+                    if (!condition.Persistent)
+                        validator.Error(asset, $"Conditional checks cannot have non-persistent conditions in {nameof(AllPersistentConditionsSet)} (found '{condition.FullID}')");
+                }
+            }
+        }
+
+        [Serializable]
+        public class ConditionalCheckEffectsConfig : IJsonSerializable
+        {
+            public List<ConditionAsset> SetConditions;
+            public List<ConditionAsset> UnsetConditions;
+            public List<ConditionAsset> SetPersistentConditions;
+            public List<ConditionAsset> UnsetPersistentConditions;
+            public List<FactAsset> RevealFacts;
+            public bool Reversible;
+
+            public void ToJson(JsonTextWriter writer)
+            {
+                writer.WriteStartObject();
+                if (SetConditions.Any())
+                    writer.WriteProperty("setConditions", SetConditions.Select(c => c.FullID));
+                if (UnsetConditions.Any())
+                    writer.WriteProperty("unsetConditions", UnsetConditions.Select(c => c.FullID));
+                if (SetPersistentConditions.Any())
+                    writer.WriteProperty("setPersistentConditions", SetPersistentConditions.Select(c => c.FullID));
+                if (UnsetPersistentConditions.Any())
+                    writer.WriteProperty("unsetPersistentConditions", UnsetPersistentConditions.Select(c => c.FullID));
+                if (RevealFacts.Any())
+                    writer.WriteProperty("revealFacts", RevealFacts.Select(f => f.FullID));
+                if (Reversible)
+                    writer.WriteProperty("reversible", Reversible);
+                writer.WriteEndObject();
+            }
+
+            public void Validate(DataAsset asset, IAssetValidator validator)
+            {
+                foreach (var condition in SetConditions)
+                {
+                    if (condition.Persistent)
+                        validator.Error(asset, $"Conditional checks cannot have persistent conditions in {nameof(SetConditions)} (found '{condition.FullID}')");
+                }
+                foreach (var condition in UnsetConditions)
+                {
+                    if (condition.Persistent)
+                        validator.Error(asset, $"Conditional checks cannot have persistent conditions in {nameof(UnsetConditions)} (found '{condition.FullID}')");
+                }
+                foreach (var condition in SetPersistentConditions)
+                {
+                    if (!condition.Persistent)
+                        validator.Error(asset, $"Conditional checks cannot have non-persistent conditions in {nameof(SetPersistentConditions)} (found '{condition.FullID}')");
+                }
+                foreach (var condition in UnsetPersistentConditions)
+                {
+                    if (!condition.Persistent)
+                        validator.Error(asset, $"Conditional checks cannot have non-persistent conditions in {nameof(UnsetPersistentConditions)} (found '{condition.FullID}')");
+                }
+            }
         }
     }
 }

@@ -15,6 +15,11 @@ namespace ModDataTools.Assets.PlanetModules
     {
         [Tooltip("Radius of the cloaking field around the planet. It's a bit finicky so experiment with different values.")]
         public float Radius;
+        public NullishSingle InnerCloakRadius;
+        public NullishSingle NearCloakRadius;
+        public NullishSingle FarCloakRadius;
+        [Tooltip("Not sure what this is. For the Stranger it is 2000. Optional (will default to be proportional to the cloak radius).")]
+        public NullishSingle CloakScaleDistance;
         [Tooltip("The AudioClip that will play when entering the cloaking field.")]
         public AudioClip Audio;
         [Tooltip("The AudioType that will play when entering the cloaking field, if not using a custom audio clip.")]
@@ -24,6 +29,11 @@ namespace ModDataTools.Assets.PlanetModules
 
         public override void WriteJsonProps(PlanetAsset planet, JsonTextWriter writer)
         {
+            writer.WriteProperty("radius", Radius);
+            writer.WriteProperty("cloakScaleDistance", CloakScaleDistance);
+            writer.WriteProperty("innerCloakRadius", InnerCloakRadius);
+            writer.WriteProperty("nearCloakRadius", NearCloakRadius);
+            writer.WriteProperty("farCloakRadius", FarCloakRadius);
             if (Audio)
                 writer.WriteProperty("audio", planet.GetResourcePath(Audio));
             else if (AudioType != AudioType.None)

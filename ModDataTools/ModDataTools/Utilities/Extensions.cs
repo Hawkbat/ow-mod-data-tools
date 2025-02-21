@@ -125,6 +125,11 @@ namespace ModDataTools.Utilities
                 module.WriteJsonObject(planet, writer);
             writer.WriteEndArray();
         }
+        [Obsolete("Write the asset's FullID instead of passing in the asset itself.")]
+        public static void WriteProperty(this JsonTextWriter writer, string name, DataAsset asset)
+        {
+            throw new NotImplementedException();
+        }
         public static void WriteProperty(this JsonTextWriter writer, string name, Vector3 value)
         {
             writer.WritePropertyName(name);
@@ -167,18 +172,22 @@ namespace ModDataTools.Utilities
             if (!value.HasValue) return;
             writer.WriteProperty(name, (Color32)value.Value);
         }
-        public static void WriteProperty(this JsonTextWriter writer, string name, AnimationCurve curve)
+        public static void WriteProperty(this JsonTextWriter writer, string name, AnimationCurve curve, string timePropertyName, string valuePropertyName)
         {
             writer.WritePropertyName(name);
             writer.WriteStartArray();
             foreach (var keyframe in curve.keys)
             {
                 writer.WriteStartObject();
-                writer.WriteProperty("time", keyframe.time);
-                writer.WriteProperty("value", keyframe.value);
+                writer.WriteProperty(timePropertyName, keyframe.time);
+                writer.WriteProperty(valuePropertyName, keyframe.value);
                 writer.WriteEndObject();
             }
             writer.WriteEndArray();
+        }
+        public static void WriteProperty(this JsonTextWriter writer, string name, AnimationCurve curve)
+        {
+            writer.WriteProperty(name, curve, "time", "value");
         }
         public static void WriteProperty(this JsonTextWriter writer, string name, Gradient gradient)
         {

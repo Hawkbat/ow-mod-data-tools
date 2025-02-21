@@ -15,12 +15,19 @@ namespace ModDataTools.Assets.PlanetModules
         public override void WriteJsonProps(PlanetAsset planet, JsonTextWriter writer)
         {
             var playerSpawns = AssetRepository.GetProps<PlayerSpawnPropData>(planet);
-            var playerSpawn = playerSpawns.FirstOrDefault(s => s.Data.IsDefault) ?? playerSpawns.FirstOrDefault();
-            var shipSpawn = AssetRepository.GetProps<ShipSpawnPropData>(planet).FirstOrDefault();
-            if (playerSpawn != null)
-                writer.WriteProperty("playerSpawn", playerSpawn);
-            if (shipSpawn != null)
-                writer.WriteProperty("shipSpawn", shipSpawn);
+            var shipSpawns = AssetRepository.GetProps<ShipSpawnPropData>(planet);
+            if (playerSpawns.Any())
+                writer.WriteProperty("playerSpawnPoints", playerSpawns);
+            if (shipSpawns.Any())
+                writer.WriteProperty("shipSpawnPoints", shipSpawns);
+        }
+
+        public override void Validate(PlanetAsset planet, IAssetValidator validator)
+        {
+            foreach (var spawn in AssetRepository.GetProps<PlayerSpawnPropData>(planet))
+                spawn.Data.Validate(spawn, planet, validator);
+            foreach (var spawn in AssetRepository.GetProps<ShipSpawnPropData>(planet))
+                spawn.Data.Validate(spawn, planet, validator);
         }
 
         public override bool ShouldWrite(PlanetAsset planet)

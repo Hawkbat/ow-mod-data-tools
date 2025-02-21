@@ -32,6 +32,11 @@ namespace ModDataTools.Assets.PlanetModules
 
         }
 
+        public virtual void Validate(PlanetAsset planet, IAssetValidator validator)
+        {
+
+        }
+
         public virtual IEnumerable<AssetResource> GetResources(PlanetAsset planet)
             => Enumerable.Empty<AssetResource>();
     }

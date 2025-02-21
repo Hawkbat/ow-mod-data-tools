@@ -21,6 +21,11 @@ namespace ModDataTools.Assets.Props
 
         }
 
+        public virtual void Validate(PropContext context, DataAsset asset, IAssetValidator validator)
+        {
+
+        }
+
         public virtual IEnumerable<AssetResource> GetResources(PropContext context)
             => Enumerable.Empty<AssetResource>();
     }

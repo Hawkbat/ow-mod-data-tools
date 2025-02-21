@@ -32,14 +32,16 @@ namespace ModDataTools.Assets.PlanetModules
         [Tooltip("Colour of fog on the planet.")]
         [ConditionalField(nameof(HasFog))]
         public NullishColor FogTint;
+        [Tooltip("Relative filepath to the fog color ramp texture, if you put fog. x axis is angle to sun (left at midnight, right at noon), y axis is distance to camera (close at bottom, far at top). Optional. If you set fogTint, a default fog ramp will be tinted for you.")]
+        [ConditionalField(nameof(HasFog))]
+        public Texture2D FogRamp;
         [Tooltip("Lets you survive on the planet without a suit.")]
         public bool HasOxygen;
         [Tooltip("Does this planet have trees? This will change the notification from \"Oxygen tank refilled\" to \"Trees detected, oxygen tank refilled\".")]
+        [ConditionalField(nameof(HasOxygen))]
         public bool HasTrees;
         [Tooltip("Does this planet have rain?")]
         public bool HasRain;
-        [Tooltip("Does this planet have snow?")]
-        public bool HasSnow;
         [Tooltip("Whether we use an atmospheric shader on the planet. Doesn't affect clouds, fog, rain, snow, oxygen, etc. Purely visual.")]
         public bool UseAtmosphereShader;
         [Tooltip("Whether this atmosphere will have flames appear when your ship goes a certain speed.")]
@@ -50,6 +52,8 @@ namespace ModDataTools.Assets.PlanetModules
         [Tooltip("Maximum speed that your ship can go in the atmosphere where flames will appear at their brightest.")]
         [ConditionalField(nameof(HasShockLayer))]
         public float MaxShockSpeed = 300f;
+        [Tooltip("Will the ship automatically try to orient itself to face upwards while in this volume?")]
+        public bool AllowShipAutoroll = true;
 
         public override void WriteJsonProps(PlanetAsset planet, JsonTextWriter writer)
         {
@@ -61,6 +65,8 @@ namespace ModDataTools.Assets.PlanetModules
                 writer.WriteProperty("fogDensity", FogDensity);
                 writer.WriteProperty("fogSize", FogSize);
                 writer.WriteProperty("fogTint", FogTint);
+                if (FogRamp)
+                    writer.WriteProperty("fogRampPath", planet.GetResourcePath(FogRamp));
             }
             if (HasOxygen)
                 writer.WriteProperty("hasOxygen", HasOxygen);
@@ -68,17 +74,18 @@ namespace ModDataTools.Assets.PlanetModules
                 writer.WriteProperty("hasTrees", HasTrees);
             if (HasRain)
                 writer.WriteProperty("hasRain", HasRain);
-            if (HasSnow)
-                writer.WriteProperty("hasSnow", HasSnow);
             writer.WriteProperty("size", Size);
             if (UseAtmosphereShader)
                 writer.WriteProperty("useAtmosphereShader", UseAtmosphereShader);
-            writer.WriteProperty("hasShockLayer", HasShockLayer);
+            if (!HasShockLayer)
+                writer.WriteProperty("hasShockLayer", HasShockLayer);
             if (HasShockLayer)
             {
                 writer.WriteProperty("minShockSpeed", MinShockSpeed);
                 writer.WriteProperty("maxShockSpeed", MaxShockSpeed);
             }
+            if (!AllowShipAutoroll)
+                writer.WriteProperty("allowShipAutoroll", AllowShipAutoroll);
         }
 
         public override IEnumerable<AssetResource> GetResources(PlanetAsset planet)
@@ -88,6 +95,8 @@ namespace ModDataTools.Assets.PlanetModules
                 foreach (var resource in Clouds.GetResources(planet))
                     yield return resource;
             }
+            if (HasFog && FogRamp)
+                yield return new ImageResource(FogRamp, planet);
         }
 
         [Serializable]

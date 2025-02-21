@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace ModDataTools.Assets.PlanetModules
 {
-    public class ShockEffect : PlanetModule
+    public class ShockEffectModule : PlanetModule
     {
         [Tooltip("Override the calculated radius of the shock effect")]
         public NullishSingle Radius;
@@ -27,7 +27,8 @@ namespace ModDataTools.Assets.PlanetModules
                     writer.WriteProperty("assetBundle", AssetRepository.GetAssetBundlePath(Mesh));
                     writer.WriteProperty("meshPath", AssetRepository.GetAssetPath(Mesh));
                 }
-            } else
+            }
+            else
             {
                 writer.WriteProperty("hasSupernovaShockEffect", IsEnabled);
             }

@@ -50,6 +50,14 @@ namespace ModDataTools.Assets.PlanetModules
         public bool HasStarController = true;
         [Tooltip("The default sun has its own atmosphere that is different from regular planets. If you want that, set this to true.")]
         public bool HasAtmosphere = true;
+        [Tooltip("Size multiplier for solar flares. Defaults to 1.")]
+        public NullishSingle SolarFlareScaleFactor;
+        [Tooltip("How long a solar flare is visible for. Defaults to 15 seconds.")]
+        public NullishSingle SolarFlareLifeLength;
+        [Tooltip("Solar flares are emitted randomly. This is the minimum amount of time between solar flares. Defaults to 5 seconds.")]
+        public NullishSingle MinTimeBetweenSolarFlares;
+        [Tooltip("Solar flares are emitted randomly. This is the maximum amount of time between solar flares. Defaults to 30 seconds.")]
+        public NullishSingle MaxTimeBetweenSolarFlares;
 
         public enum DeathType
         {
@@ -97,6 +105,16 @@ namespace ModDataTools.Assets.PlanetModules
                 writer.WriteProperty("stellarDeathType", StellarDeathType);
             if (StellarRemnantType != RemnantType.Default)
                 writer.WriteProperty("stellarRemnantType", StellarRemnantType);
+            if (SolarFlareScaleFactor.HasValue || SolarFlareLifeLength.HasValue || MinTimeBetweenSolarFlares.HasValue || MaxTimeBetweenSolarFlares.HasValue)
+            {
+                writer.WritePropertyName("solarFlareSettings");
+                writer.WriteStartObject();
+                writer.WriteProperty("scaleFactor", SolarFlareScaleFactor);
+                writer.WriteProperty("lifeLength", SolarFlareLifeLength);
+                writer.WriteProperty("minTimeBetweenFlares", MinTimeBetweenSolarFlares);
+                writer.WriteProperty("maxTimeBetweenFlares", MaxTimeBetweenSolarFlares);
+                writer.WriteEndObject();
+            }
         }
 
         public override IEnumerable<AssetResource> GetResources(PlanetAsset planet)

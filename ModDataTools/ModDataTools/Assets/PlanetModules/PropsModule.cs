@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -140,6 +141,12 @@ namespace ModDataTools.Assets.PlanetModules
         {
             foreach (var prop in GetProps(planet))
                 prop.GetProp().GetData().Localize(prop, l10n);
+        }
+
+        public override void Validate(PlanetAsset planet, IAssetValidator validator)
+        {
+            foreach (var prop in GetProps(planet))
+                prop.GetProp().GetData().Validate(prop, planet, validator);
         }
 
         public override bool ShouldWrite(PlanetAsset planet) => GetProps(planet).Any();

@@ -29,6 +29,8 @@ namespace ModDataTools.Assets.PlanetModules
         {
             if (!IsEnabled)
                 writer.WriteProperty("enabled", IsEnabled);
+            if (!IsEnabled) return;
+
             if (HideInMap)
                 writer.WriteProperty("hideInMap", HideInMap);
             writer.WriteProperty("bracketRadius", BracketRadius);

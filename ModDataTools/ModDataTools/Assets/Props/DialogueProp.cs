@@ -34,7 +34,7 @@ namespace ModDataTools.Assets.Props
             writer.WriteProperty("range", Range);
             writer.WriteProperty("lookAtRadius", LookAtRadius);
             if (BlockAfterPersistentCondition)
-                writer.WriteProperty("blockAfterPersistentCondition", BlockAfterPersistentCondition);
+                writer.WriteProperty("blockAfterPersistentCondition", BlockAfterPersistentCondition.FullID);
             if (FlashlightToggle != FlashlightToggleType.None)
                 writer.WriteProperty("flashlightToggle", FlashlightToggle);
         }

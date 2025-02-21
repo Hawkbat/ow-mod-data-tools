@@ -105,6 +105,8 @@ namespace ModDataTools.Assets
                 validator.Warn(this, $"Missing {nameof(Photo)}");
             if (!IsCuriosity && !Curiosity)
                 validator.Warn(this, $"Missing {nameof(Curiosity)}");
+            if (Curiosity && !Curiosity.IsCuriosity)
+                validator.Warn(this, $"{nameof(Curiosity)} {Curiosity.FullName} is not marked as {nameof(IsCuriosity)}");
             if (Planet && (!Planet.ExportShipLogFile || !Planet.NewHorizons.ShipLog.IsEnabled))
                 validator.Warn(this, $"{nameof(Planet)} {Planet.FullName} has ship logs but is not set to export them");
         }

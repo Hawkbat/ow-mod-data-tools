@@ -15,6 +15,8 @@ namespace ModDataTools.Assets.PlanetModules
     {
         [Tooltip("Completely remove this planet (and it's children) from map mode.")]
         public bool Remove;
+        [Tooltip("Can this ship log map mode entry be selected. Ex) Set to false for stars with no entries on them so they are skipped in navigation")]
+        public bool Selectable = true;
         [Tooltip("The path to the sprite to show when the planet is unexplored in map mode.")]
         public Texture2D OutlineSprite;
         [Tooltip("The path to the sprite to show when the planet is revealed in map mode.")]
@@ -66,6 +68,8 @@ namespace ModDataTools.Assets.PlanetModules
                     writer.WriteProperty("revealedSprite", planet.GetResourcePath(RevealedSprite));
                 if (Scale != 1f)
                     writer.WriteProperty("scale", Scale);
+                if (!Selectable)
+                    writer.WriteProperty("selectable", Selectable);
             }
             writer.WriteEndObject();
 

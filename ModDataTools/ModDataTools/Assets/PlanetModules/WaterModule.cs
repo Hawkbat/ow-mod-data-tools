@@ -22,16 +22,19 @@ namespace ModDataTools.Assets.PlanetModules
         public float Buoyancy = 1f;
         [Tooltip("Scale this object over time")]
         public AnimationCurve Curve;
-
+        [Tooltip("Will the ship automatically try to orient itself to face upwards while in this volume?")]
+        public bool AllowShipAutoroll = true;
 
         public override void WriteJsonProps(PlanetAsset planet, JsonTextWriter writer)
         {
-            writer.WriteProperty("size", Size);
             if (Curve != null && Curve.keys.Any())
                 writer.WriteProperty("curve", Curve);
+            writer.WriteProperty("size", Size);
             writer.WriteProperty("density", Density);
             writer.WriteProperty("buoyancy", Buoyancy);
             writer.WriteProperty("tint", Tint);
+            if (!AllowShipAutoroll)
+                writer.WriteProperty("autoroll", AllowShipAutoroll);
         }
     }
 }

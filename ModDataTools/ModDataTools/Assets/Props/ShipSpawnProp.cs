@@ -9,7 +9,7 @@ using UnityEngine;
 namespace ModDataTools.Assets.Props
 {
     [Serializable]
-    public class ShipSpawnPropData : GeneralPropData
+    public class ShipSpawnPropData : SpawnPropData
     {
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
@@ -17,6 +17,6 @@ namespace ModDataTools.Assets.Props
         }
     }
     [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(ShipSpawnPropAsset))]
-    public class ShipSpawnPropAsset : GeneralPropAsset<ShipSpawnPropData> { }
-    public class ShipSpawnPropComponent : GeneralPropComponent<ShipSpawnPropData> { }
+    public class ShipSpawnPropAsset : SpawnPropAsset<ShipSpawnPropData> { }
+    public class ShipSpawnPropComponent : SpawnPropComponent<ShipSpawnPropData> { }
 }

@@ -15,8 +15,8 @@ namespace ModDataTools.Assets.Volumes
     {
         [Tooltip("Whether the bodies will shrink when they enter this volume or just disappear instantly.")]
         public bool ShrinkBodies = true;
-        [Tooltip("Whether this volume only affects the player and ship.")]
-        public bool OnlyAffectsPlayerAndShip;
+        [Tooltip("Whether this volume only affects the player, ship, probe/scout, model rocket ship, and nomai shuttle.")]
+        public bool OnlyAffectsPlayerRelatedBodies;
         [Tooltip("The type of death the player will have if they enter this volume.")]
         public DeathType DeathType = DeathType.Default;
 
@@ -25,8 +25,8 @@ namespace ModDataTools.Assets.Volumes
             base.WriteJsonProps(context, writer);
             if (!ShrinkBodies)
                 writer.WriteProperty("shrinkBodies", ShrinkBodies);
-            if (OnlyAffectsPlayerAndShip)
-                writer.WriteProperty("onlyAffectsPlayerAndShip", OnlyAffectsPlayerAndShip);
+            if (OnlyAffectsPlayerRelatedBodies)
+                writer.WriteProperty("onlyAffectsPlayerRelatedBodies", OnlyAffectsPlayerRelatedBodies);
             if (DeathType != DeathType.Default)
                 writer.WriteProperty("deathType", DeathType);
         }
