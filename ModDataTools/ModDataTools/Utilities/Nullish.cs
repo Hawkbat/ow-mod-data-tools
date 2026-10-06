@@ -69,6 +69,13 @@ namespace ModDataTools.Utilities
     }
 
     [Serializable]
+    public class NullishVector2 : Nullish<Vector2>
+    {
+        public static implicit operator Vector2(NullishVector2 instance) => instance.SafeValue;
+        public static implicit operator NullishVector2(Vector2 instance) => new() { hasValue = true, value = instance };
+    }
+
+    [Serializable]
     public class NullishVector3 : Nullish<Vector3>
     {
         public static implicit operator Vector3(NullishVector3 instance) => instance.SafeValue;

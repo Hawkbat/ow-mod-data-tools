@@ -20,18 +20,38 @@ namespace ModDataTools.Assets.Props
         public TranslatorTextAsset.TextType Type;
         [Tooltip("The location of this object.")]
         public TranslatorTextAsset.Location Location;
+        [Tooltip("Turns this computer off when this dialogue condition is set, and back on when it is unset, or the other way around if the computer starts off.")]
+        [ConditionalField(nameof(Type), TranslatorTextAsset.TextType.Computer, TranslatorTextAsset.TextType.PreCrashComputer)]
+        public ConditionAsset ComputerCondition;
+        [Tooltip("Makes this computer turned off by default so the player cannot read the text.")]
+        [ConditionalField(nameof(Type), TranslatorTextAsset.TextType.Computer, TranslatorTextAsset.TextType.PreCrashComputer)]
+        public bool ComputerStartsOff;
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
             if (TranslatorText)
             {
                 writer.WriteProperty("xmlFile", TranslatorText.GetXmlOutputPath());
-                writer.WriteProperty("arcInfo", TranslatorText.TextBlocks.Select(b => b.Arc));
+                writer.WriteProperty("arcInfo", TranslatorText.TextBlocks);
                 writer.WriteProperty("seed", TranslatorText.Seed);
             }
             writer.WriteProperty("type", Type);
             if (Location != TranslatorTextAsset.Location.Unspecified)
                 writer.WriteProperty("location", Location);
+            if (Type == TranslatorTextAsset.TextType.Computer || Type == TranslatorTextAsset.TextType.PreCrashComputer)
+            {
+                if (ComputerCondition)
+                    writer.WriteProperty("computerCondition", ComputerCondition.FullID);
+                if (ComputerStartsOff)
+                    writer.WriteProperty("computerStartsOff", ComputerStartsOff);
+            }
+        }
+
+        public override void Validate(PropContext context, IAssetValidator validator)
+        {
+            base.Validate(context, validator);
+            if (ComputerCondition && ComputerCondition.Persistent)
+                validator.Error(context.Planet, $"{nameof(ComputerCondition)} must not be a persistent condition");
         }
     }
 

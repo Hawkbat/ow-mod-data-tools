@@ -38,7 +38,7 @@ namespace ModDataTools.Assets.Props
     [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(WarpReceiverPropAsset))]
     public class WarpReceiverPropAsset : GeneralPropAsset<WarpReceiverPropData>
     {
-        public WarpReceiverComputerPropAsset Computer;
+        public NomaiComputerPropAsset Computer;
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
@@ -48,8 +48,8 @@ namespace ModDataTools.Assets.Props
     }
     public class WarpReceiverPropComponent : GeneralPropComponent<WarpReceiverPropData>
     {
-        public WarpReceiverComputerPropAsset ComputerAsset;
-        public WarpReceiverComputerPropComponent Computer;
+        public NomaiComputerPropAsset ComputerAsset;
+        public NomaiComputerPropComponent Computer;
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {

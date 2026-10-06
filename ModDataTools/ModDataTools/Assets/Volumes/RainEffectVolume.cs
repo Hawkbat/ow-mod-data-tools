@@ -14,14 +14,14 @@ namespace ModDataTools.Assets.Volumes
     public class RainEffectVolumeData : GeneralPriorityVolumeData
     {
         [Tooltip("The rate at which the rain droplet effect will happen")]
-        public float DropletRate = 0.1f;
+        public float DropletRate = 10f;
         [Tooltip("The rate at which the rain streak effect will happen")]
         public float StreakRate = 1f;
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
             base.WriteJsonProps(context, writer);
-            if (DropletRate != 0.1f)
+            if (DropletRate != 10f)
                 writer.WriteProperty("dropletRate", DropletRate);
             if (StreakRate != 1f)
                 writer.WriteProperty("streakRate", StreakRate);

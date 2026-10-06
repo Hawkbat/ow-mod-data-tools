@@ -23,7 +23,7 @@ namespace ModDataTools.Assets.Props
         [Tooltip("At this distance the sound is at its loudest.")]
         public float MinDistance = 0f;
         [Tooltip("The sound will drop off by this distance.")]
-        public float MaxDistance = 5f;
+        public float MaxDistance = 30f;
         [Tooltip("How loud the sound will play")]
         [Range(0f, 1f)]
         public float Volume = 0.5f;
@@ -42,7 +42,7 @@ namespace ModDataTools.Assets.Props
                 writer.WriteProperty("volume", Volume);
             if (MinDistance != 0f)
                 writer.WriteProperty("minDistance", MinDistance);
-            if (MinDistance != 5f)
+            if (MaxDistance != 30f)
                 writer.WriteProperty("maxDistance", MaxDistance);
         }
 

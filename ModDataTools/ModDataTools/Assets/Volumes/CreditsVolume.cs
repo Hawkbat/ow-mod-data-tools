@@ -1,4 +1,5 @@
 ﻿using ModDataTools.Assets.Props;
+using ModDataTools.Assets.Resources;
 using ModDataTools.Utilities;
 using Newtonsoft.Json;
 using System;
@@ -13,14 +14,8 @@ namespace ModDataTools.Assets.Volumes
     [Serializable]
     public class CreditsVolumeData : GeneralVolumeData
     {
-        [Tooltip("The type of credits to play")]
-        public CreditsType Type;
-        [Tooltip("Text displayed in orange on game over. For localization, put translations under UI.")]
-        public string Text;
-        [Tooltip("Change the colour of the game over text. Leave empty to use the default orange.")]
-        public NullishColor Colour;
-        [Tooltip("Condition that must be true for this game over to trigger. If this is on a LoadCreditsVolume, leave empty to always trigger this game over. Note this is a regular dialogue condition, not a persistent condition.")]
-        public ConditionAsset Condition;
+        [Tooltip("The game over message and credits to show when entering this volume.")]
+        public GameOverConfig GameOver;
         [Tooltip("The type of death the player will have if they enter this volume.")]
         public DeathType DeathType = DeathType.Default;
 
@@ -30,36 +25,25 @@ namespace ModDataTools.Assets.Volumes
             if (DeathType != DeathType.Default)
                 writer.WriteProperty("deathType", DeathType);
             writer.WritePropertyName("gameOver");
-            writer.WriteStartObject();
-            if (!string.IsNullOrEmpty(Text))
-                writer.WriteProperty("text", context.GetProp().PropID);
-            writer.WriteProperty("colour", Colour);
-            if (Condition)
-                writer.WriteProperty("condition", Condition.FullID);
-            if (Type != CreditsType.Fast)
-                writer.WriteProperty("creditsType", Type);
-            writer.WriteEndObject();
+            GameOver.ToJson(writer, context.GetProp().PropID, GameOver.Audio ? context.Planet.GetResourcePath(GameOver.Audio) : null);
         }
 
         public override void Localize(PropContext context, Localization l10n)
         {
-            if (!string.IsNullOrEmpty(Text))
-                l10n.AddUI(context.GetProp().PropID, Text);
+            GameOver.Localize(context.GetProp().PropID, l10n);
         }
 
         public override void Validate(PropContext context, IAssetValidator validator)
         {
             base.Validate(context, validator);
-            if (Condition && Condition.Persistent)
-                validator.Error(context.Planet, $"Credits volume condition '{Condition.FullID}' must not be persistent.");
+            GameOver.Validate(context.Planet, validator);
         }
 
-        public enum CreditsType
+        public override IEnumerable<AssetResource> GetResources(PropContext context)
         {
-            Fast = 0,
-            Final = 1,
-            Kazoo = 2,
-            None = 3,
+            if (GameOver.Audio)
+                foreach (var resource in GameOver.GetResources(context.Planet.GetResourcePath(GameOver.Audio)))
+                    yield return resource;
         }
     }
 

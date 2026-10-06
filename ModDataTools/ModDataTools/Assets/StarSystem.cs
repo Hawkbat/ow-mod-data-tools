@@ -81,6 +81,8 @@ namespace ModDataTools.Assets
             writer.WriteProperty("canExitViaWarpDrive", nh.CanExitViaWarpDrive);
             if (nh.CanExitViaWarpDrive && nh.FactRequiredToExitViaWarpDrive)
                 writer.WriteProperty("factRequiredToExitViaWarpDrive", nh.FactRequiredToExitViaWarpDrive.FullID);
+            if (nh.WarpDriveSpawnPoint)
+                writer.WriteProperty("warpDriveSpawnPointID", nh.WarpDriveSpawnPoint.FullID);
             writer.WriteProperty("destroyStockPlanets", nh.DestroyStockPlanets);
             writer.WriteProperty("enableTimeLoop", nh.EnableTimeLoop);
             if (nh.EnableTimeLoop)
@@ -102,6 +104,8 @@ namespace ModDataTools.Assets
             writer.WriteEndObject();
             writer.WriteProperty("startHere", nh.StartHere);
             writer.WriteProperty("respawnHere", nh.RespawnHere);
+            if (nh.OptOutWarpDriveModel)
+                writer.WriteProperty("optOutWarpDriveModel", nh.OptOutWarpDriveModel);
             if (nh.GlobalMusic.HasCustomAudio)
             {
                 writer.WritePropertyName("GlobalMusic");
@@ -204,6 +208,17 @@ namespace ModDataTools.Assets
                 }
                 writer.WriteEndObject();
             }
+            if (nh.StarChart.Position.HasValue || nh.StarChart.Color.HasValue || nh.StarChart.StarTexture || nh.StarChart.DisappearanceTime.HasValue)
+            {
+                writer.WritePropertyName("StarChart");
+                writer.WriteStartObject();
+                writer.WriteProperty("position", nh.StarChart.Position);
+                writer.WriteProperty("color", nh.StarChart.Color);
+                if (nh.StarChart.StarTexture)
+                    writer.WriteProperty("starTexturePath", GetResourcePath(nh.StarChart.StarTexture));
+                writer.WriteProperty("disappearanceTime", nh.StarChart.DisappearanceTime);
+                writer.WriteEndObject();
+            }
             var entries = AssetRepository.GetAllAssets<EntryAsset>().Where(e => e.Planet && e.Planet.StarSystem == this);
             if (entries.Any())
             {
@@ -271,6 +286,8 @@ namespace ModDataTools.Assets
                 if (NewHorizons.Skybox.Back)
                     yield return new ImageResource(NewHorizons.Skybox.Back, this);
             }
+            if (NewHorizons.StarChart.StarTexture)
+                yield return new ImageResource(NewHorizons.StarChart.StarTexture, this);
             if (NewHorizons.GlobalMusic.HasCustomAudio)
             {
                 if (NewHorizons.GlobalMusic.TravelAudio)
@@ -312,6 +329,8 @@ namespace ModDataTools.Assets
             public bool CanExitViaWarpDrive = true;
             [Tooltip("The FactID that must be revealed for you to warp back to the main solar system from here.")]
             public FactAsset FactRequiredToExitViaWarpDrive;
+            [Tooltip("If you want the warp spawn point to be different from the respawn point, set the ship spawn point you want to use. Otherwise, will use the default spawn.")]
+            public ShipSpawnPropAsset WarpDriveSpawnPoint;
             [Tooltip("Do you want a clean slate for this star system? Or will it be a modified version of the original.")]
             public bool DestroyStockPlanets = true;
             [Tooltip("Should the time loop be enabled in this system?")]
@@ -327,14 +346,31 @@ namespace ModDataTools.Assets
             public bool StartHere;
             [Tooltip("Set to true if you want the player to stay in this star system if they die in it.")]
             public bool RespawnHere;
+            [Tooltip("Whether to disable the warp drive model on the ship in your system (and ignore your system in the warp drive model visibility logic for other systems).")]
+            public bool OptOutWarpDriveModel;
             [Tooltip("Replace music that plays globally")]
             public GlobalMusicConfig GlobalMusic;
             [Tooltip("Settings for the vessel")]
             public VesselConfig Vessel;
+            [Tooltip("Configure how this system will appear in the Interstellar Mode in the ship log.")]
+            public StarChartConfig StarChart;
             [Tooltip("The planet to focus on when entering the ship log for the first time in a loop. If not set this will be the planet at navtigation position (1, 0)")]
             public PlanetAsset ShipLogStartingPlanet;
             [Tooltip("A list of conditional checks to be performed while in this star system.")]
             public List<ConditionalCheckConfig> ConditionalChecks;
+        }
+
+        [Serializable]
+        public class StarChartConfig
+        {
+            [Tooltip("The position of the system on the star chart. This applies regardless of any other settings.")]
+            public NullishVector2 Position;
+            [Tooltip("The color of the star as it appears on the star chart. If specified, it will override any custom generation.")]
+            public NullishColor Color;
+            [Tooltip("A texture that will replace the default texture used to display this star in the star map. If you use this, it's probably best to leave the color blank, unless you have a white texture that you'd like to tint a different color. If specified, it will override any custom generation.")]
+            public Texture2D StarTexture;
+            [Tooltip("Time in the loop (in minutes) that this system will disappear. If not specified, the time is calculated automatically based on the stars and singularities in the system. If color or star texture is specified but this is not, it will default to 0, meaning players can warp to your system at any point. A 22 minutes and 40 seconds (22.667) disappearance time will make the system unavailable to warp to at the exact moment the vanilla loop ends.")]
+            public NullishSingle DisappearanceTime;
         }
 
         [Serializable]

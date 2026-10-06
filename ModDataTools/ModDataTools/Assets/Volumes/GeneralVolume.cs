@@ -11,24 +11,43 @@ using UnityEngine;
 namespace ModDataTools.Assets.Volumes
 {
     [Serializable]
-    public abstract class GeneralVolumeData : GeneralPointPropData
+    public abstract class GeneralVolumeData : GeneralPropData
     {
-        [Tooltip("The radius of this volume.")]
-        public float Radius;
+        [Tooltip("The radius of this volume, if a shape is not specified.")]
+        [ConditionalField(nameof(HasShape), false)]
+        public float Radius = 1f;
+        [Tooltip("Whether to use a custom shape for this volume instead of a sphere.")]
+        public bool HasShape;
+        [Tooltip("The shape of this volume.")]
+        [ConditionalField(nameof(HasShape))]
+        public ShapeConfig Shape;
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
-            writer.WriteProperty("radius", Radius);
+            if (HasShape)
+                writer.WriteProperty("shape", Shape);
+            else if (Radius != 1f)
+                writer.WriteProperty("radius", Radius);
+        }
+
+        public void DrawGizmo(Transform transform)
+        {
+            if (HasShape)
+            {
+                Shape.DrawGizmo(transform.localToWorldMatrix);
+                return;
+            }
+            Gizmos.DrawWireSphere(transform.position, Radius);
         }
     }
 
-    public abstract class GeneralVolumeAsset<T> : GeneralPointPropAsset<T> where T : GeneralVolumeData { }
-    public abstract class GeneralVolumeComponent<T> : GeneralPointPropComponent<T> where T : GeneralVolumeData
+    public abstract class GeneralVolumeAsset<T> : GeneralPropAsset<T> where T : GeneralVolumeData { }
+    public abstract class GeneralVolumeComponent<T> : GeneralPropComponent<T> where T : GeneralVolumeData
     {
         void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, Data.Radius);
+            ((T)GetData()).DrawGizmo(transform);
         }
     }
 }

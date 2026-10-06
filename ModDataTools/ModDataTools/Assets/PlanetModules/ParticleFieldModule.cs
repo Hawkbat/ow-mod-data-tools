@@ -19,6 +19,8 @@ namespace ModDataTools.Assets.PlanetModules
         public AnimationCurve DensityByHeightCurve;
         [Tooltip("An optional rename of this object.")]
         public string Rename;
+        [Tooltip("Overrides the radius of the field around the player or probe. Strongly effects visual density, due to how volume works. Defaults: Rain 20, SnowflakesHeavy 20, SnowflakesLight 10, Embers 30, Clouds 60, Leaves 30, Bubbles 40, Fog 60, CrystalMotes 30, RockMotes 30, IceMotes 30, SandMotes 10, Crawlies 20, Fireflies 30, Plankton 20, Pollen 20, Current 30.")]
+        public NullishSingle OverrideFieldRadius;
 
         public override void WriteJsonProps(PlanetAsset planet, JsonTextWriter writer)
         {
@@ -28,6 +30,7 @@ namespace ModDataTools.Assets.PlanetModules
                 writer.WriteProperty("densityByHeightCurve", DensityByHeightCurve, "height", "density");
             if (!string.IsNullOrEmpty(Rename))
                 writer.WriteProperty("rename", Rename);
+            writer.WriteProperty("overrideFieldRadius", OverrideFieldRadius);
         }
 
         public enum ParticleFieldType

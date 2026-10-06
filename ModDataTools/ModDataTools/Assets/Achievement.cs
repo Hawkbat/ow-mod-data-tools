@@ -24,6 +24,12 @@ namespace ModDataTools.Assets
         public Texture2D Icon;
         [Tooltip("Should the name and description of the achievement be hidden until it is unlocked. Good for hiding spoilers!")]
         public bool Secret;
+        [Tooltip("Should an alternate description be shown before the achievement is unlocked. Good for giving hints on how to unlock the achievement without outright spoiling it. Ignored if the achievement is secret.")]
+        [ConditionalField(nameof(Secret), false)]
+        public bool ShowDescriptionNotAchieved;
+        [Tooltip("The short description for this achievement shown before the player gets the achievement.")]
+        [ConditionalField(nameof(ShowDescriptionNotAchieved))]
+        public string DescriptionNotAchieved;
         [Tooltip("A list of facts that must be discovered before this achievement is unlocked.")]
         public List<FactAsset> Facts = new();
         [Tooltip("A list of signals that must be discovered before this achievement is unlocked.")]
@@ -47,6 +53,8 @@ namespace ModDataTools.Assets
             writer.WriteStartObject();
             writer.WriteProperty("ID", FullID);
             writer.WriteProperty("secret", Secret);
+            if (ShowDescriptionNotAchieved && !Secret)
+                writer.WriteProperty("showDescriptionNotAchieved", ShowDescriptionNotAchieved);
             if (Facts.Any())
                 writer.WriteProperty("factIDs", Facts.Select(f => f.FullID));
             if (Signals.Any())
@@ -68,7 +76,7 @@ namespace ModDataTools.Assets
 
         public override void Localize(Localization l10n)
         {
-            l10n.AddAchivement(FullID, FullName, Description);
+            l10n.AddAchivement(FullID, FullName, Description, ShowDescriptionNotAchieved && !Secret ? DescriptionNotAchieved : null);
         }
 
         public override IEnumerable<AssetResource> GetResources()

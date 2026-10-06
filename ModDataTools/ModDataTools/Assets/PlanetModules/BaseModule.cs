@@ -22,8 +22,10 @@ namespace ModDataTools.Assets.PlanetModules
         public GravityFallOffType GravityFallOff = GravityFallOffType.Linear;
         [Tooltip("You can force this planet's gravity to be felt over other gravity/zero-gravity sources by increasing this number.")]
         public NullishInt GravityVolumePriority;
+        [Tooltip("The layer of the planet's gravity volume. Volumes on different layers stack; volumes on the same layer override each other by priority. The default of 3 is planet gravity.")]
+        public int GravityVolumeLayer = 3;
         [Tooltip("Optional. Overrides how far the player must be from the planet for their feet to automatically orient towards the ground.")]
-        public NullishInt GravityAligmentRadiusOverride;
+        public NullishInt GravityAlignmentRadiusOverride;
         [Tooltip("An override for the radius of the planet's gravitational sphere of influence.")]
         public NullishSingle SphereOfInfluenceOverride;
         [Tooltip("Radius of a simple sphere used as the ground for the planet. If you want to use more complex terrain, leave this as 0.")]
@@ -58,7 +60,9 @@ namespace ModDataTools.Assets.PlanetModules
             writer.WriteProperty("surfaceGravity", SurfaceGravity);
             writer.WriteProperty("surfaceSize", SurfaceSize);
             writer.WriteProperty("gravityVolumePriority", GravityVolumePriority);
-            writer.WriteProperty("gravityAlignmentRadiusOverride", GravityAligmentRadiusOverride);
+            if (GravityVolumeLayer != 3)
+                writer.WriteProperty("gravityVolumeLayer", GravityVolumeLayer);
+            writer.WriteProperty("gravityAlignmentRadiusOverride", GravityAlignmentRadiusOverride);
             if (Pushable)
                 writer.WriteProperty("pushable", Pushable);
             if (HideProxy)

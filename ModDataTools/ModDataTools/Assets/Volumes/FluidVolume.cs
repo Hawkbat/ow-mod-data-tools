@@ -47,6 +47,9 @@ namespace ModDataTools.Assets.Volumes
             Sand = 3,
             Plasma = 4,
             Fog = 5,
+            Air = 6,
+            TractorBeam = 7,
+            Geyser = 8,
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using ModDataTools.Utilities;
+﻿using ModDataTools.Assets.Volumes;
+using ModDataTools.Utilities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,19 @@ namespace ModDataTools.Assets.Props
         [Tooltip("The maximum distance at which you'll hear the sounds of the cyclone. If not set it will scale relative to the size of the cyclone.")]
         public NullishSingle AudioDistance;
         public TornadoFluidType FluidType = TornadoFluidType.Cloud;
+        [Tooltip("The type of hazard for this tornado. Set to None for this tornado to not be hazardous.")]
+        public HazardVolumeData.HazardType HazardType = HazardVolumeData.HazardType.None;
+        [Tooltip("The amount of damage you will take per second while inside this tornado.")]
+        [ConditionalField(nameof(HazardType), HazardVolumeData.HazardType.None, Invert = true)]
+        public float DamagePerSecond = 10f;
+        [Tooltip("Whether this tornado causes damage on first contact.")]
+        public bool HasFirstContactDamage;
+        [Tooltip("The type of damage you will take when you first touch this tornado.")]
+        [ConditionalField(nameof(HasFirstContactDamage))]
+        public HazardVolumeData.InstantDamageType FirstContactDamageType;
+        [Tooltip("The amount of damage you will take when you first touch this tornado.")]
+        [ConditionalField(nameof(HasFirstContactDamage))]
+        public float FirstContactDamage = 10f;
         public override bool SkipPosition => Elevation.HasValue;
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
@@ -43,6 +57,18 @@ namespace ModDataTools.Assets.Props
             writer.WriteProperty("audioDistance", AudioDistance);
             if (FluidType != TornadoFluidType.Cloud)
                 writer.WriteProperty("fluidType", FluidType);
+            if (HazardType != HazardVolumeData.HazardType.None)
+            {
+                writer.WriteProperty("hazardType", HazardType);
+                if (DamagePerSecond != 10f)
+                    writer.WriteProperty("damagePerSecond", DamagePerSecond);
+            }
+            if (HasFirstContactDamage)
+            {
+                writer.WriteProperty("firstContactDamageType", FirstContactDamageType);
+                if (FirstContactDamage != 10f)
+                    writer.WriteProperty("firstContactDamage", FirstContactDamage);
+            }
         }
 
         public enum TornadoType
@@ -62,7 +88,7 @@ namespace ModDataTools.Assets.Props
         }
     }
 
-    [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(TornadoProp))]
-    public class TornadoProp : GeneralPropAsset<TornadoPropData> { }
+    [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(TornadoPropAsset))]
+    public class TornadoPropAsset : GeneralPropAsset<TornadoPropData> { }
     public class TornadoPropComponent : GeneralPropComponent<TornadoPropData> { }
 }

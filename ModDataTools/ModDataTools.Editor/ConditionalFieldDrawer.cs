@@ -66,6 +66,7 @@ namespace ModDataTools.Editor
                     {
                         var hasValueProp = prop.FindPropertyRelative("hasValue");
                         if (value is bool b && hasValueProp.boolValue == b) return true;
+                        continue;
                     }
                     switch (prop.propertyType)
                     {

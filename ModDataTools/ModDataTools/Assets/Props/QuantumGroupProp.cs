@@ -9,10 +9,15 @@ using UnityEngine;
 
 namespace ModDataTools.Assets.Props
 {
-    [Serializable]
-    public class QuantumGroupPropData : PropData
+    public interface IQuantumGroupMember
     {
-        [Tooltip("What type of group this is: does it define a list of states a single quantum object could take or a list of sockets one or more quantum objects could share?")]
+        public IProp GetQuantumGroup();
+    }
+
+    [Serializable]
+    public class QuantumGroupPropData : GeneralPropData
+    {
+        [Tooltip("What type of group this is: a list of sockets that the group's details move between, a list of states that a single quantum object switches between, or a set of details that are alternated between during flashes of lightning")]
         public QuantumGroupType Type;
         [ConditionalField(nameof(Type), QuantumGroupType.States)]
         [Tooltip("If this is true, then the first prop made part of this group will be used to construct a visibility box for an empty game object, which will be considered one of the states.")]
@@ -26,56 +31,102 @@ namespace ModDataTools.Assets.Props
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
-            writer.WriteProperty("type", Type);
-            if (Type == QuantumGroupType.States)
+            var details = GetMembers<DetailPropData>(context);
+            if (details.Any())
+                writer.WriteProperty("details", details);
+            if (Type == QuantumGroupType.Sockets)
             {
-                writer.WriteProperty("hasEmptyState", HasEmptyState);
-                writer.WriteProperty("sequential", Sequential);
-                if (Sequential)
-                    writer.WriteProperty("loop", Loop);
+                writer.WriteProperty("sockets", GetMembers<QuantumSocketPropData>(context));
             }
+            else if (Type == QuantumGroupType.States)
+            {
+                if (HasEmptyState)
+                    writer.WriteProperty("hasEmptyState", HasEmptyState);
+                if (Sequential)
+                {
+                    writer.WriteProperty("sequential", Sequential);
+                    if (!Loop)
+                        writer.WriteProperty("loop", Loop);
+                }
+            }
+        }
+
+        public override void Validate(PropContext context, IAssetValidator validator)
+        {
+            base.Validate(context, validator);
+            var detailCount = GetMembers<DetailPropData>(context).Count();
+            if (detailCount == 0)
+                validator.Error(context.Planet, $"Quantum group '{context.GetProp().PropName}' has no details");
+            if (Type == QuantumGroupType.Sockets && GetMembers<QuantumSocketPropData>(context).Count() < detailCount)
+                validator.Error(context.Planet, $"Quantum group '{context.GetProp().PropName}' has fewer sockets than details");
+        }
+
+        public static IEnumerable<string> GetQuantumObjectPaths(PropContext context, IProp group)
+        {
+            var groupContext = AssetRepository.GetPropContext<QuantumGroupPropData>(context.Planet, group);
+            if (groupContext == null)
+                return Enumerable.Empty<string>();
+            if (groupContext.Data.Type == QuantumGroupType.Sockets)
+                return GetMembers<DetailPropData>(groupContext).Select(d => d.Prop.GetPlanetPath(d));
+            return new[] { group.GetPlanetPath(groupContext) };
+        }
+
+        public static IEnumerable<PropContext<T>> GetMembers<T>(PropContext context) where T : PropData
+        {
+            var group = context.GetProp();
+            return AssetRepository.GetProps<T>(context.Planet)
+                .Where(p => p.Prop is IQuantumGroupMember member && member.GetQuantumGroup() == group);
         }
 
         public enum QuantumGroupType
         {
             Sockets = 0,
             States = 1,
+            Lightning = 2,
         }
     }
 
     [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(QuantumGroupPropAsset))]
-    public class QuantumGroupPropAsset : PropDataAsset<QuantumGroupPropData> {
-
+    public class QuantumGroupPropAsset : GeneralPropAsset<QuantumGroupPropData>
+    {
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
-            writer.WriteProperty("id", FullID);
-            if (Data.Type == QuantumGroupPropData.QuantumGroupType.Sockets)
+            if (Data.Type == QuantumGroupPropData.QuantumGroupType.Lightning)
             {
-                var childSockets = AssetRepository.GetProps<QuantumSocketPropData>(context.Planet)
-                .Where(ctx => (ctx.Prop is QuantumSocketPropAsset sa && sa.QuantumGroup == this)
-                    || (ctx.Prop is QuantumSocketPropComponent sc && sc.QuantumGroupAsset == this));
-                writer.WriteProperty("sockets", childSockets);
+                base.WriteJsonProps(context, writer);
+                return;
             }
-            base.WriteJsonProps(context, writer);
+            writer.WriteProperty("rename", FullID);
+            Data.WriteJsonProps(context, writer);
         }
 
-        public override string GetPlanetPath(PropContext context) => context.DetailPath + "/" + $"Quantum Sockets - " + FullID;
+        public override string GetPlanetPath(PropContext context)
+        {
+            if (Data.Type == QuantumGroupPropData.QuantumGroupType.Lightning)
+                return base.GetPlanetPath(context);
+            return context.Planet.GetSectorPath() + "/" + FullID;
+        }
     }
 
-    public class QuantumGroupPropComponent : PropDataComponent<QuantumGroupPropData> {
-
+    public class QuantumGroupPropComponent : GeneralPropComponent<QuantumGroupPropData>
+    {
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
-            writer.WriteProperty("id", PropID);
-            if (Data.Type == QuantumGroupPropData.QuantumGroupType.Sockets)
+            var data = (QuantumGroupPropData)GetData();
+            if (data.Type == QuantumGroupPropData.QuantumGroupType.Lightning)
             {
-                var childSockets = AssetRepository.GetProps<QuantumSocketPropData>(context.Planet)
-                    .Where(ctx => ctx.Prop is QuantumSocketPropComponent sc && sc.QuantumGroup == this);
-                writer.WriteProperty("sockets", childSockets);
+                base.WriteJsonProps(context, writer);
+                return;
             }
-            base.WriteJsonProps(context, writer);
+            writer.WriteProperty("rename", PropName);
+            data.WriteJsonProps(context, writer);
         }
 
-        public override string GetPlanetPath(PropContext context) => context.DetailPath + "/" + $"Quantum Sockets - " + PropID;
+        public override string GetPlanetPath(PropContext context)
+        {
+            if (((QuantumGroupPropData)GetData()).Type == QuantumGroupPropData.QuantumGroupType.Lightning)
+                return base.GetPlanetPath(context);
+            return context.Planet.GetSectorPath() + "/" + PropName;
+        }
     }
 }

@@ -22,16 +22,21 @@ namespace ModDataTools.Assets.Props
     }
 
     [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(QuantumSocketPropAsset))]
-    public class QuantumSocketPropAsset : GeneralPropAsset<QuantumSocketPropData> {
+    public class QuantumSocketPropAsset : GeneralPropAsset<QuantumSocketPropData>, IQuantumGroupMember
+    {
         [Tooltip("The quantum group that this socket belongs to")]
         public QuantumGroupPropAsset QuantumGroup;
+
+        public IProp GetQuantumGroup() => QuantumGroup ? QuantumGroup : null;
     }
 
-    public class QuantumSocketPropComponent : GeneralPropComponent<QuantumSocketPropData>
+    public class QuantumSocketPropComponent : GeneralPropComponent<QuantumSocketPropData>, IQuantumGroupMember
     {
         [Tooltip("The asset representing the quantum group that this socket belongs to")]
         public QuantumGroupPropAsset QuantumGroupAsset;
         [Tooltip("The quantum group that this socket belongs to")]
         public QuantumGroupPropComponent QuantumGroup;
+
+        public IProp GetQuantumGroup() => QuantumGroupAsset ? (IProp)QuantumGroupAsset : QuantumGroup ? QuantumGroup : null;
     }
 }

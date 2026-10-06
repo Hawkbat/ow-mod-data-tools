@@ -22,6 +22,9 @@ namespace ModDataTools.Assets.Props
         public NullishSingle DistortRadius;
         [Tooltip("If you want a black hole to load a new star system scene, put it here.")]
         public StarSystemAsset TargetStarSystem;
+        [Tooltip("If this is a black hole loading a new star system, set the spawn point you want to use. Otherwise, will use the default spawn.")]
+        [ConditionalField(nameof(TargetStarSystem))]
+        public PlayerSpawnPropAsset SpawnPoint;
         [Tooltip("Type of singularity (white hole or black hole)")]
         public SingularityType Type;
         [Tooltip("Whether a black hole emits blue particles upon warping. It doesn't scale, so disabling this for small black holes is recommended")]
@@ -37,6 +40,8 @@ namespace ModDataTools.Assets.Props
             writer.WriteProperty("distortRadius", DistortRadius);
             if (TargetStarSystem)
                 writer.WriteProperty("targetStarSystem", TargetStarSystem.FullID);
+            if (TargetStarSystem && SpawnPoint)
+                writer.WriteProperty("spawnPointID", SpawnPoint.FullID);
             writer.WriteProperty("type", Type);
             if (!HasWarpEffects)
                 writer.WriteProperty("hasWarpEffects", HasWarpEffects);

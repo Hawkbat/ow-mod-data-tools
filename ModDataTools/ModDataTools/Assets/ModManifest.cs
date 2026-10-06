@@ -81,6 +81,8 @@ namespace ModDataTools.Assets
                 validator.Error(this, $"Missing a value for {nameof(OWMLVersion)}");
             else if (!Regex.IsMatch(OWMLVersion, @"^\d+\.\d+\.\d+$"))
                 validator.Error(this, $"{nameof(OWMLVersion)} does not follow semver format (X.X.X)");
+            if (NewHorizons.ExportJsonFile && !NewHorizons.OverrideJsonFile)
+                NewHorizons.Validate(this, validator);
         }
 
         public void ToJson(JsonTextWriter writer)
@@ -131,6 +133,17 @@ namespace ModDataTools.Assets
                 else
                     yield return new TextResource(ExportUtility.ToJsonString(NewHorizons), "addon-manifest.json");
             }
+            if (NewHorizons.ExportJsonFile && !NewHorizons.OverrideJsonFile)
+                foreach (var resource in NewHorizons.GetResources())
+                    yield return resource;
+            if (NewHorizons.OverrideTitleScreenFile)
+                yield return new TextResource(NewHorizons.OverrideTitleScreenFile, "title-screen.json");
+            else
+            {
+                var titleScreens = AssetRepository.GetAllAssets<TitleScreenAsset>().Where(t => t.Mod == this).OrderBy(t => t.Priority).ToList();
+                if (titleScreens.Any())
+                    yield return new TextResource(ExportUtility.ToJsonString(new TitleScreenConfig(titleScreens)), "title-screen.json");
+            }
             if (NewHorizons.Subtitle)
                 yield return new ImageResource(NewHorizons.Subtitle, "subtitle.png");
             if (NewHorizons.Icon)
@@ -154,6 +167,8 @@ namespace ModDataTools.Assets
             [Tooltip("The addon-manifest.json file to use as-is instead of generating one")]
             [ConditionalField(nameof(ExportJsonFile))]
             public TextAsset OverrideJsonFile;
+            [Tooltip("The title-screen.json file to use as-is instead of generating one from this mod's title screen assets")]
+            public TextAsset OverrideTitleScreenFile;
             [Header("Data")]
             [Tooltip("A subtitle image to display on the main menu.")]
             public Texture2D Subtitle;
@@ -163,6 +178,12 @@ namespace ModDataTools.Assets
             public List<CreditsRow> Credits = new();
             [Tooltip("A pop-up message for the first time a user runs the add-on.")]
             public string PopUpMessage;
+            [Tooltip("If a pop-up message is set, should it repeat every time the game starts or only once")]
+            public bool RepeatPopup;
+            [Tooltip("These asset bundles will be loaded on the title screen and stay loaded. Will improve initial load time at the cost of increased memory use.")]
+            public List<string> PreloadAssetBundles = new();
+            [Tooltip("Custom game over messages for this mod. This can either display a title card before looping like in Echoes of the Eye, or show a message and roll credits like the various time loop escape endings. You must set a dialogue condition for the game over sequence to run.")]
+            public List<GameOverConfig> GameOver = new();
 
             public void ToJson(JsonTextWriter writer)
             {
@@ -174,7 +195,21 @@ namespace ModDataTools.Assets
                 if (Credits.Any())
                     writer.WriteProperty("credits", Credits.Select((c, i) => $"CREDITS_{i}"));
                 if (!string.IsNullOrEmpty(PopUpMessage))
+                {
                     writer.WriteProperty("popupMessage", "POPUP");
+                    if (RepeatPopup)
+                        writer.WriteProperty("repeatPopup", RepeatPopup);
+                }
+                if (PreloadAssetBundles.Any())
+                    writer.WriteProperty("preloadAssetBundles", PreloadAssetBundles.Select(b => $"assetbundles/{b}"));
+                if (GameOver.Any())
+                {
+                    writer.WritePropertyName("gameOver");
+                    writer.WriteStartArray();
+                    for (int i = 0; i < GameOver.Count; i++)
+                        GameOver[i].ToJson(writer, $"GAME_OVER_{i}", GameOver[i].Audio ? GetGameOverAudioPath(GameOver[i].Audio) : null);
+                    writer.WriteEndArray();
+                }
 
                 writer.WriteEndObject();
             }
@@ -187,7 +222,28 @@ namespace ModDataTools.Assets
                 }
                 if (!string.IsNullOrEmpty(PopUpMessage))
                     l10n.AddUI("POPUP", PopUpMessage);
+                for (int i = 0; i < GameOver.Count; i++)
+                    GameOver[i].Localize($"GAME_OVER_{i}", l10n);
             }
+
+            public void Validate(ModManifestAsset mod, IAssetValidator validator)
+            {
+                foreach (var gameOver in GameOver)
+                {
+                    gameOver.Validate(mod, validator);
+                    if (!gameOver.Condition)
+                        validator.Error(mod, "Mod-wide game overs must have a condition set");
+                }
+            }
+
+            public IEnumerable<AssetResource> GetResources()
+            {
+                foreach (var gameOver in GameOver.Where(g => g.Audio))
+                    foreach (var resource in gameOver.GetResources(GetGameOverAudioPath(gameOver.Audio)))
+                        yield return resource;
+            }
+
+            public string GetGameOverAudioPath(AudioClip audio) => $"audio/{AssetRepository.GetAssetFileName(audio)}";
 
             [Serializable]
             public class CreditsRow

@@ -1,4 +1,5 @@
 ﻿using ModDataTools.Utilities;
+using ModDataTools.Assets.Resources;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using UnityEngine;
 
 namespace ModDataTools.Assets
 {
-    public class TranslatorTextBlockAsset : DataAsset, IXmlSerializable
+    public class TranslatorTextBlockAsset : DataAsset, IXmlSerializable, IJsonSerializable
     {
         [Tooltip("The translator text this text block belongs to")]
         [ReadOnlyField]
@@ -46,9 +47,36 @@ namespace ModDataTools.Assets
             writer.WriteEndElement();
         }
 
+        public void ToJson(JsonTextWriter writer)
+        {
+            writer.WriteStartObject();
+            if (!Arc.AutoPlacement)
+            {
+                writer.WriteProperty("mirror", Arc.Mirror);
+                writer.WriteProperty("position", Arc.Position);
+                writer.WriteProperty("zRotation", Arc.ZRotation);
+            }
+            if (Arc.CustomTextImage)
+                writer.WriteProperty("customTextImage", TranslatorText.Planet.GetResourcePath(Arc.CustomTextImage));
+            else if (Arc.Type != ArcInfo.ArcType.Adult)
+                writer.WriteProperty("type", Arc.Type);
+            if (Arc.LegiblePersistentCondition)
+                writer.WriteProperty("legiblePersistentCondition", Arc.LegiblePersistentCondition.FullID);
+            if (!string.IsNullOrEmpty(Arc.CustomLanguageName))
+                writer.WriteProperty("customLanguageName", GetCustomLanguageNameKey());
+            writer.WriteProperty("overrideUnreadColor", Arc.OverrideUnreadColor);
+            if (Arc.OverrideUnreadColor.HasValue)
+                writer.WriteProperty("overrideTranslatedColor", Arc.OverrideTranslatedColor);
+            writer.WriteEndObject();
+        }
+
+        public string GetCustomLanguageNameKey() => $"{FullID}_LANGUAGE";
+
         public override void Localize(Localization l10n)
         {
             l10n.AddDialogue(FullID, Text);
+            if (!string.IsNullOrEmpty(Arc.CustomLanguageName))
+                l10n.AddOther(GetCustomLanguageNameKey(), Arc.CustomLanguageName);
         }
 
         public override void Validate(IAssetValidator validator)
@@ -56,10 +84,20 @@ namespace ModDataTools.Assets
             base.Validate(validator);
             if (Parent && Parent.TranslatorText != TranslatorText)
                 validator.Error(this, $"Parent block does not belong to the same translator text");
+            if (Arc.LegiblePersistentCondition && !Arc.LegiblePersistentCondition.Persistent)
+                validator.Error(this, $"{nameof(ArcInfo.LegiblePersistentCondition)} must be a persistent condition");
+        }
+
+        public override IEnumerable<AssetResource> GetResources()
+        {
+            foreach (var resource in base.GetResources())
+                yield return resource;
+            if (Arc.CustomTextImage && TranslatorText && TranslatorText.Planet)
+                yield return new ImageResource(Arc.CustomTextImage, TranslatorText.Planet);
         }
 
         [Serializable]
-        public class ArcInfo : IJsonSerializable
+        public class ArcInfo
         {
             [Tooltip("Whether to skip modifying this spiral's placement, and instead keep the automatically determined placement.")]
             public bool AutoPlacement = true;
@@ -73,27 +111,27 @@ namespace ModDataTools.Assets
             [ConditionalField(nameof(AutoPlacement), false)]
             public float ZRotation;
             [Tooltip("The type of text to display")]
+            [ConditionalField(nameof(CustomTextImage), (Texture2D)null)]
             public ArcType Type;
-
-            public void ToJson(JsonTextWriter writer)
-            {
-                writer.WriteStartObject();
-                if (!AutoPlacement)
-                {
-                    writer.WriteProperty("mirror", Mirror);
-                    writer.WriteProperty("position", Position);
-                    writer.WriteProperty("zRotation", ZRotation);
-                }
-                if (Type != ArcType.Adult)
-                    writer.WriteProperty("type", Type);
-                writer.WriteEndObject();
-            }
+            [Tooltip("Allows you to create custom alien language text by overriding the displayed image. This will automatically set the type to Custom.")]
+            public Texture2D CustomTextImage;
+            [Tooltip("Makes this text require a persistent condition to be known before it can be translated. If you want it to always be untranslatable, use a condition that you will never set.")]
+            public ConditionAsset LegiblePersistentCondition;
+            [Tooltip("Replaces the \"Nomai\" part in \"Untranslated Nomai writing\". If the type is Custom, this will default to \"unknown\".")]
+            public string CustomLanguageName;
+            [Tooltip("Overrides the default unread color of the text arc.")]
+            public NullishColor OverrideUnreadColor;
+            [Tooltip("Overrides the default translated color of the text arc. If the unread color is overridden but this is not, the translated color will be a desaturated version of the unread color.")]
+            [ConditionalField(nameof(OverrideUnreadColor), true)]
+            public NullishColor OverrideTranslatedColor;
 
             public enum ArcType
             {
                 Adult = 0,
                 Child = 1,
                 Stranger = 2,
+                Teenager = 3,
+                Custom = 4,
             }
         }
     }

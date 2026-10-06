@@ -14,6 +14,7 @@ namespace ModDataTools.Utilities
         readonly Dictionary<string, string> ui = new();
         readonly Dictionary<string, string> shiplog = new();
         readonly Dictionary<string, string> dialogue = new();
+        readonly Dictionary<string, string> other = new();
         readonly Dictionary<string, AchievementLocalization> achievements = new();
 
         public Localization(string languageName)
@@ -36,11 +37,17 @@ namespace ModDataTools.Utilities
             dialogue[key] = value;
         }
 
-        public void AddAchivement(string key, string name, string desc)
+        public void AddOther(string key, string value)
+        {
+            other[key] = value;
+        }
+
+        public void AddAchivement(string key, string name, string desc, string descNotAchieved = null)
         {
             achievements[key] = new AchievementLocalization() {
                 Name = name,
-                Description = desc
+                Description = desc,
+                DescriptionNotAchieved = descNotAchieved,
             };
         }
 
@@ -72,6 +79,14 @@ namespace ModDataTools.Utilities
                     writer.WriteProperty(key, value);
                 writer.WriteEndObject();
             }
+            if (other.Any())
+            {
+                writer.WritePropertyName("OtherDictionary");
+                writer.WriteStartObject();
+                foreach (var (key, value) in other)
+                    writer.WriteProperty(key, value);
+                writer.WriteEndObject();
+            }
             if (achievements.Any())
             {
                 writer.WritePropertyName("AchievementTranslations");
@@ -82,6 +97,8 @@ namespace ModDataTools.Utilities
                     writer.WriteStartObject();
                     writer.WriteProperty("Name", value.Name);
                     writer.WriteProperty("Description", value.Description);
+                    if (!string.IsNullOrEmpty(value.DescriptionNotAchieved))
+                        writer.WriteProperty("DescriptionNotAchieved", value.DescriptionNotAchieved);
                     writer.WriteEndObject();
                 }
                 writer.WriteEndObject();
@@ -95,6 +112,7 @@ namespace ModDataTools.Utilities
         {
             public string Name;
             public string Description;
+            public string DescriptionNotAchieved;
         }
     }
 }

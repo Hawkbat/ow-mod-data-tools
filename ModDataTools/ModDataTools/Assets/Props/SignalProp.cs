@@ -36,6 +36,12 @@ namespace ModDataTools.Assets.Props
         public bool InsideCloak;
         [Tooltip("Set to false if the player can hear the signal without equipping the signal-scope.")]
         public bool OnlyAudibleToScope = true;
+        [Tooltip("At this distance the sound is at its loudest.")]
+        public float MinDistance;
+        [Tooltip("The sound will drop off by this distance. For signals, this only affects when it is heard aloud and not via the signalscope.")]
+        public float MaxDistance = 30f;
+        [Tooltip("How loud the sound will play")]
+        public float Volume = 0.5f;
         [Tooltip("A ship log fact to reveal when the signal is identified.")]
         public FactAsset RevealFact;
 
@@ -61,6 +67,12 @@ namespace ModDataTools.Assets.Props
                 writer.WriteProperty("reveals", RevealFact.FullID);
             if (SourceRadius != 1f)
                 writer.WriteProperty("sourceRadius", SourceRadius);
+            if (MinDistance != 0f)
+                writer.WriteProperty("minDistance", MinDistance);
+            if (MaxDistance != 30f)
+                writer.WriteProperty("maxDistance", MaxDistance);
+            if (Volume != 0.5f)
+                writer.WriteProperty("volume", Volume);
         }
 
         public override void Localize(PropContext context, Localization l10n)

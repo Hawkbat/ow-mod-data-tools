@@ -20,16 +20,16 @@ namespace ModDataTools.Assets.Props
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
             var childStones = AssetRepository.GetAllProps<RemoteStonePropData>()
-                .Where(ctx => ctx.Data.RemoteProjection.StarSystem == RemoteProjection.StarSystem);
+                .Where(ctx => ctx.Data.RemoteProjection && ctx.Data.TranslatorText && ctx.Data.RemoteProjection.StarSystem == RemoteProjection.StarSystem);
 
-            writer.WriteProperty("nomaiText", childStones);
+            writer.WritePropertyName("nomaiText");
             writer.WriteStartArray();
             foreach (var stone in childStones)
             {
                 var stoneData = stone.Prop.GetData() as RemoteStonePropData;
                 writer.WriteStartObject();
                 writer.WriteProperty("id", stoneData.RemoteProjection.FullID);
-                writer.WriteProperty("arcInfo", stoneData.TranslatorText.TextBlocks.Select(b => b.Arc));
+                writer.WriteProperty("arcInfo", stoneData.TranslatorText.TextBlocks);
                 writer.WriteProperty("seed", stoneData.TranslatorText.Seed);
                 writer.WriteProperty("location", stoneData.RemoteProjection == RemoteProjection ? TranslatorTextAsset.Location.A : TranslatorTextAsset.Location.B);
                 writer.WriteProperty("xmlFile", stoneData.TranslatorText.GetXmlOutputPath());

@@ -17,6 +17,18 @@ namespace ModDataTools.Assets.PlanetModules
         public override void WriteJsonProps(PlanetAsset planet, JsonTextWriter writer)
         {
             var audioVolumes = AssetRepository.GetProps<AudioVolumeData>(planet);
+            var conditionTriggerVolumes = AssetRepository.GetProps<ConditionTriggerVolumeData>(planet);
+            var cylindricalForceVolumes = AssetRepository.GetProps<CylindricalForceVolumeData>(planet);
+            var directionalForceVolumes = AssetRepository.GetProps<DirectionalForceVolumeData>(planet);
+            var gravityVolumes = AssetRepository.GetProps<GravityVolumeData>(planet);
+            var polarForceVolumes = AssetRepository.GetProps<PolarForceVolumeData>(planet);
+            var radialForceVolumes = AssetRepository.GetProps<RadialForceVolumeData>(planet);
+            var interactionVolumes = AssetRepository.GetProps<InteractionVolumeData>(planet);
+            var playerRecoveryVolumes = AssetRepository.GetProps<PlayerRecoveryVolumeData>(planet);
+            var quantumToggleVolumes = AssetRepository.GetProps<QuantumToggleVolumeData>(planet);
+            var repairVolumes = AssetRepository.GetProps<RepairVolumeData>(planet);
+            var speedLimiterVolumes = AssetRepository.GetProps<SpeedLimiterVolumeData>(planet);
+            var dirtEffectVolumes = AssetRepository.GetProps<DirtEffectVolumeData>(planet);
             var dayNightAudioVolumes = AssetRepository.GetProps<DayNightAudioVolumeData>(planet);
             var destructionVolumes = AssetRepository.GetProps<DestructionVolumeData>(planet);
             var fluidVolumes = AssetRepository.GetProps<FluidVolumeData>(planet);
@@ -45,16 +57,38 @@ namespace ModDataTools.Assets.PlanetModules
 
             if (audioVolumes.Any())
                 writer.WriteProperty("audioVolumes", audioVolumes);
+            if (conditionTriggerVolumes.Any())
+                writer.WriteProperty("conditionTriggerVolumes", conditionTriggerVolumes);
             if (dayNightAudioVolumes.Any())
                 writer.WriteProperty("dayNightAudioVolumes", dayNightAudioVolumes);
             if (destructionVolumes.Any())
                 writer.WriteProperty("destructionVolumes", destructionVolumes);
             if (fluidVolumes.Any())
                 writer.WriteProperty("fluidVolumes", fluidVolumes);
+            if (cylindricalForceVolumes.Any() || directionalForceVolumes.Any() || gravityVolumes.Any() || polarForceVolumes.Any() || radialForceVolumes.Any())
+            {
+                writer.WritePropertyName("forces");
+                writer.WriteStartObject();
+                if (cylindricalForceVolumes.Any())
+                    writer.WriteProperty("cylindricalVolumes", cylindricalForceVolumes);
+                if (directionalForceVolumes.Any())
+                    writer.WriteProperty("directionalVolumes", directionalForceVolumes);
+                if (gravityVolumes.Any())
+                    writer.WriteProperty("gravityVolumes", gravityVolumes);
+                if (polarForceVolumes.Any())
+                    writer.WriteProperty("polarVolumes", polarForceVolumes);
+                if (radialForceVolumes.Any())
+                    writer.WriteProperty("radialVolumes", radialForceVolumes);
+                writer.WriteEndObject();
+            }
             if (hazardVolumes.Any())
                 writer.WriteProperty("hazardVolumes", hazardVolumes);
             if (interferenceVolumes.Any())
                 writer.WriteProperty("interferenceVolumes", interferenceVolumes);
+            if (interactionVolumes.Any())
+                writer.WriteProperty("interactionVolumes", interactionVolumes);
+            if (playerRecoveryVolumes.Any())
+                writer.WriteProperty("playerRecoveryVolumes", playerRecoveryVolumes);
             if (insulatingVolumes.Any())
                 writer.WriteProperty("insulatingVolumes", insulatingVolumes);
             if (lightSourceVolumes.Any())
@@ -63,6 +97,8 @@ namespace ModDataTools.Assets.PlanetModules
                 writer.WriteProperty("mapRestrictionVolumes", mapRestrictionVolumes);
             if (notificationVolumes.Any())
                 writer.WriteProperty("notificationVolumes", notificationVolumes);
+            if (quantumToggleVolumes.Any())
+                writer.WriteProperty("quantumToggleVolumes", quantumToggleVolumes);
             if (oxygenVolumes.Any())
                 writer.WriteProperty("oxygenVolumes", oxygenVolumes);
             if (probeDestructionVolumes.Any() || probeSafetyVolumes.Any())
@@ -77,6 +113,8 @@ namespace ModDataTools.Assets.PlanetModules
             }
             if (referenceFrameBlockerVolumes.Any())
                 writer.WriteProperty("referenceFrameBlockerVolumes", referenceFrameBlockerVolumes);
+            if (repairVolumes.Any())
+                writer.WriteProperty("repairVolumes", repairVolumes);
             if (revealVolumes.Any())
                 writer.WriteProperty("revealVolumes", revealVolumes);
             if (reverbVolumes.Any())
@@ -97,7 +135,9 @@ namespace ModDataTools.Assets.PlanetModules
             }
             if (speedTrapVolumes.Any())
                 writer.WriteProperty("speedTrapVolumes", speedTrapVolumes);
-            if (frostEffectVolumes.Any() || rainEffectVolumes.Any())
+            if (speedLimiterVolumes.Any())
+                writer.WriteProperty("speedLimiterVolumes", speedLimiterVolumes);
+            if (frostEffectVolumes.Any() || rainEffectVolumes.Any() || dirtEffectVolumes.Any())
             {
                 writer.WritePropertyName("visorEffects");
                 writer.WriteStartObject();
@@ -105,6 +145,8 @@ namespace ModDataTools.Assets.PlanetModules
                     writer.WriteProperty("frostEffectVolumes", frostEffectVolumes);
                 if (rainEffectVolumes.Any())
                     writer.WriteProperty("rainEffectVolumes", rainEffectVolumes);
+                if (dirtEffectVolumes.Any())
+                    writer.WriteProperty("dirtEffectVolumes", dirtEffectVolumes);
                 writer.WriteEndObject();
             }
             if (zeroGravityVolumes.Any())
@@ -143,6 +185,18 @@ namespace ModDataTools.Assets.PlanetModules
             foreach (var prop in AssetRepository.GetProps<ZeroGravityVolumeData>(planet)) yield return prop;
             foreach (var prop in AssetRepository.GetProps<SolarSystemVolumeData>(planet)) yield return prop;
             foreach (var prop in AssetRepository.GetProps<CreditsVolumeData>(planet)) yield return prop;
+            foreach (var prop in AssetRepository.GetProps<ConditionTriggerVolumeData>(planet)) yield return prop;
+            foreach (var prop in AssetRepository.GetProps<CylindricalForceVolumeData>(planet)) yield return prop;
+            foreach (var prop in AssetRepository.GetProps<DirectionalForceVolumeData>(planet)) yield return prop;
+            foreach (var prop in AssetRepository.GetProps<GravityVolumeData>(planet)) yield return prop;
+            foreach (var prop in AssetRepository.GetProps<PolarForceVolumeData>(planet)) yield return prop;
+            foreach (var prop in AssetRepository.GetProps<RadialForceVolumeData>(planet)) yield return prop;
+            foreach (var prop in AssetRepository.GetProps<InteractionVolumeData>(planet)) yield return prop;
+            foreach (var prop in AssetRepository.GetProps<PlayerRecoveryVolumeData>(planet)) yield return prop;
+            foreach (var prop in AssetRepository.GetProps<QuantumToggleVolumeData>(planet)) yield return prop;
+            foreach (var prop in AssetRepository.GetProps<RepairVolumeData>(planet)) yield return prop;
+            foreach (var prop in AssetRepository.GetProps<SpeedLimiterVolumeData>(planet)) yield return prop;
+            foreach (var prop in AssetRepository.GetProps<DirtEffectVolumeData>(planet)) yield return prop;
         }
 
         public override IEnumerable<AssetResource> GetResources(PlanetAsset planet)

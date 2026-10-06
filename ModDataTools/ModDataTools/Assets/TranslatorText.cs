@@ -123,6 +123,9 @@ namespace ModDataTools.Assets
             Trailmarker = 7,
             CairnVariant = 8,
             Whiteboard = 9,
+            CairnBH = 10,
+            CairnTH = 11,
+            CairnCT = 12,
         }
 
         public enum Location

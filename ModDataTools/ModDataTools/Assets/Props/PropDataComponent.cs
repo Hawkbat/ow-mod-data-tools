@@ -56,7 +56,7 @@ namespace ModDataTools.Assets.Props
         [Tooltip("The data for this prop")]
         public T Data;
 
-        T IProp<T>.Data => Data;
+        T IProp<T>.Data => (T)GetData();
 
         public override PropData GetData() => OverrideAsset ? OverrideAsset.Data : Data;
     }

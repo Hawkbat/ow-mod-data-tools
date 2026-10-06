@@ -36,6 +36,13 @@ namespace ModDataTools.Utilities
             => PropCache<T>.GetAllProps();
         public static IEnumerable<PropContext<T>> GetProps<T>(PlanetAsset planet) where T : PropData
             => PropCache<T>.GetProps(planet);
+        public static PropContext<T> GetPropContext<T>(PlanetAsset planet, IProp prop) where T : PropData
+            => PropCache<T>.GetProps(planet).FirstOrDefault(p => p.Prop == prop);
+        public static string GetPropPlanetPath<T>(PlanetAsset planet, IProp prop) where T : PropData
+        {
+            var context = GetPropContext<T>(planet, prop);
+            return context != null ? prop.GetPlanetPath(context) : null;
+        }
 
         public static string GetAssetBundle(UnityEngine.Object obj)
             => store == null ? null : store.GetAssetBundle(obj);

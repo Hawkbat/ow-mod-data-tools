@@ -75,6 +75,7 @@ namespace ModDataTools.Assets.PlanetModules
             Pulsar = 3,
             BlackHole = 4,
             Custom = 5,
+            None = 6,
         }
 
         public override void WriteJsonProps(PlanetAsset planet, JsonTextWriter writer)

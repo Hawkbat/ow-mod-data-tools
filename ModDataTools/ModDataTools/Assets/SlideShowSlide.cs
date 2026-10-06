@@ -40,7 +40,7 @@ namespace ModDataTools.Assets
         public Color AmbientLightColor;
         [Tooltip("Ambient light range when viewing this slide.")]
         [ConditionalField(nameof(AmbientLightIntensity))]
-        public float AmbientLightRange;
+        public float AmbientLightRange = 20f;
         [Tooltip("Spotlight intensity modifier when viewing this slide.")]
         public float SpotIntensityMod;
         [Tooltip("Before viewing this slide, there will be a black frame for this many seconds.")]
@@ -49,6 +49,8 @@ namespace ModDataTools.Assets
         public float PlayTimeDuration;
         [Tooltip("Ship log fact revealed when viewing this slide")]
         public FactAsset RevealFact;
+        [Tooltip("Exclusive to slide reels. Whether this slide should rotate the reel item while inside a projector.")]
+        public bool Rotate = true;
 
         public override IEnumerable<DataAsset> GetParentAssets()
         {
@@ -62,9 +64,11 @@ namespace ModDataTools.Assets
             {
                 writer.WriteProperty("ambientLightColor", (Color32)AmbientLightColor);
                 writer.WriteProperty("ambientLightIntensity", AmbientLightIntensity);
-                writer.WriteProperty("ambientLightRange", AmbientLightRange);
-                writer.WriteProperty("spotIntensityMod", SpotIntensityMod);
+                if (AmbientLightRange != 20f)
+                    writer.WriteProperty("ambientLightRange", AmbientLightRange);
             }
+            if (SpotIntensityMod != 0f)
+                writer.WriteProperty("spotIntensityMod", SpotIntensityMod);
             if (BackdropAudio)
                 writer.WriteProperty("backdropAudio", $"slides/{SlideShow.Planet.StarSystem.FullID}/{SlideShow.Planet.FullID}/{AssetRepository.GetAssetFileName(BackdropAudio)}");
             else if (BackdropAudioType != AudioType.None)
@@ -84,6 +88,8 @@ namespace ModDataTools.Assets
             writer.WriteProperty("imagePath", $"slides/{SlideShow.Planet.StarSystem.FullID}/{SlideShow.Planet.FullID}/{AssetRepository.GetAssetFileName(Image)}");
             if (RevealFact)
                 writer.WriteProperty("reveal", RevealFact.FullID);
+            if (!Rotate)
+                writer.WriteProperty("rotate", Rotate);
             writer.WriteEndObject();
         }
 
