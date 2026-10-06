@@ -1,4 +1,5 @@
 ﻿using ModDataTools.Assets.Props;
+using ModDataTools.Assets.Resources;
 using ModDataTools.Utilities;
 using Newtonsoft.Json;
 using System;
@@ -27,11 +28,26 @@ namespace ModDataTools.Assets.PlanetModules
         public override void Validate(PlanetAsset planet, IAssetValidator validator)
         {
             foreach (var prop in AssetRepository.GetProps<EyeTravelerPropData>(planet))
-                validator.Validate(prop);
+                prop.GetProp().Validate(prop, validator);
             foreach (var prop in AssetRepository.GetProps<InstrumentZonePropData>(planet))
-                validator.Validate(prop);
+                prop.GetProp().Validate(prop, validator);
             foreach (var prop in AssetRepository.GetProps<QuantumInstrumentPropData>(planet))
-                validator.Validate(prop);
+                prop.GetProp().Validate(prop, validator);
+        }
+
+        public override IEnumerable<AssetResource> GetResources(PlanetAsset planet)
+        {
+            foreach (var resource in base.GetResources(planet))
+                yield return resource;
+            foreach (var prop in AssetRepository.GetProps<EyeTravelerPropData>(planet))
+                foreach (var resource in prop.GetProp().GetResources(prop))
+                    yield return resource;
+            foreach (var prop in AssetRepository.GetProps<InstrumentZonePropData>(planet))
+                foreach (var resource in prop.GetProp().GetResources(prop))
+                    yield return resource;
+            foreach (var prop in AssetRepository.GetProps<QuantumInstrumentPropData>(planet))
+                foreach (var resource in prop.GetProp().GetResources(prop))
+                    yield return resource;
         }
 
         public override bool ShouldWrite(PlanetAsset planet) =>

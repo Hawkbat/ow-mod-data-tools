@@ -73,8 +73,7 @@ namespace ModDataTools.Assets.Props
         }
     }
 
-    [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(DetailPropAsset))]
-    public class DetailPropAsset : GeneralPropAsset<DetailPropData>
+    public abstract class DetailPropAsset<T> : GeneralPropAsset<T> where T : DetailPropData
     {
         [Tooltip("Scale the prop")]
         public float Scale = 1f;
@@ -95,8 +94,9 @@ namespace ModDataTools.Assets.Props
         }
     }
 
-    public class DetailPropComponent : GeneralPropComponent<DetailPropData> {
-        [Tooltip("If this value is not null, this prop will be quantum. Assign this field to asset representing the quantum group it should be a part of. The group it is assigned to determines what kind of quantum object it is")]
+    public abstract class DetailPropComponent<T> : GeneralPropComponent<T> where T : DetailPropData
+    {
+        [Tooltip("If this value is not null, this prop will be quantum. Assign this field to the quantum group it should be a part of. The group it is assigned to determines what kind of quantum object it is")]
         public QuantumGroupPropAsset QuantumGroupAsset;
         [Tooltip("If this value is not null, this prop will be quantum. Assign this field to the quantum group it should be a part of. The group it is assigned to determines what kind of quantum object it is")]
         public QuantumGroupPropComponent QuantumGroup;
@@ -114,4 +114,9 @@ namespace ModDataTools.Assets.Props
             base.WriteJsonProps(context, writer);
         }
     }
+
+    [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(DetailPropAsset))]
+    public class DetailPropAsset : DetailPropAsset<DetailPropData> { }
+
+    public class DetailPropComponent : DetailPropComponent<DetailPropData> { }
 }

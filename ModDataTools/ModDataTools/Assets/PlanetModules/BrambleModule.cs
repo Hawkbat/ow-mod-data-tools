@@ -1,4 +1,5 @@
 ﻿using ModDataTools.Assets.Props;
+using ModDataTools.Assets.Resources;
 using ModDataTools.Utilities;
 using Newtonsoft.Json;
 using System;
@@ -67,8 +68,25 @@ namespace ModDataTools.Assets.PlanetModules
 
         public override void Validate(PlanetAsset planet, IAssetValidator validator)
         {
+            base.Validate(planet, validator);
             foreach (var node in AssetRepository.GetProps<BrambleNodePropData>(planet))
-                node.Data.Validate(node, planet, validator);
+                node.GetProp().Validate(node, validator);
+        }
+
+        public override void Localize(PlanetAsset planet, Localization l10n)
+        {
+            base.Localize(planet, l10n);
+            foreach (var node in AssetRepository.GetProps<BrambleNodePropData>(planet))
+                node.GetProp().Localize(node, l10n);
+        }
+
+        public override IEnumerable<AssetResource> GetResources(PlanetAsset planet)
+        {
+            foreach (var resource in base.GetResources(planet))
+                yield return resource;
+            foreach (var node in AssetRepository.GetProps<BrambleNodePropData>(planet))
+                foreach (var resource in node.GetProp().GetResources(node))
+                    yield return resource;
         }
 
         public override bool ShouldWrite(PlanetAsset planet)

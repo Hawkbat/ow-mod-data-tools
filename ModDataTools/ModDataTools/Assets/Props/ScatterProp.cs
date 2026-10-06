@@ -77,11 +77,34 @@ namespace ModDataTools.Assets.Props
     }
 
     [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(ScatterPropAsset))]
-    public class ScatterPropAsset : PropDataAsset<ScatterPropData> {
-        public override string GetPlanetPath(PropContext context) => context.DetailPath;
+    public class ScatterPropAsset : PropDataAsset<ScatterPropData>
+    {
+        [Tooltip("The path (not including the root planet object) of the parent of this game object. Optional (will default to the root sector).")]
+        public string ParentPath;
+
+        public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
+        {
+            base.WriteJsonProps(context, writer);
+            if (!string.IsNullOrEmpty(ParentPath))
+                writer.WriteProperty("parentPath", ParentPath);
+        }
+
+        public string GetParentPlanetPath(PropContext context) => !string.IsNullOrEmpty(ParentPath) ? ParentPath : context.DetailPath;
+
+        public override string GetPlanetPath(PropContext context)
+            => GetParentPlanetPath(context) + "/" + FullID;
     }
     public class ScatterPropComponent : PropDataComponent<ScatterPropData>
     {
-        public override string GetPlanetPath(PropContext context) => context.DetailPath;
+        public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
+        {
+            base.WriteJsonProps(context, writer);
+            writer.WriteProperty("parentPath", GetParentPlanetPath(context));
+        }
+
+        public string GetParentPlanetPath(PropContext context) => UnityUtility.ResolvePaths(context.DetailPath + "/" + UnityUtility.GetTransformPath(transform.parent, true));
+
+        public override string GetPlanetPath(PropContext context)
+            => UnityUtility.ResolvePaths(context.DetailPath + "/" + UnityUtility.GetTransformPath(transform, true));
     }
 }

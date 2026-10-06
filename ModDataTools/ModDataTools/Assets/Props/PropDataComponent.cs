@@ -1,4 +1,5 @@
-﻿using ModDataTools.Utilities;
+﻿using ModDataTools.Assets.Resources;
+using ModDataTools.Utilities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,12 +12,21 @@ namespace ModDataTools.Assets.Props
 {
     public abstract class PropDataComponent : MonoBehaviour, IProp
     {
-        public string PropID => GetInstanceID().ToString();
+        public string PropID => "PROP_" + GetInstanceID().ToString();
         public string PropName => transform.name;
 
         public abstract PropData GetData();
         public virtual void WriteJsonProps(PropContext context, JsonTextWriter writer)
             => GetData().WriteJsonProps(context, writer);
+        public virtual void Validate(PropContext context, IAssetValidator validator)
+            => GetData().Validate(context, validator);
+        public virtual void Localize(PropContext context, Localization l10n)
+            => GetData().Localize(context, l10n);
+        public virtual IEnumerable<AssetResource> GetResources(PropContext context)
+        {
+            foreach (var resource in GetData().GetResources(context))
+                yield return resource;
+        }
 
         public abstract string GetPlanetPath(PropContext context);
 

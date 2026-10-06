@@ -16,15 +16,9 @@ namespace ModDataTools.Assets.Props
     {
         public abstract void WriteJsonProps(PropContext context, JsonTextWriter writer);
 
-        public virtual void Localize(PropContext context, Localization l10n)
-        {
+        public virtual void Localize(PropContext context, Localization l10n) { }
 
-        }
-
-        public virtual void Validate(PropContext context, DataAsset asset, IAssetValidator validator)
-        {
-
-        }
+        public virtual void Validate(PropContext context, IAssetValidator validator) { }
 
         public virtual IEnumerable<AssetResource> GetResources(PropContext context)
             => Enumerable.Empty<AssetResource>();

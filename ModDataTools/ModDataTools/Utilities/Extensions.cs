@@ -4,8 +4,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using UnityEngine;
@@ -151,13 +149,18 @@ namespace ModDataTools.Utilities
         {
             writer.WritePropertyName(name);
             writer.WriteStartObject();
-            writer.WriteProperty("r", value.r);
-            writer.WriteProperty("g", value.g);
-            writer.WriteProperty("b", value.b);
-            writer.WriteProperty("a", value.a);
+            writer.WriteProperty("r", (int)value.r);
+            writer.WriteProperty("g", (int)value.g);
+            writer.WriteProperty("b", (int)value.b);
+            writer.WriteProperty("a", (int)value.a);
             writer.WriteEndObject();
         }
         public static void WriteProperty(this JsonTextWriter writer, string name, NullishSingle value)
+        {
+            if (!value.HasValue) return;
+            writer.WriteProperty(name, value.Value);
+        }
+        public static void WriteProperty(this JsonTextWriter writer, string name, NullishInt value)
         {
             if (!value.HasValue) return;
             writer.WriteProperty(name, value.Value);

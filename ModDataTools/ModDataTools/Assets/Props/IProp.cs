@@ -1,4 +1,5 @@
-﻿using ModDataTools.Utilities;
+﻿using ModDataTools.Assets.Resources;
+using ModDataTools.Utilities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,9 @@ namespace ModDataTools.Assets.Props
         public abstract string PropName { get; }
         public PropData GetData();
         public void WriteJsonProps(PropContext context, JsonTextWriter writer);
+        public void Validate(PropContext context, IAssetValidator validator);
+        public void Localize(PropContext context, Localization l10n);
+        public IEnumerable<AssetResource> GetResources(PropContext context);
         public string GetPlanetPath(PropContext context);
     }
 

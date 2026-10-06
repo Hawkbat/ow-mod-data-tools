@@ -44,7 +44,8 @@ namespace ModDataTools.Assets.Props
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
             base.WriteJsonProps(context, writer);
-            writer.WriteProperty("normal", Normal);
+            if (Normal != Vector3.zero)
+                writer.WriteProperty("normal", Normal);
         }
     }
     public class TranslatorTextPropComponent : GeneralPropComponent<TranslatorTextPropData>

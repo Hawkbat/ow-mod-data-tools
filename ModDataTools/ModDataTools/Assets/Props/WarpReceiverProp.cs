@@ -13,10 +13,10 @@ namespace ModDataTools.Assets.Props
     public class WarpReceiverPropData : GeneralPropData
     {
         [Tooltip("The custom frequency of the warp receiver.")]
-        public FrequencyAsset Frequency;
+        public FrequencyAsset FrequencyAsset;
         [Tooltip("The frequency of the warp receiver, if not using a custom value.")]
-        [ConditionalField(nameof(Frequency), (FrequencyAsset)null)]
-        public NomaiWarpPlatform.Frequency WarpFrequency;
+        [ConditionalField(nameof(FrequencyAsset), (FrequencyAsset)null)]
+        public NomaiWarpPlatform.Frequency Frequency;
         [Tooltip("The body the transmitter must be aligned with to warp to this receiver. Defaults to the body the receiver is on.")]
         public PlanetAsset AlignmentTargetBody;
         [Tooltip("Set to true if you want to include Nomai ruin details around the warp pad.")]
@@ -24,10 +24,10 @@ namespace ModDataTools.Assets.Props
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
-            if (Frequency)
-                writer.WriteProperty("frequency", Frequency.FullID);
+            if (FrequencyAsset)
+                writer.WriteProperty("frequency", FrequencyAsset.FullID);
             else
-                writer.WriteProperty("frequency", WarpFrequency, false);
+                writer.WriteProperty("frequency", Frequency, false);
             if (AlignmentTargetBody)
                 writer.WriteProperty("alignmentTargetBody", AlignmentTargetBody.FullID);
             if (Detailed)

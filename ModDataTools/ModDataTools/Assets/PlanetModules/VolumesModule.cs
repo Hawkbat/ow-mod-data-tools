@@ -147,15 +147,25 @@ namespace ModDataTools.Assets.PlanetModules
 
         public override IEnumerable<AssetResource> GetResources(PlanetAsset planet)
         {
+            foreach (var resource in base.GetResources(planet))
+                yield return resource;
             foreach (var prop in GetProps(planet))
-                foreach (var resource in prop.GetProp().GetData().GetResources(prop))
+                foreach (var resource in prop.GetProp().GetResources(prop))
                     yield return resource;
         }
 
         public override void Validate(PlanetAsset planet, IAssetValidator validator)
         {
+            base.Validate(planet, validator);
             foreach (var prop in GetProps(planet))
-                prop.GetProp().GetData().Validate(prop, planet, validator);
+                prop.GetProp().Validate(prop, validator);
+        }
+
+        public override void Localize(PlanetAsset planet, Localization l10n)
+        {
+            base.Localize(planet, l10n);
+            foreach (var prop in GetProps(planet))
+                prop.GetProp().Localize(prop, l10n);
         }
 
         public override bool ShouldWrite(PlanetAsset planet) => GetProps(planet).Any();

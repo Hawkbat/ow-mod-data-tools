@@ -45,10 +45,11 @@ namespace ModDataTools.Assets.Volumes
             l10n.AddUI(context.GetProp().PropID, Text);
         }
 
-        public override void Validate(PropContext context, DataAsset asset, IAssetValidator validator)
+        public override void Validate(PropContext context, IAssetValidator validator)
         {
+            base.Validate(context, validator);
             if (Condition && Condition.Persistent)
-                validator.Error(asset, $"Credits volume condition '{Condition.FullID}' must not be persistent.");
+                validator.Error(context.Planet, $"Credits volume condition '{Condition.FullID}' must not be persistent.");
         }
 
         public enum CreditsType

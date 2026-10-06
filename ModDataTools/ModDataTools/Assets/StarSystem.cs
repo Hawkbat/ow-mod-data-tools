@@ -78,7 +78,7 @@ namespace ModDataTools.Assets
             if (nh.CanEnterViaWarpDrive && nh.FactRequiredForWarp)
                 writer.WriteProperty("factRequiredForWarp", nh.FactRequiredForWarp.FullID);
             writer.WriteProperty("canExitViaWarpDrive", nh.CanExitViaWarpDrive);
-            if (nh.CanExitViaWarpDrive && nh.FactRequiredForWarp)
+            if (nh.CanExitViaWarpDrive && nh.FactRequiredToExitViaWarpDrive)
                 writer.WriteProperty("factRequiredToExitViaWarpDrive", nh.FactRequiredToExitViaWarpDrive.FullID);
             writer.WriteProperty("destroyStockPlanets", nh.DestroyStockPlanets);
             writer.WriteProperty("enableTimeLoop", nh.EnableTimeLoop);
@@ -130,9 +130,9 @@ namespace ModDataTools.Assets
                 else if (nh.GlobalMusic.FinalEndTimesLoopAudioType != AudioType.None)
                     writer.WriteProperty("finalEndTimesLoopAudio", nh.GlobalMusic.FinalEndTimesLoopAudioType, false);
                 if (nh.GlobalMusic.FinalEndTimesBrambleAudio)
-                    writer.WriteProperty("finalEndTimesBrambleAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.FinalEndTimesBrambleAudio)}");
+                    writer.WriteProperty("finalEndTimesBrambleDimensionAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.FinalEndTimesBrambleAudio)}");
                 else if (nh.GlobalMusic.FinalEndTimesBrambleAudioType != AudioType.None)
-                    writer.WriteProperty("finalEndTimesBrambleAudio", nh.GlobalMusic.FinalEndTimesBrambleAudioType, false);
+                    writer.WriteProperty("finalEndTimesBrambleDimensionAudio", nh.GlobalMusic.FinalEndTimesBrambleAudioType, false);
                 writer.WriteEndObject();
             }
             if (nh.ConditionalChecks.Any())

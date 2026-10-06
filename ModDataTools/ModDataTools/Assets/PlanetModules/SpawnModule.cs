@@ -25,9 +25,9 @@ namespace ModDataTools.Assets.PlanetModules
         public override void Validate(PlanetAsset planet, IAssetValidator validator)
         {
             foreach (var spawn in AssetRepository.GetProps<PlayerSpawnPropData>(planet))
-                spawn.Data.Validate(spawn, planet, validator);
+                spawn.GetProp().Validate(spawn, validator);
             foreach (var spawn in AssetRepository.GetProps<ShipSpawnPropData>(planet))
-                spawn.Data.Validate(spawn, planet, validator);
+                spawn.GetProp().Validate(spawn, validator);
         }
 
         public override bool ShouldWrite(PlanetAsset planet)

@@ -31,6 +31,17 @@ namespace ModDataTools.Editor
                             EditorGUILayout.ObjectField(block, typeof(TranslatorTextBlockAsset), false);
                         }
                     }
+                    if (GUILayout.Button("Auto-Name Children"))
+                    {
+                        for (int i = 0; i < text.TextBlocks.Count; i++)
+                        {
+                            var block = text.TextBlocks[i];
+                            block.name = $"{i + 1}";
+                            EditorUtility.SetDirty(block);
+                        }
+                        AssetDatabase.SaveAssets();
+                        AssetDatabase.Refresh();
+                    }
                     if (GUILayout.Button("Add New Text Block"))
                     {
                         var block = CreateInstance<TranslatorTextBlockAsset>();

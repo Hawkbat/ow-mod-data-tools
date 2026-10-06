@@ -23,10 +23,6 @@ namespace ModDataTools.Assets.Props
         }
     }
     [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(PlayerSpawnPropAsset))]
-    public class PlayerSpawnPropAsset : SpawnPropAsset<PlayerSpawnPropData> {
-        public override void WriteJsonProps(PropContext context, JsonTextWriter writer) { }
-    }
-    public class PlayerSpawnPropComponent : SpawnPropComponent<PlayerSpawnPropData> {
-        public override void WriteJsonProps(PropContext context, JsonTextWriter writer) { }
-    }
+    public class PlayerSpawnPropAsset : SpawnPropAsset<PlayerSpawnPropData> { }
+    public class PlayerSpawnPropComponent : SpawnPropComponent<PlayerSpawnPropData> { }
 }

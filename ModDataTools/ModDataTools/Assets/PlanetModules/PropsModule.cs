@@ -25,6 +25,7 @@ namespace ModDataTools.Assets.PlanetModules
             var proxyDetails = AssetRepository.GetProps<DetailPropData>(planet)
                 .Where(p => p.Data.IsProxyDetail);
             var rafts = AssetRepository.GetProps<RaftPropData>(planet);
+            var raftDocks = AssetRepository.GetProps<RaftDockPropData>(planet);
             var scatters = AssetRepository.GetProps<ScatterPropData>(planet);
             var slideShows = AssetRepository.GetProps<SlideShowPropData>(planet);
             var quantumGroups = AssetRepository.GetProps<QuantumGroupPropData>(planet);
@@ -53,6 +54,8 @@ namespace ModDataTools.Assets.PlanetModules
                 writer.WriteProperty("proxyDetails", proxyDetails);
             if (rafts.Any())
                 writer.WriteProperty("rafts", rafts);
+            if (raftDocks.Any())
+                writer.WriteProperty("raftDocks", raftDocks);
             if (scatters.Any())
                 writer.WriteProperty("scatter", scatters);
             if (slideShows.Any())
@@ -115,6 +118,7 @@ namespace ModDataTools.Assets.PlanetModules
             foreach (var prop in AssetRepository.GetProps<GeyserPropData>(planet)) yield return prop;
             foreach (var prop in AssetRepository.GetProps<TranslatorTextPropData>(planet)) yield return prop;
             foreach (var prop in AssetRepository.GetProps<RaftPropData>(planet)) yield return prop;
+            foreach (var prop in AssetRepository.GetProps<RaftDockPropData>(planet)) yield return prop;
             foreach (var prop in AssetRepository.GetProps<ScatterPropData>(planet)) yield return prop;
             foreach (var prop in AssetRepository.GetProps<SlideShowPropData>(planet)) yield return prop;
             foreach (var prop in AssetRepository.GetProps<QuantumGroupPropData>(planet)) yield return prop;
@@ -133,20 +137,20 @@ namespace ModDataTools.Assets.PlanetModules
         public override IEnumerable<AssetResource> GetResources(PlanetAsset planet)
         {
             foreach (var prop in GetProps(planet))
-                foreach (var resource in prop.GetProp().GetData().GetResources(prop))
+                foreach (var resource in prop.GetProp().GetResources(prop))
                     yield return resource;
         }
 
         public override void Localize(PlanetAsset planet, Localization l10n)
         {
             foreach (var prop in GetProps(planet))
-                prop.GetProp().GetData().Localize(prop, l10n);
+                prop.GetProp().Localize(prop, l10n);
         }
 
         public override void Validate(PlanetAsset planet, IAssetValidator validator)
         {
             foreach (var prop in GetProps(planet))
-                prop.GetProp().GetData().Validate(prop, planet, validator);
+                prop.GetProp().Validate(prop, validator);
         }
 
         public override bool ShouldWrite(PlanetAsset planet) => GetProps(planet).Any();

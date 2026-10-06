@@ -11,10 +11,7 @@ namespace ModDataTools.Assets.Props
     [Serializable]
     public class ShipSpawnPropData : SpawnPropData
     {
-        public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
-        {
 
-        }
     }
     [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(ShipSpawnPropAsset))]
     public class ShipSpawnPropAsset : SpawnPropAsset<ShipSpawnPropData> { }

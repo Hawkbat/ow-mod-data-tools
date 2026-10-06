@@ -1,4 +1,5 @@
-﻿using ModDataTools.Utilities;
+﻿using ModDataTools.Assets.Resources;
+using ModDataTools.Utilities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,26 @@ namespace ModDataTools.Assets.Props
         public override IEnumerable<DataAsset> GetParentAssets()
         {
             if (Planet) yield return Planet;
+        }
+
+        public void Validate(PropContext context, IAssetValidator validator)
+        {
+            base.Validate(validator);
+            GetData().Validate(context, validator);
+        }
+
+        public void Localize(PropContext context, Localization l10n)
+        {
+            base.Localize(l10n);
+            GetData().Localize(context, l10n);
+        }
+
+        public IEnumerable<AssetResource> GetResources(PropContext context)
+        {
+            foreach (var resource in base.GetResources())
+                yield return resource;
+            foreach (var resource in GetData().GetResources(context))
+                yield return resource;
         }
     }
 
