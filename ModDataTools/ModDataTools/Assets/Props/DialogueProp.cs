@@ -17,7 +17,7 @@ namespace ModDataTools.Assets.Props
         [Tooltip("The dialogue tree to use")]
         public DialogueAsset Dialogue;
         [Tooltip("Radius of the spherical collision volume where you get the \"talk to\" prompt when looking at. If you use a remoteTriggerPosition, you can set this to 0 to make the dialogue only trigger remotely.")]
-        public float Radius;
+        public float Radius = 1f;
         [Tooltip("Distance from radius the prompt appears")]
         public float Range = 2f;
         [Tooltip("If a pathToAnimController is supplied, if you are within this distance the character will look at you. If it is set to 0, they will only look at you when spoken to.")]

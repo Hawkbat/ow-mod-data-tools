@@ -10,7 +10,7 @@ using UnityEngine;
 namespace ModDataTools.Assets.Props
 {
     [Serializable]
-    public class TornadoPropData : GeneralPointPropData
+    public class TornadoPropData : GeneralPropData
     {
         [Tooltip("Alternative to setting the position. Will choose a random place at this elevation.")]
         public NullishSingle Elevation;
@@ -63,6 +63,6 @@ namespace ModDataTools.Assets.Props
     }
 
     [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(TornadoProp))]
-    public class TornadoProp : GeneralPointPropAsset<TornadoPropData> { }
-    public class TornadoPropComponent : GeneralPointPropComponent<TornadoPropData> { }
+    public class TornadoProp : GeneralPropAsset<TornadoPropData> { }
+    public class TornadoPropComponent : GeneralPropComponent<TornadoPropData> { }
 }

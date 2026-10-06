@@ -24,7 +24,7 @@ namespace ModDataTools.Assets.Volumes
             if (TargetStarSystem)
                 writer.WriteProperty("targetStarSystem", TargetStarSystem.FullID);
             if (SpawnPoint)
-                writer.WriteProperty("spawnPoint", SpawnPoint.FullID);
+                writer.WriteProperty("spawnPointID", SpawnPoint.FullID);
         }
     }
 

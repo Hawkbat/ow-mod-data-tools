@@ -31,7 +31,8 @@ namespace ModDataTools.Assets.Volumes
                 writer.WriteProperty("deathType", DeathType);
             writer.WritePropertyName("gameOver");
             writer.WriteStartObject();
-            writer.WriteProperty("text", Text);
+            if (!string.IsNullOrEmpty(Text))
+                writer.WriteProperty("text", context.GetProp().PropID);
             writer.WriteProperty("colour", Colour);
             if (Condition)
                 writer.WriteProperty("condition", Condition.FullID);
@@ -42,7 +43,8 @@ namespace ModDataTools.Assets.Volumes
 
         public override void Localize(PropContext context, Localization l10n)
         {
-            l10n.AddUI(context.GetProp().PropID, Text);
+            if (!string.IsNullOrEmpty(Text))
+                l10n.AddUI(context.GetProp().PropID, Text);
         }
 
         public override void Validate(PropContext context, IAssetValidator validator)

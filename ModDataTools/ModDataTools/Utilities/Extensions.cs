@@ -160,6 +160,11 @@ namespace ModDataTools.Utilities
             if (!value.HasValue) return;
             writer.WriteProperty(name, value.Value);
         }
+        public static void WriteProperty(this JsonTextWriter writer, string name, NullishBool value)
+        {
+            if (!value.HasValue) return;
+            writer.WriteProperty(name, value.Value);
+        }
         public static void WriteProperty(this JsonTextWriter writer, string name, NullishInt value)
         {
             if (!value.HasValue) return;

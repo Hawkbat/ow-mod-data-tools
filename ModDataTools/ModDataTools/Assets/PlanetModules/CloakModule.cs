@@ -30,7 +30,7 @@ namespace ModDataTools.Assets.PlanetModules
         public override void WriteJsonProps(PlanetAsset planet, JsonTextWriter writer)
         {
             writer.WriteProperty("radius", Radius);
-            writer.WriteProperty("cloakScaleDistance", CloakScaleDistance);
+            writer.WriteProperty("cloakScaleDist", CloakScaleDistance);
             writer.WriteProperty("innerCloakRadius", InnerCloakRadius);
             writer.WriteProperty("nearCloakRadius", NearCloakRadius);
             writer.WriteProperty("farCloakRadius", FarCloakRadius);

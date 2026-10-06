@@ -24,7 +24,7 @@ namespace ModDataTools.Utilities
                 return value;
             }
             set {
-                Value = value;
+                this.value = value;
                 hasValue = true;
             }
         }
@@ -52,6 +52,13 @@ namespace ModDataTools.Utilities
     {
         public static implicit operator float(NullishSingle instance) => instance.SafeValue;
         public static implicit operator NullishSingle(float instance) => new() { hasValue = true, value = instance };
+    }
+
+    [Serializable]
+    public class NullishBool : Nullish<bool>
+    {
+        public static implicit operator bool(NullishBool instance) => instance.SafeValue;
+        public static implicit operator NullishBool(bool instance) => new() { hasValue = true, value = instance };
     }
 
     [Serializable]

@@ -23,7 +23,7 @@ namespace ModDataTools.Assets.Props
         [Tooltip("The color of the light from the node. Alpha controls brightness. The default value is solid white.")]
         public NullishColor LightTint;
         [Tooltip("Should this node have a point of light from afar? Typically, nodes will have a foglight, while seeds won't, and neither will if not in a dimension.")]
-        public bool HasFogLight;
+        public NullishBool HasFogLight;
         [Tooltip("The allowed exits from this node. Use Unity Explorer to check the SphericalFogWarpExits to determine which ones to disable.")]
         [BitField(6)]
         public int PossibleExits = 0b111111;
@@ -33,12 +33,14 @@ namespace ModDataTools.Assets.Props
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
             writer.WriteProperty("isSeed", IsSeed);
+            if (LinkedPlanet)
+                writer.WriteProperty("linksTo", LinkedPlanet.FullID);
             writer.WriteProperty("fogTint", FogTint);
             writer.WriteProperty("lightTint", LightTint);
             writer.WriteProperty("hasFogLight", HasFogLight);
             if (!BitFieldUtility.GetValues(PossibleExits, 6).All(v => v))
             {
-                writer.WritePropertyName("allowedEntrances");
+                writer.WritePropertyName("possibleExits");
                 writer.WriteStartArray();
                 for (int i = 0; i < 6; i++)
                     if (BitFieldUtility.GetValue(PossibleExits, i))

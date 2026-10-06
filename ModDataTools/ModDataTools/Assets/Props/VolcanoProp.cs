@@ -10,7 +10,7 @@ using UnityEngine;
 namespace ModDataTools.Assets.Props
 {
     [Serializable]
-    public class VolcanoPropData : GeneralPointPropData
+    public class VolcanoPropData : GeneralPropData
     {
         [Tooltip("The colour of the meteor's lava.")]
         public NullishColor LavaTint;
@@ -40,6 +40,6 @@ namespace ModDataTools.Assets.Props
     }
 
     [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(VolcanoPropAsset))]
-    public class VolcanoPropAsset : GeneralPointPropAsset<VolcanoPropData> { }
-    public class VolcanoPropComponent : GeneralPointPropComponent<VolcanoPropData> { }
+    public class VolcanoPropAsset : GeneralPropAsset<VolcanoPropData> { }
+    public class VolcanoPropComponent : GeneralPropComponent<VolcanoPropData> { }
 }

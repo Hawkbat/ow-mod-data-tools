@@ -20,7 +20,7 @@ namespace ModDataTools.Assets.PlanetModules
         public override void WriteJsonProps(PlanetAsset planet, JsonTextWriter writer)
         {
             if (IsDreamWorld)
-                writer.WriteProperty("isDreamWorld", IsDreamWorld);
+                writer.WriteProperty("inDreamWorld", IsDreamWorld);
             if (GenerateSimulationMeshes)
                 writer.WriteProperty("generateSimulationMeshes", GenerateSimulationMeshes);
         }

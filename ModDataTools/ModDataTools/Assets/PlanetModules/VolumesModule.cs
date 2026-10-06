@@ -110,9 +110,9 @@ namespace ModDataTools.Assets.PlanetModules
             if (zeroGravityVolumes.Any())
                 writer.WriteProperty("zeroGravityVolumes", zeroGravityVolumes);
             if (solarSystemVolumes.Any())
-                writer.WriteProperty("solarSystemVolumes", solarSystemVolumes);
+                writer.WriteProperty("starSystemVolumes", solarSystemVolumes);
             if (creditsVolumes.Any())
-                writer.WriteProperty("creditsVolumes", creditsVolumes);
+                writer.WriteProperty("creditsVolume", creditsVolumes);
         }
 
         public IEnumerable<PropContext> GetProps(PlanetAsset planet)

@@ -33,7 +33,7 @@ namespace ModDataTools.Assets.PlanetModules
             None = 0,
             Hub = 1,
             Cluster = 2,
-            SmalllNest = 3,
+            SmallNest = 3,
             ExitOnly = 4,
         }
 

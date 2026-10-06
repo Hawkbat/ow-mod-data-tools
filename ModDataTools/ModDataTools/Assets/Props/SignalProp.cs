@@ -55,6 +55,8 @@ namespace ModDataTools.Assets.Props
                 writer.WriteProperty("identificationRadius", IdentificationRadius);
             if (InsideCloak)
                 writer.WriteProperty("insideCloak", InsideCloak);
+            if (!OnlyAudibleToScope)
+                writer.WriteProperty("onlyAudibleToScope", OnlyAudibleToScope);
             if (RevealFact)
                 writer.WriteProperty("reveals", RevealFact.FullID);
             if (SourceRadius != 1f)

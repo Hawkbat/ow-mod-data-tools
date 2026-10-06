@@ -17,9 +17,9 @@ namespace ModDataTools.Assets.PlanetModules
         [Tooltip("Tint of the water")]
         public NullishColor Tint;
         [Tooltip("Density of the water sphere. The higher the density, the harder it is to go through this fluid.")]
-        public float Density = 1.2f;
+        public float Density = 30f;
         [Tooltip("Buoyancy density of the water sphere")]
-        public float Buoyancy = 1f;
+        public float Buoyancy = 1.1f;
         [Tooltip("Scale this object over time")]
         public AnimationCurve Curve;
         [Tooltip("Will the ship automatically try to orient itself to face upwards while in this volume?")]
@@ -34,7 +34,7 @@ namespace ModDataTools.Assets.PlanetModules
             writer.WriteProperty("buoyancy", Buoyancy);
             writer.WriteProperty("tint", Tint);
             if (!AllowShipAutoroll)
-                writer.WriteProperty("autoroll", AllowShipAutoroll);
+                writer.WriteProperty("allowShipAutoroll", AllowShipAutoroll);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace ModDataTools.Assets.Volumes
         [Tooltip("The type of hazard for this volume.")]
         public HazardType Type = HazardType.General;
         [Tooltip("The amount of damage you will take per second while inside this volume.")]
-        public float DamagePerSecond;
+        public float DamagePerSecond = 10f;
         [Tooltip("The type of damage you will take when you first touch this volume.")]
         public InstantDamageType FirstContactDamageType = InstantDamageType.Impact;
         [Tooltip("The amount of damage you will take when you first touch this volume.")]
