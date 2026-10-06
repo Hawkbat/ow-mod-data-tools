@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace ModDataTools.Assets.PlanetModules
 {
+    [Serializable]
     public class EyeOfTheUniverseModule : PlanetModule
     {
         public override void WriteJsonProps(PlanetAsset planet, JsonTextWriter writer)

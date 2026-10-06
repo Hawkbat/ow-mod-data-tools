@@ -253,6 +253,7 @@ namespace ModDataTools.Assets
             [Tooltip("Make this planet part of the dream world")]
             public DreamModule Dream = new();
             [Tooltip("Add features exclusive to the Eye of the Universe scene")]
+            [HideInInspector]
             public EyeOfTheUniverseModule EyeOfTheUniverse = new();
             [Tooltip("Make this body into a focal point (barycenter)")]
             public FocalPointModule FocalPoint = new();

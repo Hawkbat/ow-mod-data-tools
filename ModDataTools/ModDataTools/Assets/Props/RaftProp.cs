@@ -10,7 +10,7 @@ using UnityEngine;
 namespace ModDataTools.Assets.Props
 {
     [Serializable]
-    public class RaftPropData : GeneralPointPropData
+    public class RaftPropData : GeneralPropData
     {
         [Tooltip("Acceleration of the raft. Default acceleration is 5.")]
         public float Acceleration = 5f;
@@ -22,6 +22,6 @@ namespace ModDataTools.Assets.Props
     }
 
     [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(RaftPropAsset))]
-    public class RaftPropAsset : GeneralPointPropAsset<RaftPropData> { }
-    public class RaftPropComponent : GeneralPointPropComponent<RaftPropData> { }
+    public class RaftPropAsset : GeneralPropAsset<RaftPropData> { }
+    public class RaftPropComponent : GeneralPropComponent<RaftPropData> { }
 }

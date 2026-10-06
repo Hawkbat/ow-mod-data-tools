@@ -10,7 +10,7 @@ using UnityEngine;
 namespace ModDataTools.Assets.Props
 {
     [Serializable]
-    public class RaftDockPropData : GeneralPointPropData
+    public class RaftDockPropData : GeneralPropData
     {
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
@@ -20,6 +20,6 @@ namespace ModDataTools.Assets.Props
     }
 
     [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(RaftDockPropAsset))]
-    public class RaftDockPropAsset : GeneralPointPropAsset<RaftDockPropData> { }
-    public class RaftDockPropComponent : GeneralPointPropComponent<RaftDockPropData> { }
+    public class RaftDockPropAsset : GeneralPropAsset<RaftDockPropData> { }
+    public class RaftDockPropComponent : GeneralPropComponent<RaftDockPropData> { }
 }

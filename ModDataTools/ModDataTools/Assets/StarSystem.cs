@@ -8,7 +8,6 @@ using ModDataTools.Assets.Props;
 using ModDataTools.Utilities;
 using Newtonsoft.Json;
 using ModDataTools.Assets.Resources;
-using System.EnterpriseServices.CompensatingResourceManager;
 
 namespace ModDataTools.Assets
 {
@@ -55,6 +54,8 @@ namespace ModDataTools.Assets
                 validator.Error(this, $"Invalid warp coordinates");
             if (NewHorizons.Skybox.HasCustomSkybox && !NewHorizons.Skybox.IsCustomSkyboxValid())
                 validator.Error(this, $"Missing some skybox images");
+            if (NewHorizons.ShipLogStartingPlanet && NewHorizons.ShipLogStartingPlanet.StarSystem != this)
+                validator.Error(this, $"{nameof(NewHorizonsConfig.ShipLogStartingPlanet)} is not in this star system");
             if (NewHorizons.ConditionalChecks.Any())
             {
                 foreach (var check in NewHorizons.ConditionalChecks)
@@ -140,7 +141,7 @@ namespace ModDataTools.Assets
 
             var vesselProp = AssetRepository.GetAllProps<VesselPropData>().FirstOrDefault(c => c.Planet && c.Planet.StarSystem == this);
             var warpExitProp = AssetRepository.GetAllProps<VesselWarpExitPropData>().FirstOrDefault(c => c.Planet && c.Planet.StarSystem == this);
-            if (nh.Vessel.HasWarpCoordinates || nh.Vessel.VesselPosition.HasValue || nh.Vessel.WarpExitPosition.HasValue || vesselProp != null && warpExitProp != null)
+            if (nh.Vessel.HasWarpCoordinates || nh.Vessel.VesselPosition.HasValue || nh.Vessel.WarpExitPosition.HasValue || vesselProp != null || warpExitProp != null)
             {
                 writer.WritePropertyName("Vessel");
                 writer.WriteStartObject();
@@ -177,13 +178,13 @@ namespace ModDataTools.Assets
                     {
                         writer.WriteProperty("vesselSpawn", vesselProp);
                         var vesselPropData = vesselProp.Prop.GetData() as VesselPropData;
-                        if (nh.Vessel.AlwaysPresent)
+                        if (vesselPropData.AlwaysPresent)
                             writer.WriteProperty("alwaysPresent", vesselPropData.AlwaysPresent);
-                        if (nh.Vessel.SpawnOnVessel)
+                        if (vesselPropData.SpawnOnVessel)
                             writer.WriteProperty("spawnOnVessel", vesselPropData.SpawnOnVessel);
-                        if (nh.Vessel.HasPhysics)
+                        if (vesselPropData.HasPhysics)
                             writer.WriteProperty("hasPhysics", vesselPropData.HasPhysics);
-                        if (nh.Vessel.HasZeroGravityVolume)
+                        if (vesselPropData.HasZeroGravityVolume)
                             writer.WriteProperty("hasZeroGravityVolume", vesselPropData.HasZeroGravityVolume);
                     }
                 }
@@ -221,6 +222,8 @@ namespace ModDataTools.Assets
                 .Where(f => f.InitiallyRevealed && f.Entry && f.Entry.Planet && f.Entry.Planet.StarSystem == this);
             if (initialFacts.Any())
                 writer.WriteProperty("initialReveal", initialFacts.Select(f => f.FullID));
+            if (nh.ShipLogStartingPlanet)
+                writer.WriteProperty("shipLogStartingPlanetID", nh.ShipLogStartingPlanet.FullID);
             var curiosities = AssetRepository.GetAllAssets<EntryAsset>().Where(e => e.IsCuriosity && e.Planet && e.Planet.StarSystem == this);
             if (curiosities.Any())
             {
