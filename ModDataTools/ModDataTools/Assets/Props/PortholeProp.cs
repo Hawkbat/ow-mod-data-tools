@@ -25,14 +25,24 @@ namespace ModDataTools.Assets.Props
             if (FieldOfView != 90f)
                 writer.WriteProperty("fieldOfView", FieldOfView);
         }
+
     }
 
     [Serializable]
     public class PortholeTargetPropData : GeneralSolarSystemPropData
     {
+        [Tooltip("Volumes to explicitly add the player to when peeking through the porthole. They must be on the same planet as this target.")]
+        public EntrywayVolumesConfig EntrywayVolumes;
+
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
+            EntrywayVolumes.WriteJsonProperty(context.Planet, writer);
+        }
 
+        public override void Validate(PropContext context, IAssetValidator validator)
+        {
+            base.Validate(context, validator);
+            EntrywayVolumes.Validate(context, context.Planet, validator);
         }
     }
 
@@ -54,6 +64,11 @@ namespace ModDataTools.Assets.Props
             base.Validate(validator);
             if (!Target)
                 validator.Error(this, $"Missing {nameof(Target)}");
+            else
+            {
+                var targetContext = Target.GetContext(new PropContext<PortholePropData> { Planet = Planet, DetailPath = Planet ? Planet.GetSectorPath() : null, Prop = this });
+                targetContext.Data.Validate(targetContext, validator);
+            }
         }
     }
 
@@ -67,17 +82,28 @@ namespace ModDataTools.Assets.Props
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
             base.WriteJsonProps(context, writer);
-            if (TargetAsset)
-                writer.WriteProperty("target", TargetAsset.GetContext(context));
-            else if (Target)
-                writer.WriteProperty("target", context.MakeSibling(Target));
+            var targetContext = GetTargetContext(context);
+            if (targetContext != null)
+                writer.WriteProperty("target", targetContext);
         }
 
         public override void Validate(PropContext context, IAssetValidator validator)
         {
             base.Validate(context, validator);
-            if (!TargetAsset && !Target)
+            var targetContext = GetTargetContext(context);
+            if (targetContext == null)
                 validator.Error(context.Planet, $"Porthole '{PropName}' has no target set");
+            else
+                targetContext.Data.Validate(targetContext, validator);
+        }
+
+        PropContext<PortholeTargetPropData> GetTargetContext(PropContext context)
+        {
+            if (TargetAsset)
+                return TargetAsset.GetContext(context);
+            if (Target)
+                return context.MakeSibling(Target);
+            return null;
         }
     }
 

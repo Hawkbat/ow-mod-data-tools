@@ -31,6 +31,8 @@ namespace ModDataTools.Assets.Props
         public bool HasWarpEffects = true;
         [Tooltip("Optional override for the render queue. If the singularity is rendering oddly, increasing this to 3000 can help. Value must be between 2501 and 3500")]
         public NullishInt RenderQueueOverride;
+        [Tooltip("Trigger volumes to add the player/ship/scout to when warping through this singularity. Use this to add the player to the Vessel's oxygen volume or other entryway-controlled trigger volumes.")]
+        public EntrywayVolumesConfig EntrywayVolumes;
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
@@ -46,6 +48,13 @@ namespace ModDataTools.Assets.Props
             if (!HasWarpEffects)
                 writer.WriteProperty("hasWarpEffects", HasWarpEffects);
             writer.WriteProperty("renderQueueOverride", RenderQueueOverride);
+            EntrywayVolumes.WriteJsonProperty(context.Planet, writer);
+        }
+
+        public override void Validate(PropContext context, IAssetValidator validator)
+        {
+            base.Validate(context, validator);
+            EntrywayVolumes.Validate(context, context.Planet, validator);
         }
 
         public enum SingularityType

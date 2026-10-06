@@ -21,6 +21,8 @@ namespace ModDataTools.Assets.Props
         public PlanetAsset AlignmentTargetBody;
         [Tooltip("Set to true if you want to include Nomai ruin details around the warp pad.")]
         public bool Detailed;
+        [Tooltip("Volumes to explicitly add the warped player/scout to when using this warp pad.")]
+        public EntrywayVolumesConfig EntrywayVolumes;
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
@@ -32,6 +34,13 @@ namespace ModDataTools.Assets.Props
                 writer.WriteProperty("alignmentTargetBody", AlignmentTargetBody.FullID);
             if (Detailed)
                 writer.WriteProperty("detailed", Detailed);
+            EntrywayVolumes.WriteJsonProperty(context.Planet, writer);
+        }
+
+        public override void Validate(PropContext context, IAssetValidator validator)
+        {
+            base.Validate(context, validator);
+            EntrywayVolumes.Validate(context, context.Planet, validator);
         }
     }
 

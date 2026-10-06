@@ -13,6 +13,21 @@ namespace ModDataTools.Assets.Props
     [Serializable]
     public class DreamCampfirePropData : CampfirePropData
     {
+        [Tooltip("Volumes to explicitly add the player to when waking up at this campfire.")]
+        public EntrywayVolumesConfig EntrywayVolumes;
+
+        public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
+        {
+            base.WriteJsonProps(context, writer);
+            EntrywayVolumes.WriteJsonProperty(context.Planet, writer);
+        }
+
+        public override void Validate(PropContext context, IAssetValidator validator)
+        {
+            base.Validate(context, validator);
+            EntrywayVolumes.Validate(context, context.Planet, validator);
+        }
+
         public static void WriteLinks(PropContext context, JsonTextWriter writer, IProp arrivalPoint, IProp alarmBell)
         {
             if (arrivalPoint != null)

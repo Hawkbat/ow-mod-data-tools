@@ -22,6 +22,8 @@ namespace ModDataTools.Assets.Props
         public ConditionAsset MakeDefaultIfPersistentConditionSet;
         [Tooltip("Offsets the player/ship by this local vector when spawning. Used to prevent spawning in the floor. Optional: defaults to (0, 4, 0).")]
         public NullishVector3 Offset;
+        [Tooltip("Volumes to explicitly add the player/ship to when spawning. Use this to add the player to the Vessel's oxygen volume or other entryway-controlled trigger volumes.")]
+        public EntrywayVolumesConfig EntrywayVolumes;
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
@@ -32,6 +34,13 @@ namespace ModDataTools.Assets.Props
                 writer.WriteProperty("makeDefaultIfPersistentCondition", MakeDefaultIfPersistentConditionSet.FullID);
             if (IsDefault)
                 writer.WriteProperty("isDefault", IsDefault);
+            EntrywayVolumes.WriteJsonProperty(context.Planet, writer);
+        }
+
+        public override void Validate(PropContext context, IAssetValidator validator)
+        {
+            base.Validate(context, validator);
+            EntrywayVolumes.Validate(context, context.Planet, validator);
         }
     }
     public abstract class SpawnPropAsset<T> : GeneralPropAsset<T> where T : SpawnPropData

@@ -20,6 +20,8 @@ namespace ModDataTools.Assets.Props
         public bool DisableStructure;
         [Tooltip("Disable the pool that rises when you place a stone.")]
         public bool DisablePool;
+        [Tooltip("Volumes to explicitly add the player to when viewing this remote projection.")]
+        public EntrywayVolumesConfig EntrywayVolumes;
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
@@ -29,6 +31,13 @@ namespace ModDataTools.Assets.Props
                 writer.WriteProperty("disableStructure", DisableStructure);
             if (DisablePool)
                 writer.WriteProperty("disablePool", DisablePool);
+            EntrywayVolumes.WriteJsonProperty(context.Planet, writer);
+        }
+
+        public override void Validate(PropContext context, IAssetValidator validator)
+        {
+            base.Validate(context, validator);
+            EntrywayVolumes.Validate(context, context.Planet, validator);
         }
     }
 

@@ -43,6 +43,22 @@ namespace ModDataTools.Utilities
             var context = GetPropContext<T>(planet, prop);
             return context != null ? prop.GetPlanetPath(context) : null;
         }
+        public static PropContext GetPropContext(PlanetAsset planet, IProp prop)
+        {
+            var dataType = prop.GetType().GetInterfaces()
+                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IProp<>))?
+                .GetGenericArguments()[0];
+            if (dataType == null) return null;
+            var method = typeof(AssetRepository).GetMethods()
+                .First(m => m.Name == nameof(GetPropContext) && m.IsGenericMethodDefinition)
+                .MakeGenericMethod(dataType);
+            return (PropContext)method.Invoke(null, new object[] { planet, prop });
+        }
+        public static string GetPropPlanetPath(PlanetAsset planet, IProp prop)
+        {
+            var context = GetPropContext(planet, prop);
+            return context != null ? prop.GetPlanetPath(context) : null;
+        }
 
         public static string GetAssetBundle(UnityEngine.Object obj)
             => store == null ? null : store.GetAssetBundle(obj);

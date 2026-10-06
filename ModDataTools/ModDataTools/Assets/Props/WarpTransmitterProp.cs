@@ -21,6 +21,8 @@ namespace ModDataTools.Assets.Props
         public float AlignmentWindow = 5f;
         [Tooltip("This makes the alignment happen if the destination planet is BELOW you rather than above.")]
         public bool FlipAlignment;
+        [Tooltip("Volumes to explicitly add the warped player/scout to when using this warp pad.")]
+        public EntrywayVolumesConfig EntrywayVolumes;
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
@@ -32,6 +34,13 @@ namespace ModDataTools.Assets.Props
                 writer.WriteProperty("alignmentWindow", AlignmentWindow);
             if (FlipAlignment)
                 writer.WriteProperty("flipAlignment", FlipAlignment);
+            EntrywayVolumes.WriteJsonProperty(context.Planet, writer);
+        }
+
+        public override void Validate(PropContext context, IAssetValidator validator)
+        {
+            base.Validate(context, validator);
+            EntrywayVolumes.Validate(context, context.Planet, validator);
         }
     }
 
