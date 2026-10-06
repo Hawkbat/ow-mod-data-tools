@@ -146,8 +146,9 @@ MonoBehaviour:
     Cloak:
       IsEnabled: 0
       Radius: 0
-      Audio: {fileID: 0}
-      AudioType: 0
+      Audio:
+        Clip: {fileID: 0}
+        Type: 0
     FocalPoint:
       IsEnabled: 0
       Primary: {fileID: 0}

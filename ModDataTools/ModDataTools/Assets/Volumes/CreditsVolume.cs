@@ -25,7 +25,7 @@ namespace ModDataTools.Assets.Volumes
             if (DeathType != DeathType.Default)
                 writer.WriteProperty("deathType", DeathType);
             writer.WritePropertyName("gameOver");
-            GameOver.ToJson(writer, context.GetProp().PropID, GameOver.Audio ? context.Planet.GetResourcePath(GameOver.Audio) : null);
+            GameOver.ToJson(writer, context.GetProp().PropID, context.Planet.GetResourcePath);
         }
 
         public override void Localize(PropContext context, Localization l10n)
@@ -41,9 +41,8 @@ namespace ModDataTools.Assets.Volumes
 
         public override IEnumerable<AssetResource> GetResources(PropContext context)
         {
-            if (GameOver.Audio)
-                foreach (var resource in GameOver.GetResources(context.Planet.GetResourcePath(GameOver.Audio)))
-                    yield return resource;
+            foreach (var resource in GameOver.GetResources(context.Planet.GetResourcePath))
+                yield return resource;
         }
     }
 

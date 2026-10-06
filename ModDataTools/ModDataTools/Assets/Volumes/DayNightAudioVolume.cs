@@ -14,18 +14,10 @@ namespace ModDataTools.Assets.Volumes
     [Serializable]
     public class DayNightAudioVolumeData : GeneralPriorityVolumeData
     {
-        [Tooltip("The AudioClip to use during the day")]
-        public AudioClip DayAudio;
-        [Tooltip("The AudioType to use during the day, if not using a custom audio clip")]
-        [ConditionalField(nameof(DayAudio), (AudioClip)null)]
-        [EnumValuePicker]
-        public AudioType DayAudioType;
-        [Tooltip("The AudioClip to use during the night")]
-        public AudioClip NightAudio;
-        [Tooltip("The AudioType to use during the night, if not using a custom audio clip")]
-        [ConditionalField(nameof(NightAudio), (AudioClip)null)]
-        [EnumValuePicker]
-        public AudioType NightAudioType;
+        [Tooltip("The audio to use during the day")]
+        public AudioConfig DayAudio;
+        [Tooltip("The audio to use during the night")]
+        public AudioConfig NightAudio;
         [Tooltip("The astro object used to determine if it is day or night.")]
         public PlanetAsset Sun;
         [Tooltip("Angle in degrees defining daytime. Inside this window it will be day and outside it will be night.")]
@@ -40,14 +32,8 @@ namespace ModDataTools.Assets.Volumes
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
             base.WriteJsonProps(context, writer);
-            if (DayAudio)
-                writer.WriteProperty("dayAudio", context.Planet.GetResourcePath(DayAudio));
-            else if (DayAudioType != AudioType.None)
-                writer.WriteProperty("dayAudio", DayAudioType, false);
-            if (NightAudio)
-                writer.WriteProperty("nightAudio", context.Planet.GetResourcePath(NightAudio));
-            else if (NightAudioType != AudioType.None)
-                writer.WriteProperty("nightAudio", NightAudioType, false);
+            writer.WriteProperty("dayAudio", DayAudio, context.Planet.GetResourcePath);
+            writer.WriteProperty("nightAudio", NightAudio, context.Planet.GetResourcePath);
             if (Sun)
                 writer.WriteProperty("sun", Sun.FullID);
             if (DayWindow != 180f)
@@ -60,10 +46,10 @@ namespace ModDataTools.Assets.Volumes
 
         public override IEnumerable<AssetResource> GetResources(PropContext context)
         {
-            if (DayAudio)
-                yield return new AudioResource(DayAudio, context.Planet);
-            if (NightAudio)
-                yield return new AudioResource(NightAudio, context.Planet);
+            foreach (var resource in DayAudio.GetResources(context.Planet.GetResourcePath))
+                yield return resource;
+            foreach (var resource in NightAudio.GetResources(context.Planet.GetResourcePath))
+                yield return resource;
         }
     }
 

@@ -42,11 +42,7 @@ namespace ModDataTools.Assets.Volumes
         [Tooltip("The dialogue condition or persistent condition to set when the volume is interacted with.")]
         public ConditionAsset Condition;
         [Tooltip("A sound to play when the volume is interacted with.")]
-        public AudioClip Audio;
-        [Tooltip("A sound to play when the volume is interacted with, if not using a custom audio clip.")]
-        [ConditionalField(nameof(Audio), (AudioClip)null)]
-        [EnumValuePicker]
-        public AudioType AudioType;
+        public AudioConfig Audio;
         [Tooltip("The name of an animation trigger to set on the animator when the volume is interacted with.")]
         public string AnimationTrigger;
 
@@ -63,10 +59,7 @@ namespace ModDataTools.Assets.Volumes
                 if (Condition.Persistent)
                     writer.WriteProperty("persistent", Condition.Persistent);
             }
-            if (Audio)
-                writer.WriteProperty("audio", context.Planet.GetResourcePath(Audio));
-            else if (AudioType != AudioType.None)
-                writer.WriteProperty("audio", AudioType, false);
+            writer.WriteProperty("audio", Audio, context.Planet.GetResourcePath);
             if (!string.IsNullOrEmpty(AnimationTrigger))
                 writer.WriteProperty("animationTrigger", AnimationTrigger);
         }
@@ -84,8 +77,8 @@ namespace ModDataTools.Assets.Volumes
         {
             foreach (var resource in base.GetResources(context))
                 yield return resource;
-            if (Audio)
-                yield return new AudioResource(Audio, context.Planet);
+            foreach (var resource in Audio.GetResources(context.Planet.GetResourcePath))
+                yield return resource;
         }
     }
 

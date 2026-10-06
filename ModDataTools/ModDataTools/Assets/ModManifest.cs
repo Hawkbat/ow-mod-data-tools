@@ -207,7 +207,7 @@ namespace ModDataTools.Assets
                     writer.WritePropertyName("gameOver");
                     writer.WriteStartArray();
                     for (int i = 0; i < GameOver.Count; i++)
-                        GameOver[i].ToJson(writer, $"GAME_OVER_{i}", GameOver[i].Audio ? GetGameOverAudioPath(GameOver[i].Audio) : null);
+                        GameOver[i].ToJson(writer, $"GAME_OVER_{i}", GetGameOverAudioPath);
                     writer.WriteEndArray();
                 }
 
@@ -238,12 +238,12 @@ namespace ModDataTools.Assets
 
             public IEnumerable<AssetResource> GetResources()
             {
-                foreach (var gameOver in GameOver.Where(g => g.Audio))
-                    foreach (var resource in gameOver.GetResources(GetGameOverAudioPath(gameOver.Audio)))
+                foreach (var gameOver in GameOver)
+                    foreach (var resource in gameOver.GetResources(GetGameOverAudioPath))
                         yield return resource;
             }
 
-            public string GetGameOverAudioPath(AudioClip audio) => $"audio/{AssetRepository.GetAssetFileName(audio)}";
+            public string GetGameOverAudioPath(UnityEngine.Object audio) => $"audio/{AssetRepository.GetAssetFileName(audio)}";
 
             [Serializable]
             public class CreditsRow

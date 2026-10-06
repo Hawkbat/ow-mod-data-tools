@@ -14,12 +14,8 @@ namespace ModDataTools.Assets.Props
     [Serializable]
     public class AudioSourcePropData : GeneralPointPropData
     {
-        [Tooltip("The AudioClip to use")]
-        public AudioClip Audio;
-        [Tooltip("The AudioType to use, if not using a custom audio clip")]
-        [ConditionalField(nameof(Audio), (AudioClip)null)]
-        [EnumValuePicker]
-        public AudioType AudioType;
+        [Tooltip("The audio to use")]
+        public AudioConfig Audio;
         [Tooltip("At this distance the sound is at its loudest.")]
         public float MinDistance = 0f;
         [Tooltip("The sound will drop off by this distance.")]
@@ -32,10 +28,7 @@ namespace ModDataTools.Assets.Props
 
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
-            if (Audio)
-                writer.WriteProperty("audio", context.Planet.GetResourcePath(Audio));
-            else if (AudioType != AudioType.None)
-                writer.WriteProperty("audio", AudioType, false);
+            writer.WriteProperty("audio", Audio, context.Planet.GetResourcePath);
             if (Track != OuterWildsMixerTrackName.Environment)
                 writer.WriteProperty("track", Track);
             if (Volume != 0.5f)
@@ -48,8 +41,8 @@ namespace ModDataTools.Assets.Props
 
         public override IEnumerable<AssetResource> GetResources(PropContext context)
         {
-            if (Audio)
-                yield return new AudioResource(Audio, context.Planet);
+            foreach (var resource in Audio.GetResources(context.Planet.GetResourcePath))
+                yield return resource;
         }
     }
     [CreateAssetMenu(menuName = PROP_MENU_PREFIX + nameof(AudioSourcePropAsset))]

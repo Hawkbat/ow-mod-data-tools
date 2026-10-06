@@ -24,7 +24,7 @@ namespace ModDataTools.Assets.Props
         [Tooltip("The audio signal to use for the traveler while playing around the campfire (and also for their paired quantum instrument if another is not specified). The audio clip should be 16 measures at 92 BPM (approximately 42 seconds long).")] 
         public SignalPropData Signal;
         [Tooltip("The audio to use for the traveler during the finale of the campfire song. It should be 8 measures of the main loop at 92 BPM followed by 2 measures of fade-out (approximately 26 seconds long in total). Can be a path to a .wav/.ogg/.mp3 file, or taken from the AudioClip list.")] 
-        public AudioClip FinaleAudio;
+        public AudioConfig FinaleAudio;
         [Tooltip("The dialogue to use for this traveler. If omitted, the first CharacterDialogueTree in the object will be used.")] 
         public DialoguePropData Dialogue;
         [Tooltip("The name of the base game traveler to position this traveler after at the campfire, starting clockwise from Riebeck. Defaults to the end of the list (right before Riebeck).")] 
@@ -45,8 +45,7 @@ namespace ModDataTools.Assets.Props
             writer.WriteStartObject();
             Signal.WriteJsonProps(context, writer);
             writer.WriteEndObject();
-            if (FinaleAudio)
-                writer.WriteProperty("finaleAudio", context.Planet.GetResourcePath(FinaleAudio));
+            writer.WriteProperty("finaleAudio", FinaleAudio, context.Planet.GetResourcePath);
             writer.WritePropertyName("dialogue");
             writer.WriteStartObject();
             Dialogue.WriteJsonProps(context, writer);
@@ -78,8 +77,8 @@ namespace ModDataTools.Assets.Props
                 yield return resource;
             foreach (var resource in Dialogue.GetResources(context))
                 yield return resource;
-            if (FinaleAudio)
-                yield return new AudioResource(FinaleAudio, context.Planet);
+            foreach (var resource in FinaleAudio.GetResources(context.Planet.GetResourcePath))
+                yield return resource;
         }
 
         public enum TravelerName

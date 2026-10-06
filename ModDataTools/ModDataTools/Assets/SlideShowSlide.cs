@@ -17,20 +17,12 @@ namespace ModDataTools.Assets
         public SlideShowAsset SlideShow;
         [Tooltip("The image file for this slide.")]
         public Texture2D Image;
-        [Tooltip("The AudioClip that will continuously play while watching these slides")]
-        public AudioClip BackdropAudio;
-        [Tooltip("The AudioType that will continuously play while watching these slides, if not using a custom audio clip")]
-        [ConditionalField(nameof(BackdropAudio), (AudioClip)null)]
-        [EnumValuePicker]
-        public AudioType BackdropAudioType;
+        [Tooltip("The audio that will continuously play while watching these slides")]
+        public AudioConfig BackdropAudio;
         [Tooltip("The time to fade into the backdrop audio")]
         public float BackdropFadeTime;
-        [Tooltip("The AudioClip for a one-shot sound when opening the slide.")]
-        public AudioClip BeatAudio;
-        [Tooltip("The AudioType for a one-shot sound when opening the slide, if not using a custom audio clip")]
-        [ConditionalField(nameof(BeatAudio), (AudioClip)null)]
-        [EnumValuePicker]
-        public AudioType BeatAudioType;
+        [Tooltip("The audio for a one-shot sound when opening the slide.")]
+        public AudioConfig BeatAudio;
         [Tooltip("The time delay until the one-shot audio")]
         public float BeatDelay;
         [Tooltip("Ambient light intensity when viewing this slide.")]
@@ -52,6 +44,8 @@ namespace ModDataTools.Assets
         [Tooltip("Exclusive to slide reels. Whether this slide should rotate the reel item while inside a projector.")]
         public bool Rotate = true;
 
+        public string GetResourcePath(UnityEngine.Object resource) => $"slides/{SlideShow.Planet.StarSystem.FullID}/{SlideShow.Planet.FullID}/{AssetRepository.GetAssetFileName(resource)}";
+
         public override IEnumerable<DataAsset> GetParentAssets()
         {
             if (SlideShow) yield return SlideShow;
@@ -69,23 +63,17 @@ namespace ModDataTools.Assets
             }
             if (SpotIntensityMod != 0f)
                 writer.WriteProperty("spotIntensityMod", SpotIntensityMod);
-            if (BackdropAudio)
-                writer.WriteProperty("backdropAudio", $"slides/{SlideShow.Planet.StarSystem.FullID}/{SlideShow.Planet.FullID}/{AssetRepository.GetAssetFileName(BackdropAudio)}");
-            else if (BackdropAudioType != AudioType.None)
-                writer.WriteProperty("backdropAudio", BackdropAudioType, false);
-            if (BackdropFadeTime != 0f && (BackdropAudio || BackdropAudioType != AudioType.None))
+            writer.WriteProperty("backdropAudio", BackdropAudio, GetResourcePath);
+            if (BackdropFadeTime != 0f && BackdropAudio.HasValue)
                 writer.WriteProperty("backdropFadeTime", BackdropFadeTime);
-            if (BeatAudio)
-                writer.WriteProperty("beatAudio", $"slides/{SlideShow.Planet.StarSystem.FullID}/{SlideShow.Planet.FullID}/{AssetRepository.GetAssetFileName(BeatAudio)}");
-            else if (BeatAudioType != AudioType.None)
-                writer.WriteProperty("beatAudio", BeatAudioType, false);
-            if (BeatDelay != 0f && (BeatAudio || BeatAudioType != AudioType.None))
+            writer.WriteProperty("beatAudio", BeatAudio, GetResourcePath);
+            if (BeatDelay != 0f && BeatAudio.HasValue)
                 writer.WriteProperty("beatDelay", BeatDelay);
             if (BlackFrameDuration != 0f)
                 writer.WriteProperty("blackFrameDuration", BlackFrameDuration);
             if (PlayTimeDuration != 0f)
                 writer.WriteProperty("playTimeDuration", PlayTimeDuration);
-            writer.WriteProperty("imagePath", $"slides/{SlideShow.Planet.StarSystem.FullID}/{SlideShow.Planet.FullID}/{AssetRepository.GetAssetFileName(Image)}");
+            writer.WriteProperty("imagePath", GetResourcePath(Image));
             if (RevealFact)
                 writer.WriteProperty("reveal", RevealFact.FullID);
             if (!Rotate)
@@ -96,11 +84,11 @@ namespace ModDataTools.Assets
         public override IEnumerable<AssetResource> GetResources()
         {
             if (Image)
-                yield return new ImageResource(Image, $"slides/{SlideShow.Planet.StarSystem.FullID}/{SlideShow.Planet.FullID}/{AssetRepository.GetAssetFileName(Image)}");
-            if (BackdropAudio)
-                yield return new AudioResource(BackdropAudio, $"slides/{SlideShow.Planet.StarSystem.FullID}/{SlideShow.Planet.FullID}/{AssetRepository.GetAssetFileName(BackdropAudio)}");
-            if (BeatAudio)
-                yield return new AudioResource(BeatAudio, $"slides/{SlideShow.Planet.StarSystem.FullID}/{SlideShow.Planet.FullID}/{AssetRepository.GetAssetFileName(BeatAudio)}");
+                yield return new ImageResource(Image, GetResourcePath(Image));
+            foreach (var resource in BackdropAudio.GetResources(GetResourcePath))
+                yield return resource;
+            foreach (var resource in BeatAudio.GetResources(GetResourcePath))
+                yield return resource;
         }
     }
 }

@@ -23,11 +23,7 @@ namespace ModDataTools.Assets
         public CreditsType Type;
         [Tooltip("The audio to use for the credits music. Credits will be silent unless this is specified.")]
         [ConditionalField(nameof(Type), CreditsType.Custom)]
-        public AudioClip Audio;
-        [Tooltip("The audio to use for the credits music, if not using a custom audio clip.")]
-        [ConditionalField(nameof(Type), CreditsType.Custom)]
-        [EnumValuePicker]
-        public AudioType AudioType;
+        public AudioConfig Audio;
         [Tooltip("The volume of the credits music.")]
         [ConditionalField(nameof(Type), CreditsType.Custom)]
         public float AudioVolume = 1f;
@@ -38,7 +34,7 @@ namespace ModDataTools.Assets
         [ConditionalField(nameof(Type), CreditsType.Custom)]
         public float Length = 120f;
 
-        public void ToJson(JsonTextWriter writer, string textKey, string audioPath)
+        public void ToJson(JsonTextWriter writer, string textKey, Func<UnityEngine.Object, string> getAudioPath)
         {
             writer.WriteStartObject();
             if (!string.IsNullOrEmpty(Text))
@@ -50,10 +46,7 @@ namespace ModDataTools.Assets
                 writer.WriteProperty("creditsType", Type);
             if (Type == CreditsType.Custom)
             {
-                if (Audio)
-                    writer.WriteProperty("audio", audioPath);
-                else if (AudioType != AudioType.None)
-                    writer.WriteProperty("audio", AudioType, false);
+                writer.WriteProperty("audio", Audio, getAudioPath);
                 if (AudioVolume != 1f)
                     writer.WriteProperty("audioVolume", AudioVolume);
                 if (AudioLooping)
@@ -76,10 +69,11 @@ namespace ModDataTools.Assets
                 validator.Error(asset, $"Game over condition '{Condition.FullID}' must not be persistent.");
         }
 
-        public IEnumerable<AssetResource> GetResources(string audioPath)
+        public IEnumerable<AssetResource> GetResources(Func<UnityEngine.Object, string> getAudioPath)
         {
-            if (Type == CreditsType.Custom && Audio)
-                yield return new AudioResource(Audio, audioPath);
+            if (Type == CreditsType.Custom)
+                foreach (var resource in Audio.GetResources(getAudioPath))
+                    yield return resource;
         }
 
         public enum CreditsType

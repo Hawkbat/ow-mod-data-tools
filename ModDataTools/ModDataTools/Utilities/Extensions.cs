@@ -160,6 +160,13 @@ namespace ModDataTools.Utilities
             if (!value.HasValue) return;
             writer.WriteProperty(name, value.Value);
         }
+        public static void WriteProperty(this JsonTextWriter writer, string name, AudioConfig audio, Func<UnityEngine.Object, string> getClipPath)
+        {
+            if (audio.Clip)
+                writer.WriteProperty(name, getClipPath(audio.Clip));
+            else if (audio.Type != AudioType.None)
+                writer.WriteProperty(name, audio.Type, false);
+        }
         public static void WriteProperty(this JsonTextWriter writer, string name, NullishBool value)
         {
             if (!value.HasValue) return;

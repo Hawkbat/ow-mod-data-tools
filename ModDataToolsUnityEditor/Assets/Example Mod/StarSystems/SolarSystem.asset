@@ -40,8 +40,9 @@ MonoBehaviour:
       Back: {fileID: 0}
     StartHere: 0
     RespawnHere: 0
-    TravelAudio: {fileID: 0}
-    TravelAudioType: 0
+    TravelAudio:
+      Clip: {fileID: 0}
+      Type: 0
     Vessel:
       VesselPosition:
         hasValue: 0

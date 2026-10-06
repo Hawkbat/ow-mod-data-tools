@@ -78,8 +78,9 @@ MonoBehaviour:
     Radius: 0
     Layer: 0
     Priority: 1
-    Audio: {fileID: 0}
-    AudioType: 0
+    Audio:
+      Clip: {fileID: 0}
+      Type: 0
     ClipSelection: 0
     Track: 4
     Volume: 1

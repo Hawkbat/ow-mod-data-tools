@@ -15,12 +15,8 @@ namespace ModDataTools.Assets.Props
     [Serializable]
     public class SignalPropData : GeneralPointPropData
     {
-        [Tooltip("The AudioClip to use")]
-        public AudioClip Audio;
-        [Tooltip("The AudioType to use, if not using a custom audio clip")]
-        [ConditionalField(nameof(Audio), (AudioClip)null)]
-        [EnumValuePicker]
-        public AudioType AudioType;
+        [Tooltip("The audio to use")]
+        public AudioConfig Audio;
         [Tooltip("The custom frequency of the signal.")]
         public FrequencyAsset Frequency;
         [Tooltip("The frequency of the signal, if not using a custom value.")]
@@ -48,10 +44,7 @@ namespace ModDataTools.Assets.Props
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
             writer.WriteProperty("name", context.GetProp().PropID);
-            if (Audio)
-                writer.WriteProperty("audio", context.Planet.GetResourcePath(Audio));
-            else if (AudioType != AudioType.None)
-                writer.WriteProperty("audio", AudioType, false);
+            writer.WriteProperty("audio", Audio, context.Planet.GetResourcePath);
             writer.WriteProperty("detectionRadius", DetectionRadius);
             if (Frequency)
                 writer.WriteProperty("frequency", Frequency.FullID);
@@ -82,8 +75,8 @@ namespace ModDataTools.Assets.Props
 
         public override IEnumerable<AssetResource> GetResources(PropContext context)
         {
-            if (Audio)
-                yield return new AudioResource(Audio, context.Planet);
+            foreach (var resource in Audio.GetResources(context.Planet.GetResourcePath))
+                yield return resource;
         }
     }
 

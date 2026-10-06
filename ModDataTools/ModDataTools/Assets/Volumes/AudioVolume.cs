@@ -14,14 +14,10 @@ namespace ModDataTools.Assets.Volumes
     [Serializable]
     public class AudioVolumeData : GeneralPriorityVolumeData
     {
-        [Tooltip("The AudioClip to use")]
-        public AudioClip Audio;
-        [Tooltip("The AudioType to use, if not using a custom audio clip")]
-        [ConditionalField(nameof(Audio), (AudioClip)null)]
-        [EnumValuePicker]
-        public AudioType AudioType;
+        [Tooltip("The audio to use")]
+        public AudioConfig Audio;
         [Tooltip("Which sound clip to pick, if multiple are available for this AudioType")]
-        [ConditionalField(nameof(Audio), (AudioClip)null)]
+        [ConditionalField(nameof(Audio) + "." + nameof(AudioConfig.Clip), (AudioClip)null)]
         public ClipSelectionType ClipSelection;
         [Tooltip("The audio track of this audio volume")]
         public OuterWildsMixerTrackName Track = OuterWildsMixerTrackName.Environment;
@@ -42,10 +38,7 @@ namespace ModDataTools.Assets.Volumes
         public override void WriteJsonProps(PropContext context, JsonTextWriter writer)
         {
             base.WriteJsonProps(context, writer);
-            if (Audio)
-                writer.WriteProperty("audio", context.Planet.GetResourcePath(Audio));
-            else if (AudioType != AudioType.None)
-                writer.WriteProperty("audio", AudioType, false);
+            writer.WriteProperty("audio", Audio, context.Planet.GetResourcePath);
             if (ClipSelection != ClipSelectionType.Random)
                 writer.WriteProperty("clipSelection", ClipSelection);
             if (Track != OuterWildsMixerTrackName.Environment)
@@ -66,8 +59,8 @@ namespace ModDataTools.Assets.Volumes
 
         public override IEnumerable<AssetResource> GetResources(PropContext context)
         {
-            if (Audio)
-                yield return new AudioResource(Audio, context.Planet);
+            foreach (var resource in Audio.GetResources(context.Planet.GetResourcePath))
+                yield return resource;
         }
 
         public enum ClipSelectionType

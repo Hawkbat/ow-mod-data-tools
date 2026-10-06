@@ -49,22 +49,14 @@ namespace ModDataTools.Assets
         [Tooltip("Customize the skybox for this title screen")]
         public StarSystemAsset.SkyboxConfig Skybox;
         [Tooltip("The music audio that will play on the title screen.")]
-        public AudioClip Music;
-        [Tooltip("The music audio that will play on the title screen, if not using a custom audio clip.")]
-        [ConditionalField(nameof(Music), (AudioClip)null)]
-        [EnumValuePicker]
-        public AudioType MusicType;
+        public AudioConfig Music;
         [Tooltip("How long (in seconds) it should take for the music to fade in from 0 to the configured volume. 0 disables fade-in and music will be at full volume immediately. Vanilla is 8.")]
         public float MusicFadeInTime = 8f;
         [Tooltip("Volume multiplier for the music (0.0 - 1.0). Vanilla is 0.1.")]
         [Range(0f, 1f)]
         public float MusicVolume = 0.1f;
         [Tooltip("The ambience audio that will play on the title screen.")]
-        public AudioClip Ambience;
-        [Tooltip("The ambience audio that will play on the title screen, if not using a custom audio clip.")]
-        [ConditionalField(nameof(Ambience), (AudioClip)null)]
-        [EnumValuePicker]
-        public AudioType AmbienceType;
+        public AudioConfig Ambience;
         [Tooltip("Volume multiplier for the ambience (0.0 - 1.0). Vanilla is 0.7.")]
         [Range(0f, 1f)]
         public float AmbienceVolume = 0.7f;
@@ -118,18 +110,12 @@ namespace ModDataTools.Assets
                 }
                 writer.WriteEndObject();
             }
-            if (Music)
-                writer.WriteProperty("music", GetResourcePath(Music));
-            else if (MusicType != AudioType.None)
-                writer.WriteProperty("music", MusicType, false);
+            writer.WriteProperty("music", Music, GetResourcePath);
             if (MusicFadeInTime != 8f)
                 writer.WriteProperty("musicFadeInTime", MusicFadeInTime);
             if (MusicVolume != 0.1f)
                 writer.WriteProperty("musicVolume", MusicVolume);
-            if (Ambience)
-                writer.WriteProperty("ambience", GetResourcePath(Ambience));
-            else if (AmbienceType != AudioType.None)
-                writer.WriteProperty("ambience", AmbienceType, false);
+            writer.WriteProperty("ambience", Ambience, GetResourcePath);
             if (AmbienceVolume != 0.7f)
                 writer.WriteProperty("ambienceVolume", AmbienceVolume);
             if (Background.RotationSpeed != 1f || Background.RemoveChildren.Any() || Background.Details.Any())
@@ -171,10 +157,10 @@ namespace ModDataTools.Assets
                     if (texture)
                         yield return new ImageResource(texture, GetResourcePath(texture));
             }
-            if (Music)
-                yield return new AudioResource(Music, GetResourcePath(Music));
-            if (Ambience)
-                yield return new AudioResource(Ambience, GetResourcePath(Ambience));
+            foreach (var resource in Music.GetResources(GetResourcePath))
+                yield return resource;
+            foreach (var resource in Ambience.GetResources(GetResourcePath))
+                yield return resource;
             foreach (var detail in Background.Details.Concat(MenuPlanet.Details).Where(d => d.Prefab))
                 yield return new PrefabResource(detail.Prefab, string.Empty);
         }

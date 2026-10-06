@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using ModDataTools.Assets;
 using ModDataTools.Utilities;
 using System.Reflection;
 
@@ -20,6 +21,11 @@ namespace ModDataTools.Editor
                 if (baseDrawer == null || !(baseDrawer is NullishDrawer)) baseDrawer = new NullishDrawer();
                 return baseDrawer.GetPropertyHeight(property, label);
             }
+            if (property.type == nameof(AudioConfig))
+            {
+                if (baseDrawer == null || !(baseDrawer is AudioConfigDrawer)) baseDrawer = new AudioConfigDrawer();
+                return baseDrawer.GetPropertyHeight(property, label);
+            }
             return EditorGUI.GetPropertyHeight(property, label, true);
         }
 
@@ -34,6 +40,10 @@ namespace ModDataTools.Editor
             } else if (property.type.StartsWith("Nullish"))
             {
                 if (baseDrawer == null || !(baseDrawer is NullishDrawer)) baseDrawer = new NullishDrawer();
+                baseDrawer.OnGUI(position, property, label);
+            } else if (property.type == nameof(AudioConfig))
+            {
+                if (baseDrawer == null || !(baseDrawer is AudioConfigDrawer)) baseDrawer = new AudioConfigDrawer();
                 baseDrawer.OnGUI(position, property, label);
             } else
             {

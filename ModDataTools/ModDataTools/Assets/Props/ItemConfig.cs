@@ -38,29 +38,13 @@ namespace ModDataTools.Assets.Props
         [Tooltip("A relative offset to apply to the item's rotation when placing it into a socket.")]
         public NullishVector3 SocketRotation;
         [Tooltip("The audio to play when this item is picked up. Only applies to custom/non-vanilla item types. Defaults to ToolItemWarpCorePickUp.")]
-        public AudioClip PickupAudio;
-        [Tooltip("The audio to play when this item is picked up, if not using a custom audio clip.")]
-        [ConditionalField(nameof(PickupAudio), (AudioClip)null)]
-        [EnumValuePicker]
-        public AudioType PickupAudioType;
+        public AudioConfig PickupAudio;
         [Tooltip("The audio to play when this item is dropped. Only applies to custom/non-vanilla item types. Defaults to ToolItemWarpCoreDrop.")]
-        public AudioClip DropAudio;
-        [Tooltip("The audio to play when this item is dropped, if not using a custom audio clip.")]
-        [ConditionalField(nameof(DropAudio), (AudioClip)null)]
-        [EnumValuePicker]
-        public AudioType DropAudioType;
+        public AudioConfig DropAudio;
         [Tooltip("The audio to play when this item is inserted into a socket. Only applies to custom/non-vanilla item types. Defaults to the pickup audio.")]
-        public AudioClip SocketAudio;
-        [Tooltip("The audio to play when this item is inserted into a socket, if not using a custom audio clip.")]
-        [ConditionalField(nameof(SocketAudio), (AudioClip)null)]
-        [EnumValuePicker]
-        public AudioType SocketAudioType;
+        public AudioConfig SocketAudio;
         [Tooltip("The audio to play when this item is removed from a socket. Only applies to custom/non-vanilla item types. Defaults to the drop audio.")]
-        public AudioClip UnsocketAudio;
-        [Tooltip("The audio to play when this item is removed from a socket, if not using a custom audio clip.")]
-        [ConditionalField(nameof(UnsocketAudio), (AudioClip)null)]
-        [EnumValuePicker]
-        public AudioType UnsocketAudioType;
+        public AudioConfig UnsocketAudio;
         [Tooltip("A dialogue condition to set when picking up this item.")]
         public ConditionAsset PickupCondition;
         [Tooltip("Whether the pickup condition should be cleared when dropping the item.")]
@@ -98,10 +82,10 @@ namespace ModDataTools.Assets.Props
             writer.WriteProperty("holdRotation", HoldRotation);
             writer.WriteProperty("socketOffset", SocketOffset);
             writer.WriteProperty("socketRotation", SocketRotation);
-            WriteAudio(context, writer, "pickupAudio", PickupAudio, PickupAudioType);
-            WriteAudio(context, writer, "dropAudio", DropAudio, DropAudioType);
-            WriteAudio(context, writer, "socketAudio", SocketAudio, SocketAudioType);
-            WriteAudio(context, writer, "unsocketAudio", UnsocketAudio, UnsocketAudioType);
+            writer.WriteProperty("pickupAudio", PickupAudio, context.Planet.GetResourcePath);
+            writer.WriteProperty("dropAudio", DropAudio, context.Planet.GetResourcePath);
+            writer.WriteProperty("socketAudio", SocketAudio, context.Planet.GetResourcePath);
+            writer.WriteProperty("unsocketAudio", UnsocketAudio, context.Planet.GetResourcePath);
             if (PickupCondition)
             {
                 writer.WriteProperty("pickupCondition", PickupCondition.FullID);
@@ -118,14 +102,6 @@ namespace ModDataTools.Assets.Props
                     writer.WriteProperty("pathToInitialSocket", socketPath);
             }
             writer.WriteEndObject();
-        }
-
-        void WriteAudio(PropContext context, JsonTextWriter writer, string name, AudioClip clip, AudioType type)
-        {
-            if (clip)
-                writer.WriteProperty(name, context.Planet.GetResourcePath(clip));
-            else if (type != AudioType.None)
-                writer.WriteProperty(name, type, false);
         }
 
         public void Localize(PropContext context, Localization l10n)
@@ -151,14 +127,14 @@ namespace ModDataTools.Assets.Props
 
         public IEnumerable<AssetResource> GetResources(PropContext context)
         {
-            if (PickupAudio)
-                yield return new AudioResource(PickupAudio, context.Planet);
-            if (DropAudio)
-                yield return new AudioResource(DropAudio, context.Planet);
-            if (SocketAudio)
-                yield return new AudioResource(SocketAudio, context.Planet);
-            if (UnsocketAudio)
-                yield return new AudioResource(UnsocketAudio, context.Planet);
+            foreach (var resource in PickupAudio.GetResources(context.Planet.GetResourcePath))
+                yield return resource;
+            foreach (var resource in DropAudio.GetResources(context.Planet.GetResourcePath))
+                yield return resource;
+            foreach (var resource in SocketAudio.GetResources(context.Planet.GetResourcePath))
+                yield return resource;
+            foreach (var resource in UnsocketAudio.GetResources(context.Planet.GetResourcePath))
+                yield return resource;
         }
     }
 

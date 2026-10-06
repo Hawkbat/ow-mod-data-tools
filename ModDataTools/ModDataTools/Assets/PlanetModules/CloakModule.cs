@@ -20,12 +20,8 @@ namespace ModDataTools.Assets.PlanetModules
         public NullishSingle FarCloakRadius;
         [Tooltip("Not sure what this is. For the Stranger it is 2000. Optional (will default to be proportional to the cloak radius).")]
         public NullishSingle CloakScaleDistance;
-        [Tooltip("The AudioClip that will play when entering the cloaking field.")]
-        public AudioClip Audio;
-        [Tooltip("The AudioType that will play when entering the cloaking field, if not using a custom audio clip.")]
-        [ConditionalField(nameof(Audio), (AudioClip)null)]
-        [EnumValuePicker]
-        public AudioType AudioType;
+        [Tooltip("The audio that will play when entering the cloaking field.")]
+        public AudioConfig Audio;
 
         public override void WriteJsonProps(PlanetAsset planet, JsonTextWriter writer)
         {
@@ -34,16 +30,13 @@ namespace ModDataTools.Assets.PlanetModules
             writer.WriteProperty("innerCloakRadius", InnerCloakRadius);
             writer.WriteProperty("nearCloakRadius", NearCloakRadius);
             writer.WriteProperty("farCloakRadius", FarCloakRadius);
-            if (Audio)
-                writer.WriteProperty("audio", planet.GetResourcePath(Audio));
-            else if (AudioType != AudioType.None)
-                writer.WriteProperty("audio", AudioType, false);
+            writer.WriteProperty("audio", Audio, planet.GetResourcePath);
         }
 
         public override IEnumerable<AssetResource> GetResources(PlanetAsset planet)
         {
-            if (Audio)
-                yield return new AudioResource(Audio, planet);
+            foreach (var resource in Audio.GetResources(planet.GetResourcePath))
+                yield return resource;
         }
     }
 }

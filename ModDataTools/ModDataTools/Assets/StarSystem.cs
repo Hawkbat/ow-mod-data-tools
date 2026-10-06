@@ -110,34 +110,13 @@ namespace ModDataTools.Assets
             {
                 writer.WritePropertyName("GlobalMusic");
                 writer.WriteStartObject();
-                if (nh.GlobalMusic.TravelAudio)
-                    writer.WriteProperty("travelAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.TravelAudio)}");
-                else if (nh.GlobalMusic.TravelAudioType != AudioType.None)
-                    writer.WriteProperty("travelAudio", nh.GlobalMusic.TravelAudioType, false);
-                if (nh.GlobalMusic.EndTimesAudio)
-                    writer.WriteProperty("endTimesAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.EndTimesAudio)}");
-                else if (nh.GlobalMusic.EndTimesAudioType != AudioType.None)
-                    writer.WriteProperty("endTimesAudio", nh.GlobalMusic.EndTimesAudioType, false);
-                if (nh.GlobalMusic.EndTimesDreamAudio)
-                    writer.WriteProperty("endTimesDreamAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.EndTimesDreamAudio)}");
-                else if (nh.GlobalMusic.EndTimesDreamAudioType != AudioType.None)
-                    writer.WriteProperty("endTimesDreamAudio", nh.GlobalMusic.EndTimesDreamAudioType, false);
-                if (nh.GlobalMusic.BrambleDimensionAudio)
-                    writer.WriteProperty("brambleDimensionAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.BrambleDimensionAudio)}");
-                else if (nh.GlobalMusic.BrambleDimensionAudioType != AudioType.None)
-                    writer.WriteProperty("brambleDimensionAudio", nh.GlobalMusic.BrambleDimensionAudioType, false);
-                if (nh.GlobalMusic.FinalEndTimesIntroAudio)
-                    writer.WriteProperty("finalEndTimesIntroAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.FinalEndTimesIntroAudio)}");
-                else if (nh.GlobalMusic.FinalEndTimesIntroAudioType != AudioType.None)
-                    writer.WriteProperty("finalEndTimesIntroAudio", nh.GlobalMusic.FinalEndTimesIntroAudioType, false);
-                if (nh.GlobalMusic.FinalEndTimesLoopAudio)
-                    writer.WriteProperty("finalEndTimesLoopAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.FinalEndTimesLoopAudio)}");
-                else if (nh.GlobalMusic.FinalEndTimesLoopAudioType != AudioType.None)
-                    writer.WriteProperty("finalEndTimesLoopAudio", nh.GlobalMusic.FinalEndTimesLoopAudioType, false);
-                if (nh.GlobalMusic.FinalEndTimesBrambleAudio)
-                    writer.WriteProperty("finalEndTimesBrambleDimensionAudio", $"systems/{FullID}/{AssetRepository.GetAssetFileName(nh.GlobalMusic.FinalEndTimesBrambleAudio)}");
-                else if (nh.GlobalMusic.FinalEndTimesBrambleAudioType != AudioType.None)
-                    writer.WriteProperty("finalEndTimesBrambleDimensionAudio", nh.GlobalMusic.FinalEndTimesBrambleAudioType, false);
+                writer.WriteProperty("travelAudio", nh.GlobalMusic.TravelAudio, GetResourcePath);
+                writer.WriteProperty("endTimesAudio", nh.GlobalMusic.EndTimesAudio, GetResourcePath);
+                writer.WriteProperty("endTimesDreamAudio", nh.GlobalMusic.EndTimesDreamAudio, GetResourcePath);
+                writer.WriteProperty("brambleDimensionAudio", nh.GlobalMusic.BrambleDimensionAudio, GetResourcePath);
+                writer.WriteProperty("finalEndTimesIntroAudio", nh.GlobalMusic.FinalEndTimesIntroAudio, GetResourcePath);
+                writer.WriteProperty("finalEndTimesLoopAudio", nh.GlobalMusic.FinalEndTimesLoopAudio, GetResourcePath);
+                writer.WriteProperty("finalEndTimesBrambleDimensionAudio", nh.GlobalMusic.FinalEndTimesBrambleAudio, GetResourcePath);
                 writer.WriteEndObject();
             }
             if (nh.ConditionalChecks.Any())
@@ -290,20 +269,20 @@ namespace ModDataTools.Assets
                 yield return new ImageResource(NewHorizons.StarChart.StarTexture, this);
             if (NewHorizons.GlobalMusic.HasCustomAudio)
             {
-                if (NewHorizons.GlobalMusic.TravelAudio)
-                    yield return new AudioResource(NewHorizons.GlobalMusic.TravelAudio, this);
-                if (NewHorizons.GlobalMusic.EndTimesAudio)
-                    yield return new AudioResource(NewHorizons.GlobalMusic.EndTimesAudio, this);
-                if (NewHorizons.GlobalMusic.EndTimesDreamAudio)
-                    yield return new AudioResource(NewHorizons.GlobalMusic.EndTimesDreamAudio, this);
-                if (NewHorizons.GlobalMusic.BrambleDimensionAudio)
-                    yield return new AudioResource(NewHorizons.GlobalMusic.BrambleDimensionAudio, this);
-                if (NewHorizons.GlobalMusic.FinalEndTimesIntroAudio)
-                    yield return new AudioResource(NewHorizons.GlobalMusic.FinalEndTimesIntroAudio, this);
-                if (NewHorizons.GlobalMusic.FinalEndTimesLoopAudio)
-                    yield return new AudioResource(NewHorizons.GlobalMusic.FinalEndTimesLoopAudio, this);
-                if (NewHorizons.GlobalMusic.FinalEndTimesBrambleAudio)
-                    yield return new AudioResource(NewHorizons.GlobalMusic.FinalEndTimesBrambleAudio, this);
+                foreach (var resource in NewHorizons.GlobalMusic.TravelAudio.GetResources(GetResourcePath))
+                    yield return resource;
+                foreach (var resource in NewHorizons.GlobalMusic.EndTimesAudio.GetResources(GetResourcePath))
+                    yield return resource;
+                foreach (var resource in NewHorizons.GlobalMusic.EndTimesDreamAudio.GetResources(GetResourcePath))
+                    yield return resource;
+                foreach (var resource in NewHorizons.GlobalMusic.BrambleDimensionAudio.GetResources(GetResourcePath))
+                    yield return resource;
+                foreach (var resource in NewHorizons.GlobalMusic.FinalEndTimesIntroAudio.GetResources(GetResourcePath))
+                    yield return resource;
+                foreach (var resource in NewHorizons.GlobalMusic.FinalEndTimesLoopAudio.GetResources(GetResourcePath))
+                    yield return resource;
+                foreach (var resource in NewHorizons.GlobalMusic.FinalEndTimesBrambleAudio.GetResources(GetResourcePath))
+                    yield return resource;
             }
         }
 
@@ -401,56 +380,23 @@ namespace ModDataTools.Assets
         public class GlobalMusicConfig
         {
             [Tooltip("The audio that will play when travelling in space.")]
-            public AudioClip TravelAudio;
-            [Tooltip("The audio that will play when travelling in space, if not using a custom audio clip")]
-            [ConditionalField(nameof(TravelAudio), (AudioClip)null)]
-            [EnumValuePicker]
-            public AudioType TravelAudioType;
+            public AudioConfig TravelAudio;
             [Tooltip("The audio that will play right before the loop ends.")]
-            public AudioClip EndTimesAudio;
-            [Tooltip("The audio that will play right before the loop ends, if not using a custom audio clip")]
-            [ConditionalField(nameof(EndTimesAudio), (AudioClip)null)]
-            [EnumValuePicker]
-            public AudioType EndTimesAudioType;
+            public AudioConfig EndTimesAudio;
             [Tooltip("The audio that will play right before the loop ends while inside the dreamworld.")]
-            public AudioClip EndTimesDreamAudio;
-            [Tooltip("The audio that will play right before the loop ends while inside the dreamworld, if not using a custom audio clip")]
-            [ConditionalField(nameof(EndTimesDreamAudio), (AudioClip)null)]
-            [EnumValuePicker]
-            public AudioType EndTimesDreamAudioType;
+            public AudioConfig EndTimesDreamAudio;
             [Tooltip("The audio that will play when travelling through a bramble dimension.")]
-            public AudioClip BrambleDimensionAudio;
-            [Tooltip("The audio that will play when travelling through a bramble dimension, if not using a custom audio clip")]
-            [ConditionalField(nameof(BrambleDimensionAudio), (AudioClip)null)]
-            [EnumValuePicker]
-            public AudioType BrambleDimensionAudioType;
+            public AudioConfig BrambleDimensionAudio;
             [Tooltip("The audio that will play when you leave the ash twin project after taking out the advanced warp core.")]
-            public AudioClip FinalEndTimesIntroAudio;
-            [Tooltip("The audio that will play when you leave the ash twin project after taking out the advanced warp core, if not using a custom audio clip")]
-            [ConditionalField(nameof(FinalEndTimesIntroAudio), (AudioClip)null)]
-            [EnumValuePicker]
-            public AudioType FinalEndTimesIntroAudioType;
+            public AudioConfig FinalEndTimesIntroAudio;
             [Tooltip("The audio that will loop after the final end times intro.")]
-            public AudioClip FinalEndTimesLoopAudio;
-            [Tooltip("The audio that will loop after the final end times intro, if not using a custom audio clip")]
-            [ConditionalField(nameof(FinalEndTimesLoopAudio), (AudioClip)null)]
-            [EnumValuePicker]
-            public AudioType FinalEndTimesLoopAudioType;
+            public AudioConfig FinalEndTimesLoopAudio;
             [Tooltip("The audio that will loop after the final end times intro while inside a bramble dimension.")]
-            public AudioClip FinalEndTimesBrambleAudio;
-            [Tooltip("The audio that will loop after the final end times intro while inside a bramble dimension, if not using a custom audio clip")]
-            [ConditionalField(nameof(FinalEndTimesBrambleAudio), (AudioClip)null)]
-            [EnumValuePicker]
-            public AudioType FinalEndTimesBrambleAudioType;
+            public AudioConfig FinalEndTimesBrambleAudio;
 
             public bool HasCustomAudio =>
-                TravelAudio || TravelAudioType != AudioType.None
-                || EndTimesAudio || EndTimesAudioType != AudioType.None
-                || EndTimesDreamAudio || EndTimesDreamAudioType != AudioType.None
-                || BrambleDimensionAudio || BrambleDimensionAudioType != AudioType.None
-                || FinalEndTimesIntroAudio || FinalEndTimesIntroAudioType != AudioType.None
-                || FinalEndTimesLoopAudio || FinalEndTimesLoopAudioType != AudioType.None
-                || FinalEndTimesBrambleAudio || FinalEndTimesBrambleAudioType != AudioType.None;
+                TravelAudio.HasValue || EndTimesAudio.HasValue || EndTimesDreamAudio.HasValue || BrambleDimensionAudio.HasValue
+                || FinalEndTimesIntroAudio.HasValue || FinalEndTimesLoopAudio.HasValue || FinalEndTimesBrambleAudio.HasValue;
         }
 
         [Serializable]
